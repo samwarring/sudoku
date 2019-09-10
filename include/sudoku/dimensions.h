@@ -40,6 +40,10 @@ namespace sudoku
      * This return a vector of 4 groups. The first group (0) contains {0, 1, 4, 5}; the next
      * group (1) contains {2, 3, 6, 7}; etc.
      * 
+     * \todo
+     * -# Specify behavior when non-integers are parsed
+     * -# Specify behavior when group numbers are skipped (e.g. "0 1 2 99")
+     * -# Include ability to 'ignore' positions so they don't belong to any group
      */
     std::vector<std::vector<size_t>> computeGroupsFromMap(const std::string& groupMap);
 
@@ -89,6 +93,8 @@ namespace sudoku
              *       as a 1-dimensional list - each with a unique position. The topography of related cells
              *       are encoded in the `cellGroups` parameter. To specify that a sudoku is rendered as a 
              *       2-dimensional grid, see the \ref Formatter class.
+             * 
+             * \todo Input validation
              */
             Dimensions(size_t cellCount, size_t maxCellValue, std::vector<std::vector<size_t>> cellGroups)
                 : cellCount_(cellCount)

@@ -4,34 +4,24 @@
 #include <vector>
 #include <sudoku/dimensions.h>
 
-/**
- * \file standard.h
- * 
- * This file defines specializations of \ref sudoku classes which aid in solving
- * standard 9x9 sudokus.
- */
 
 namespace sudoku
 {
     /**
-     * Number of cells in a standard 9x9 sudoku
+     * This namespace defines specializations of \ref sudoku classes which
+     * are specific to solving standard 9x9 sudokus.
      */
-    const size_t STANDARD_CELL_COUNT = 81;
-    
-    /**
-     * Maximum cell value for a 9x9 sudoku.
-     */
-    const size_t STANDARD_MAX_CELL_VALUE = 9;
+    namespace standard
+    {
+        class Dimensions : public sudoku::Dimensions
+        {
+            public:
 
-    /**
-     * Cell groups for a 9x9 sudoku.
-     */
-    extern const std::vector<std::vector<size_t>> STANDARD_GROUPS;
+                Dimensions() : sudoku::Dimensions(81, 9, computeStandardGroups()) {}
 
-    /**
-     * Dimensions for solving 9x9 sudokus.
-     */
-    extern const Dimensions STANDARD_DIMENSIONS;
+                static std::vector<std::vector<size_t>> computeStandardGroups();
+        };
+    }
 }
 
 #endif
