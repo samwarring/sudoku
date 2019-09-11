@@ -5,6 +5,13 @@ add_executable(
     sudoku_test
     sudoku_test.cpp
     dimensions_test.cpp
+    groups_test.cpp
+)
+
+message(STATUS "${CMAKE_CURRENT_SOURCE_DIR}")
+target_include_directories(
+    sudoku_test
+    PRIVATE ${CMAKE_CURRENT_SOUCE_DIR}
 )
 
 target_link_libraries(

@@ -1,5 +1,6 @@
 #include <sudoku/standard.h>
 #include <sudoku/dimensions.h>
+#include <sudoku/groups.h>
 
 namespace sudoku
 {

@@ -2,6 +2,7 @@ add_library(
     sudoku
     dimensions.cpp
     standard.cpp
+    groups.cpp
 )
 
 target_include_directories(

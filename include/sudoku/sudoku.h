@@ -10,5 +10,6 @@
 
 #include <sudoku/dimensions.h>
 #include <sudoku/standard.h>
+#include <sudoku/groups.h>
 
 #endif
