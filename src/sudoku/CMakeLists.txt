@@ -3,6 +3,7 @@ add_library(
     dimensions.cpp
     standard.cpp
     groups.cpp
+    potential.cpp
 )
 
 target_include_directories(

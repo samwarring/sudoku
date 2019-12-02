@@ -6,6 +6,7 @@ add_executable(
     sudoku_test.cpp
     dimensions_test.cpp
     groups_test.cpp
+    potential_test.cpp
 )
 
 target_include_directories(
