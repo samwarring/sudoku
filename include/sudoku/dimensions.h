@@ -2,10 +2,19 @@
 #define INCLUDED_SUDOKU_DIMENSIONS_H
 
 #include <vector>
+#include <stdexcept>
 #include <string>
 
 namespace sudoku
 {
+    /**
+     * Error raised when initializing an invalid \ref Dimensions object
+     */
+    class DimensionsException : public std::logic_error
+    {
+        using logic_error::logic_error;
+    };
+
     /**
      * Describes the size of the sudoku as well as the relationships between cells.
      */
@@ -20,15 +29,25 @@ namespace sudoku
              *                   cells. A solution to the sudoku must not assign the same value to any 
              *                   two cells if they share a group. Values for this parameter are typically
              *                   formed by joining the results of the \ref computeRowGroups,
-             *                   \ref computeColumnGroups, and \ref computeGroupsFromMap functions via th
+             *                   \ref computeColumnGroups, and \ref computeGroupsFromMap functions via the
              *                   \ref joinGroups function.
              * 
-             * \note Dimensions objects do not specify the *positions* of the cells. They treat the cells
-             *       as a 1-dimensional list - each with a unique position. The topography of related cells
-             *       are encoded in the `cellGroups` parameter. To specify that a sudoku is rendered as a 
-             *       2-dimensional grid, see the \ref Formatter class.
+             * \throws DimensionsError 
+             *         1. if any cell group contains a position beyond cellCount.
+             *         2. if any cell group size exceeds maxCellValue.
+             *         3. if cellCount <= 0.
+             *         4. if maxCellValue <= 0.
              * 
-             * \todo Input validation
+             * \note Dimensions objects treat the cells as a 1-dimensional list - each with a unique
+             *       position. The topography of related cells are encoded in the `cellGroups` parameter.
+             *       To specify that a sudoku is rendered as a 2-dimensional grid, see the \ref Formatter
+             *       class.
+             * 
+             * \note Undefined behavior
+             *       1. if any cell group contains duplicate values.
+             *       2. if any cell groups contain the excact same values.
+             *       These situations can be addressed in the future by passing groups as
+             *       std::set<size_t>, but for now, this is not essential.
              */
             Dimensions(size_t cellCount, size_t maxCellValue, std::vector<std::vector<size_t>> cellGroups)
                 : cellCount_(cellCount)
@@ -63,6 +82,12 @@ namespace sudoku
              * Computes the initial value of groupsForEachCell_
              */
             std::vector<std::vector<size_t>> computeGroupsForEachCell();
+
+            /**
+             * Throws an exception if the object is invalid.
+             * \see Dimensions::Dimensions
+             */
+            void validate() const;
 
             const size_t cellCount_;
             const size_t maxCellValue_;
