@@ -7,6 +7,7 @@ add_executable(
     dimensions_test.cpp
     groups_test.cpp
     potential_test.cpp
+    cell_value_parser_test.cpp
 )
 
 target_include_directories(

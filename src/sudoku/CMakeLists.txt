@@ -4,6 +4,7 @@ add_library(
     standard.cpp
     groups.cpp
     potential.cpp
+    cell_value_parser.cpp
 )
 
 target_include_directories(
