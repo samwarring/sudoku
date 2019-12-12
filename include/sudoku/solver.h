@@ -9,15 +9,33 @@
 namespace sudoku
 {
     /**
-     * \todo Document this class
+     * Solver objects solve sudokus. The initial cell values are fixed at
+     * object construction and cannot be changed. After constructing, users
+     * can iterate through all possible solutions of the sudoku for the given
+     * initial values.
      */
     class Solver
     {
         public:
+
+            /**
+             * \param dims dimensions of the sudoku
+             * \param cellValues initial values of the sudoku
+             */
             Solver(const Dimensions& dims, std::vector<size_t> cellValues);
 
+            /**
+             * Compute the next solution for the sudoku.
+             * 
+             * \return true if a new solution could be found, or false
+             *         if there are no more solutions.
+             */
             bool computeNextSolution();
 
+            /**
+             * Read the current cell values of the sudoku. If \ref computeNextSolution
+             * has not been called, this returns the initial cell values.
+             */
             const std::vector<size_t>& getCellValues() const;
 
         private:
