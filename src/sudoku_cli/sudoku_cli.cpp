@@ -85,9 +85,16 @@ int main(int argc, char** argv)
             numSolutions = options["num-solutions"].as<size_t>();
         }
 
-        for (size_t n = 0; n < numSolutions && solver.computeNextSolution(); ++n) {
-            std::cout << "Solution " << (n + 1) << ":\n";
+        size_t numSolutionsFound = 0;
+        while (numSolutionsFound < numSolutions && solver.computeNextSolution()) {
+            numSolutionsFound++;
+            std::cout << "Solution " << numSolutionsFound << ", ";
+            std::cout << "Total Guesses: " << solver.getTotalGuesses() << '\n';
             std::cout << formatter.format(solver.getCellValues()) << '\n';
+        }
+
+        if (numSolutionsFound == 0) {
+            std::cout << "No solution after " << solver.getTotalGuesses() << " guesses.\n";
         }
     }
 }

@@ -38,6 +38,11 @@ namespace sudoku
              */
             const std::vector<size_t>& getCellValues() const;
 
+            /**
+             * Get the number of total guesses made so far.
+             */
+            size_t getTotalGuesses() const { return totalGuesses_; }
+
         private:
             void initializeCellPotentials();
 
@@ -47,14 +52,13 @@ namespace sudoku
 
             size_t selectNextCell() const;
 
-            bool recursiveSolve();
-
             bool sequentialSolve();
 
             const Dimensions& dims_;
             std::vector<size_t> cellValues_;
             std::stack<std::pair<size_t, size_t>> guesses_;  ///< pairs of (position, value)
             std::vector<Potential> cellPotentials_;
+            size_t totalGuesses_ = 0;  ///< Number of guesses made. Does not decrease.
     };
 }
 

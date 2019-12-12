@@ -46,6 +46,7 @@ namespace sudoku
             }
         }
         guesses_.push({ cellPos, cellValue });
+        totalGuesses_++;
     }
 
     std::pair<size_t, size_t> Solver::popGuess()
@@ -71,30 +72,6 @@ namespace sudoku
             }
         }
         return dims_.getCellCount();
-    }
-
-    bool Solver::recursiveSolve()
-    {
-        size_t cellPos = selectNextCell();
-        if (cellPos == dims_.getCellCount()) {
-            // no more empty cells
-            return true;
-        }
-        for(
-            size_t cellValue = cellPotentials_[cellPos].getNextAvailableValue(0);
-            cellValue != 0;
-            cellValue = cellPotentials_[cellPos].getNextAvailableValue(cellValue)
-        ) {
-            pushGuess(cellPos, cellValue);
-            if (recursiveSolve()) {
-                // This guess led to a solution.
-                return true;
-            }
-            popGuess();
-        }
-
-        // None of the available values (if any) led to a solution
-        return false;
     }
 
     bool Solver::sequentialSolve()
