@@ -11,5 +11,8 @@
 #include <sudoku/dimensions.h>
 #include <sudoku/standard.h>
 #include <sudoku/groups.h>
+#include <sudoku/cell_value_parser.h>
+#include <sudoku/formatter.h>
+#include <sudoku/solver.h>
 
 #endif
