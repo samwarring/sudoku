@@ -3,11 +3,17 @@
 
 #include <vector>
 #include <stack>
+#include <stdexcept>
 #include <sudoku/dimensions.h>
 #include <sudoku/potential.h>
 
 namespace sudoku
 {
+    /**
+     * Thrown when constructing invalid Solver objects.
+     */
+    class SolverException : public std::logic_error { using logic_error::logic_error; };
+
     /**
      * Solver objects solve sudokus. The initial cell values are fixed at
      * object construction and cannot be changed. After constructing, users
@@ -21,6 +27,8 @@ namespace sudoku
             /**
              * \param dims dimensions of the sudoku
              * \param cellValues initial values of the sudoku
+             * \throw SolverException if a standard sudoku had two 1's in the
+             *        first row, or if a cell value exceeds the max cell value.
              */
             Solver(const Dimensions& dims, std::vector<size_t> cellValues);
 
@@ -45,6 +53,8 @@ namespace sudoku
 
         private:
             void initializeCellPotentials();
+
+            void validateCellValues() const;
 
             void pushGuess(size_t cellPos, size_t cellValue);
 

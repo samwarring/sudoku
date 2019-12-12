@@ -78,23 +78,29 @@ int main(int argc, char** argv)
 
         std::cout << "Input values:\n" << formatter.format(inputValues) << '\n';
 
-        sudoku::Solver solver(standardDims, inputValues);
+        try {
+            sudoku::Solver solver(standardDims, inputValues);
 
-        size_t numSolutions = 1;
-        if (options.count("num-solutions")) {
-            numSolutions = options["num-solutions"].as<size_t>();
+            size_t numSolutions = 1;
+            if (options.count("num-solutions")) {
+                numSolutions = options["num-solutions"].as<size_t>();
+            }
+
+            size_t numSolutionsFound = 0;
+            while (numSolutionsFound < numSolutions && solver.computeNextSolution()) {
+                numSolutionsFound++;
+                std::cout << "Solution " << numSolutionsFound << ", ";
+                std::cout << "Total Guesses: " << solver.getTotalGuesses() << '\n';
+                std::cout << formatter.format(solver.getCellValues()) << '\n';
+            }
+
+            if (numSolutionsFound == 0) {
+                std::cout << "No solution after " << solver.getTotalGuesses() << " guesses.\n";
+            }
         }
-
-        size_t numSolutionsFound = 0;
-        while (numSolutionsFound < numSolutions && solver.computeNextSolution()) {
-            numSolutionsFound++;
-            std::cout << "Solution " << numSolutionsFound << ", ";
-            std::cout << "Total Guesses: " << solver.getTotalGuesses() << '\n';
-            std::cout << formatter.format(solver.getCellValues()) << '\n';
-        }
-
-        if (numSolutionsFound == 0) {
-            std::cout << "No solution after " << solver.getTotalGuesses() << " guesses.\n";
+        catch (const sudoku::SolverException& err) {
+            std::cerr << "error: " << err.what() << '\n';
+            exit(1);
         }
     }
 }

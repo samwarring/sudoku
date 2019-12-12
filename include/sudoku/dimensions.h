@@ -67,6 +67,11 @@ namespace sudoku
             size_t getMaxCellValue() const { return maxCellValue_; }
 
             /**
+             * Gets the number of groups in the dimensions.
+             */
+            size_t getNumGroups() const { return cellsForEachGroup_.size(); }
+
+            /**
              * Gets a list of cell positions for the given group num.
              */
             const std::vector<size_t>& getCellsInGroup(size_t groupNum) const { return cellsForEachGroup_[groupNum]; }

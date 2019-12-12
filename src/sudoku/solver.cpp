@@ -6,7 +6,11 @@ namespace sudoku
         : dims_(dims)
         , cellValues_(std::move(cellValues))
     {
+        if (cellValues_.size() != dims_.getCellCount()) {
+            throw SolverException("Number of initial values does not match dimensions");
+        }
         initializeCellPotentials();
+        validateCellValues();
     }
 
     bool Solver::computeNextSolution()
@@ -32,6 +36,28 @@ namespace sudoku
                     for (size_t relatedCellPos : dims_.getCellsInGroup(groupNum)) {
                         cellPotentials_[relatedCellPos].block(cellValues_[cellPos]);
                     }
+                }
+            }
+        }
+    }
+
+    void Solver::validateCellValues() const
+    {
+        for (size_t cellPos = 0; cellPos < dims_.getCellCount(); ++cellPos) {
+            if (dims_.getMaxCellValue() < cellValues_[cellPos]) {
+                throw SolverException("A cell value is out of range");
+            }
+        }
+
+        for (size_t groupNum = 0; groupNum < dims_.getNumGroups(); ++groupNum) {
+            std::vector<int> occurs(dims_.getMaxCellValue());
+            for (size_t cellPos : dims_.getCellsInGroup(groupNum)) {
+                size_t cellValue = cellValues_[cellPos];
+                if (cellValue != 0) {
+                    if (0 < occurs[cellValue - 1]) {
+                        throw SolverException("A group contained a repeated value");
+                    }
+                    occurs[cellValue - 1]++;
                 }
             }
         }
@@ -66,12 +92,18 @@ namespace sudoku
 
     size_t Solver::selectNextCell() const
     {
+        size_t leadingPos = dims_.getCellCount();
+        size_t leadingNumBlocked = 0;
         for (size_t cellPos = 0; cellPos < dims_.getCellCount(); ++cellPos) {
             if (cellValues_[cellPos] == 0) {
-                return cellPos;
+                size_t amountBlocked = cellPotentials_[cellPos].getAmountBlocked();
+                if (leadingNumBlocked <= amountBlocked) {
+                    leadingPos = cellPos;
+                    leadingNumBlocked = amountBlocked;
+                }
             }
         }
-        return dims_.getCellCount();
+        return leadingPos;
     }
 
     bool Solver::sequentialSolve()
