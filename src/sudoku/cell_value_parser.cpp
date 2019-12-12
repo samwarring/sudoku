@@ -53,4 +53,9 @@ namespace sudoku
 
         return cellValues;
     }
+
+    std::vector<size_t> parseCellValues(const sudoku::Dimensions& dims, const char* valueString)
+    {
+        return parseCellValues(dims.getCellCount(), dims.getMaxCellValue(), valueString);
+    }
 }

@@ -6,7 +6,7 @@ namespace sudoku
 {
     namespace standard
     {
-        std::vector<std::vector<size_t>> computeStandardGroups()
+        std::vector<std::vector<size_t>> Dimensions::computeStandardGroups()
         {
             auto rowGroups = computeRowGroups(9, 9);
             auto columnGroups = computeColumnGroups(9, 9);

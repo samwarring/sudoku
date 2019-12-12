@@ -7,6 +7,7 @@ add_executable(
     dimensions_test.cpp
     groups_test.cpp
     potential_test.cpp
+    solver_test.cpp
     cell_value_parser_test.cpp
 )
 
@@ -24,4 +25,9 @@ target_link_libraries(
 add_test(
     NAME sudoku_test
     COMMAND sudoku_test
+)
+
+set_tests_properties(
+    sudoku_test
+    PROPERTIES TIMEOUT 10
 )

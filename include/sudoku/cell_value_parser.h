@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <vector>
+#include <sudoku/dimensions.h>
 
 namespace sudoku
 {
@@ -28,6 +29,8 @@ namespace sudoku
      *                                beyond maxCellValue, (4) maxCellValue > 15.
      */
     std::vector<size_t> parseCellValues(size_t cellCount, size_t maxCellValue, const char* valueString);
+
+    std::vector<size_t> parseCellValues(const sudoku::Dimensions& dims, const char* valueString);
 }
 
 #endif

@@ -4,6 +4,7 @@ add_library(
     standard.cpp
     groups.cpp
     potential.cpp
+    solver.cpp
     cell_value_parser.cpp
 )
 
