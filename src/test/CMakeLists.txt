@@ -9,6 +9,7 @@ add_executable(
     potential_test.cpp
     solver_test.cpp
     cell_value_parser_test.cpp
+    formatter_test.cpp
 )
 
 target_include_directories(

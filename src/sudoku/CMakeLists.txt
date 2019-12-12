@@ -6,6 +6,7 @@ add_library(
     potential.cpp
     solver.cpp
     cell_value_parser.cpp
+    formatter.cpp
 )
 
 target_include_directories(
