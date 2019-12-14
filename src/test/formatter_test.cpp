@@ -20,3 +20,14 @@ BOOST_AUTO_TEST_CASE(Formatter_2x2)
     std::string outputString = fmt.format(cellValues);
     BOOST_REQUIRE_EQUAL(outputString, expectedString);
 }
+
+BOOST_AUTO_TEST_CASE(Formatter_customPlaceholder)
+{
+    sudoku::Dimensions dims(4, 2, {});
+    std::vector<size_t> cellValues{ 0, 1, 2, 1 };
+    const char* formatString = "\\..*.*.(:>).*.*../";
+    const char* placeholders = "*";
+    sudoku::Formatter fmt(dims, formatString, placeholders);
+    std::string outputString = fmt.format(cellValues);
+    BOOST_REQUIRE_EQUAL(outputString, "\\..0.1.(:>).2.1../");
+}

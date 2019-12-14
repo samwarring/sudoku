@@ -4,12 +4,18 @@
 
 namespace sudoku
 {
-    Formatter::Formatter(const sudoku::Dimensions& dims, std::string formatString)
+    Formatter::Formatter(const sudoku::Dimensions& dims, std::string formatString, std::string placeholders)
         : dims_(dims)
         , formatString_(std::move(formatString))
+        , placeholders_(placeholders)
     {
         // Validate the format string
-        size_t numPlaceholders = std::count_if(cbegin(formatString_), cend(formatString_), isPlaceholder);
+        size_t numPlaceholders = 0;
+        for(size_t i = 0; i < formatString_.length(); ++i) {
+            if (isPlaceholder(formatString_[i])) {
+                numPlaceholders++;
+            }
+        }
         if (numPlaceholders != dims_.getCellCount()) {
             throw FormatterException("Formatter dimensions do not match formatString");
         }
@@ -35,15 +41,8 @@ namespace sudoku
         return sout.str();
     }
 
-    bool Formatter::isPlaceholder(char ch)
+    bool Formatter::isPlaceholder(char ch) const
     {
-        switch (ch) {
-            case '0':
-            case '_':
-            case '.':
-                return true;
-            default:
-                return false;
-        }
+        return placeholders_.find(ch) != std::string::npos;
     }
 }

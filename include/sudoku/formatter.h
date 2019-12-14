@@ -22,12 +22,12 @@ namespace sudoku
             /**
              * \param dims Dimensions of the sudoku
              * \param formatString String representation of the formatted sudoku.
-             *                     '0', '.', and '_' characters are treated as
-             *                     placeholders for sudoku values.
+             * \param placeholders String indicating which characters to replace
+             *                     with cell values.
              * \throw FormatterError if the number of placeholders in formatString
              *        does not match the dimensions' cell count.
              */
-            Formatter(const Dimensions& dims, std::string formatString);
+            Formatter(const Dimensions& dims, std::string formatString, std::string placeholders="0");
 
             /**
              * Formats the cell values as a string.
@@ -38,10 +38,11 @@ namespace sudoku
             std::string format(const std::vector<size_t>& cellValues) const;
 
         private:
-            static bool isPlaceholder(char ch);
+            bool isPlaceholder(char ch) const;
 
             const Dimensions& dims_;
             const std::string formatString_;
+            const std::string placeholders_;
     };
 }
 
