@@ -1,6 +1,7 @@
 #ifndef INCLUDED_SUDOKU_SOLVER_H
 #define INCLUDED_SUDOKU_SOLVER_H
 
+#include <chrono>
 #include <vector>
 #include <stack>
 #include <stdexcept>
@@ -23,6 +24,11 @@ namespace sudoku
     class Solver
     {
         public:
+
+            /**
+             * Underlying type for time durations.
+             */
+            using Duration = std::chrono::high_resolution_clock::duration;
 
             /**
              * \param dims dimensions of the sudoku
@@ -51,6 +57,11 @@ namespace sudoku
              */
             size_t getTotalGuesses() const { return totalGuesses_; }
 
+            /**
+             * Get the total time spent computing solutions
+             */
+            Duration getSolutionDuration() const { return solutionDuration_; }
+
         private:
             void initializeCellPotentials();
 
@@ -69,6 +80,7 @@ namespace sudoku
             std::stack<std::pair<size_t, size_t>> guesses_;  ///< pairs of (position, value)
             std::vector<Potential> cellPotentials_;
             size_t totalGuesses_ = 0;  ///< Number of guesses made. Does not decrease.
+            Duration solutionDuration_{0};
     };
 }
 

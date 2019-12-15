@@ -15,7 +15,11 @@ namespace sudoku
 
     bool Solver::computeNextSolution()
     {
-        return sequentialSolve();
+        auto startTime = std::chrono::high_resolution_clock::now();
+        bool result = sequentialSolve();
+        auto stopTime = std::chrono::high_resolution_clock::now();
+        solutionDuration_ += (stopTime - startTime);
+        return result;
     }
 
     const std::vector<size_t>& Solver::getCellValues() const

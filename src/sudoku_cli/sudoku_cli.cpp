@@ -89,8 +89,12 @@ int main(int argc, char** argv)
             size_t numSolutionsFound = 0;
             while (numSolutionsFound < numSolutions && solver.computeNextSolution()) {
                 numSolutionsFound++;
+                auto durationNano = solver.getSolutionDuration();
+                auto durationMilli = std::chrono::duration_cast<std::chrono::milliseconds>(durationNano);
                 std::cout << "Solution " << numSolutionsFound << ", ";
-                std::cout << "Total Guesses: " << solver.getTotalGuesses() << '\n';
+                std::cout << "Total Guesses: " << solver.getTotalGuesses() << ", ";
+                std::cout << "Duration: " << durationMilli.count() << " ms, ";
+                std::cout << "Guess Rate: " << (solver.getTotalGuesses() * 1.0 / durationMilli.count()) << " guesses/ms\n";
                 std::cout << formatter.format(solver.getCellValues()) << '\n';
             }
 
