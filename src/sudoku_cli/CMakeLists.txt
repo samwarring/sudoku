@@ -3,6 +3,13 @@ find_package(Boost REQUIRED program_options)
 add_executable(
     sudoku_cli
     sudoku_cli.cpp
+    program_options.cpp
+)
+
+# Required for std::optional
+set_property(
+    TARGET sudoku_cli
+    PROPERTY CXX_STANDARD 17
 )
 
 target_include_directories(
@@ -18,5 +25,5 @@ target_link_libraries(
 
 add_test(
     NAME sudoku_cli
-    COMMAND sudoku_cli
+    COMMAND sudoku_cli --input 0
 )
