@@ -26,10 +26,13 @@ class ProgramOptions
 
         OutputFormat getOutputFormat() const;
 
+        std::string getInputFile() const;
+
     private:
     
         boost::program_options::options_description description_;
         boost::program_options::variables_map optionMap_;
+        OutputFormat outputFormat_;
 };
 
 #endif

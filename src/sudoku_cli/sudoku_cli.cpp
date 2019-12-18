@@ -2,6 +2,9 @@
 #include <string>
 #include <optional>
 #include <vector>
+#include <fstream>
+#include <algorithm>
+#include <locale>
 #include <boost/program_options.hpp>
 #include <sudoku/sudoku.h>
 #include "program_options.h"
@@ -14,13 +17,30 @@ int handleOptions(const ProgramOptions& options)
         return 0;
     }
 
-    // Parse cell values from --input
-    std::vector<size_t> inputValues;
+    // Using standard dimensions only
     sudoku::standard::Dimensions standardDims;
-    inputValues = sudoku::parseCellValues(
-        standardDims,
-        options.getInput().c_str()
-    );
+
+    // Parse cell values from --input or --input-file
+    std::vector<std::vector<size_t>> inputValues;
+    if (!options.getInput().empty()) {
+        inputValues.push_back(sudoku::parseCellValues(
+            standardDims,
+            options.getInput().c_str()
+        ));
+    }
+    else if (!options.getInputFile().empty()) {
+        std::ifstream fin(options.getInputFile());
+        std::string line;
+        while (std::getline(fin, line)) {
+            if (std::all_of(line.begin(), line.end(), isspace)) {
+                continue;
+            }
+            inputValues.push_back(sudoku::parseCellValues(
+                standardDims,
+                line.c_str()
+            ));
+        }
+    }
 
     // Select the correct format
     std::optional<sudoku::Formatter> formatter;
@@ -46,25 +66,31 @@ int handleOptions(const ProgramOptions& options)
             break;
     }
 
-    // Print the input values
-    std::cout << "Input values:\n" << formatter->format(inputValues) << '\n';
+    // Solve each set of input values
+    for (size_t inputNum = 0; inputNum < inputValues.size(); ++inputNum) {
+        const std::vector<size_t>& curInput = inputValues[inputNum];
+        
+        // Print the input values
+        std::cout << "Input " << (inputNum + 1) << ":\n" << formatter->format(curInput) << '\n';
 
-    // Find the first N solutions
-    sudoku::Solver solver(standardDims, inputValues);
-    size_t numSolutionsFound = 0;
-    while (numSolutionsFound < options.getNumSolutions() && solver.computeNextSolution()) {
-        numSolutionsFound++;
-        auto duration = solver.getSolutionDuration();
-        auto durationMilli = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
-        std::cout << "Solution " << numSolutionsFound << ", ";
-        std::cout << "Total Guesses: " << solver.getTotalGuesses() << ", ";
-        std::cout << "Duration: " << durationMilli.count() << " ms, ";
-        std::cout << "Guess Rate: " << (solver.getTotalGuesses() * 1.0 / durationMilli.count()) << " guesses/ms\n";
-        std::cout << formatter->format(solver.getCellValues()) << '\n';
-    }
+        // Find the first N solutions
+        sudoku::Solver solver(standardDims, curInput);
+        size_t numSolutionsFound = 0;
+        while (numSolutionsFound < options.getNumSolutions() && solver.computeNextSolution()) {
+            numSolutionsFound++;
+            auto duration = solver.getSolutionDuration();
+            auto durationMilli = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
+            std::cout << "Input " << (inputNum + 1) << ", ";
+            std::cout << "Solution " << numSolutionsFound << ", ";
+            std::cout << "Total Guesses: " << solver.getTotalGuesses() << ", ";
+            std::cout << "Duration: " << durationMilli.count() << " ms, ";
+            std::cout << "Guess Rate: " << (solver.getTotalGuesses() * 1.0 / durationMilli.count()) << " guesses/ms\n";
+            std::cout << formatter->format(solver.getCellValues()) << '\n';
+        }
 
-    if (numSolutionsFound == 0) {
-        std::cout << "No solution after " << solver.getTotalGuesses() << " guesses.\n";
+        if (numSolutionsFound == 0) {
+            std::cout << "No solution after " << solver.getTotalGuesses() << " guesses.\n";
+        }
     }
 
     return 0;
