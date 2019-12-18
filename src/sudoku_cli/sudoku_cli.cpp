@@ -24,12 +24,21 @@ bpo::variables_map parseOptions(int argc, char** argv)
         ("help,h", "Show usage and exit")
         ("input,i", bpo::value<std::string>(), "Initial cell values")
         ("num-solutions,n", bpo::value<size_t>(), "Compute up to this many solutions")
+        ("output-format,f", bpo::value<std::string>(), "Choose from `pretty` (default) or `serial`")
         ; // end of options
 
     bpo::variables_map optionMap;
     try {
         bpo::store(bpo::parse_command_line(argc, argv, description), optionMap);
         bpo::notify(optionMap);
+
+        // validate --output-format
+        if (optionMap.count("output-format")) {
+            const auto& outputFormat = optionMap["output-format"].as<std::string>();
+            if (outputFormat != "pretty" && outputFormat != "serial") {
+                throw bpo::validation_error(bpo::validation_error::invalid_option_value, "output-format");
+            }
+        }
     }
     catch (const std::exception& err) {
         std::cerr << description << '\n';
@@ -51,7 +60,8 @@ int main(int argc, char** argv)
     if (options.count("input")) {
         std::vector<size_t> inputValues;
         sudoku::standard::Dimensions standardDims;
-        sudoku::Formatter formatter(standardDims,
+        sudoku::Formatter prettyFormatter(
+            standardDims,
             "0 0 0 | 0 0 0 | 0 0 0\n"
             "0 0 0 | 0 0 0 | 0 0 0\n"
             "0 0 0 | 0 0 0 | 0 0 0\n"
@@ -64,6 +74,7 @@ int main(int argc, char** argv)
             "0 0 0 | 0 0 0 | 0 0 0\n"
             "0 0 0 | 0 0 0 | 0 0 0\n"
         );
+        sudoku::Formatter serialFormatter(standardDims, std::string(81, '0'));
 
         try {
             inputValues = sudoku::parseCellValues(
@@ -76,7 +87,21 @@ int main(int argc, char** argv)
             exit(1);
         }
 
-        std::cout << "Input values:\n" << formatter.format(inputValues) << '\n';
+        const sudoku::Formatter* formatter = nullptr;
+        if (options.count("output-format")) {
+            auto outputFormat = options["output-format"].as<std::string>();
+            if (outputFormat == "pretty") {
+                formatter = &prettyFormatter;
+            }
+            else if (outputFormat == "serial") {
+                formatter = &serialFormatter;
+            }
+        }
+        else {
+            formatter = &prettyFormatter;
+        }
+
+        std::cout << "Input values:\n" << formatter->format(inputValues) << '\n';
 
         try {
             sudoku::Solver solver(standardDims, inputValues);
@@ -95,7 +120,7 @@ int main(int argc, char** argv)
                 std::cout << "Total Guesses: " << solver.getTotalGuesses() << ", ";
                 std::cout << "Duration: " << durationMilli.count() << " ms, ";
                 std::cout << "Guess Rate: " << (solver.getTotalGuesses() * 1.0 / durationMilli.count()) << " guesses/ms\n";
-                std::cout << formatter.format(solver.getCellValues()) << '\n';
+                std::cout << formatter->format(solver.getCellValues()) << '\n';
             }
 
             if (numSolutionsFound == 0) {
