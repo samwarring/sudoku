@@ -7,6 +7,7 @@ add_library(
     solver.cpp
     cell_value_parser.cpp
     formatter.cpp
+    solution_queue.cpp
 )
 
 target_include_directories(

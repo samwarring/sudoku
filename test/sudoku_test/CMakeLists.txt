@@ -10,6 +10,7 @@ add_executable(
     solver_test.cpp
     cell_value_parser_test.cpp
     formatter_test.cpp
+    solution_queue_test.cpp
 )
 
 target_include_directories(
