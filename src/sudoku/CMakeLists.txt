@@ -1,7 +1,6 @@
 add_library(
     sudoku
     dimensions.cpp
-    standard.cpp
     groups.cpp
     potential.cpp
     solver.cpp

@@ -87,6 +87,14 @@ BOOST_AUTO_TEST_CASE(computeColumnGroups_3x4)
     BOOST_REQUIRE_EQUAL_VECTORS(columnGroups[3], {3, 7, 11});
 }
 
+BOOST_AUTO_TEST_CASE(computeSquareGroups_9x9)
+{
+    auto squareGroups = sudoku::computeSquareGroups(3);
+    BOOST_REQUIRE_EQUAL(squareGroups.size(), 9);
+    BOOST_REQUIRE_EQUAL_VECTORS(squareGroups[0], {0, 1, 2, 9, 10, 11, 18, 19, 20});
+    BOOST_REQUIRE_EQUAL_VECTORS(squareGroups[5], {33, 34, 35, 42, 43, 44, 51, 52, 53});
+}
+
 BOOST_AUTO_TEST_CASE(computeGroupsFromMap_emptyString)
 {
     auto groups = sudoku::computeGroupsFromMap("");

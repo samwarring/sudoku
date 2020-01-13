@@ -2,8 +2,7 @@
 #define INCLUDED_SUDOKU_STANDARD_H
 
 #include <vector>
-#include <sudoku/dimensions.h>
-
+#include <sudoku/square.h>
 
 namespace sudoku
 {
@@ -13,13 +12,10 @@ namespace sudoku
      */
     namespace standard
     {
-        class Dimensions : public sudoku::Dimensions
+        class Dimensions : public square::Dimensions
         {
             public:
-
-                Dimensions() : sudoku::Dimensions(81, 9, computeStandardGroups()) {}
-
-                static std::vector<std::vector<size_t>> computeStandardGroups();
+                Dimensions() : square::Dimensions(3) {}
         };
     }
 }

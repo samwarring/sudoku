@@ -14,5 +14,6 @@
 #include <sudoku/cell_value_parser.h>
 #include <sudoku/formatter.h>
 #include <sudoku/solver.h>
+#include <sudoku/square.h>
 
 #endif

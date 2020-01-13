@@ -4,28 +4,7 @@
 #include <vector>
 #include <boost/test/unit_test.hpp>
 #include <sudoku/solution_queue.h>
-
-namespace std
-{
-    /**
-     * For reasons I don't fully understand, we need to define this overloaded
-     * operator<< inside the std namespace. I tried defining the operator in
-     * the global namespace with the argument as `const std::vector<T>&`, but
-     * compilation failed with boost template instantiation error.
-     * 
-     * Hint: https://stackoverflow.com/a/33884671
-     */
-    template <typename T>
-    ostream& operator<<(ostream& out, const vector<T>& vec)
-    {
-        out << "{ ";
-        for (const T& item : vec) {
-            out << item << ' ';
-        }
-        out << '}';
-        return out;
-    }
-}
+#include "util.h"
 
 BOOST_AUTO_TEST_CASE(SolutionQueue_Constructor)
 {

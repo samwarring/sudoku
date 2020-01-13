@@ -23,6 +23,13 @@ namespace sudoku
     std::vector<std::vector<size_t>> computeColumnGroups(size_t rowCount, size_t columnCount);
 
     /**
+     * Computes a vector of cell groups for a square sudoku with the given root. For example,
+     * the typical 9x9 sudoku has a root of 3. A 36x36 sudoku has a root of 6. The returned
+     * groups do not contain row groups or column groups - only the remaining "sub-squares".
+     */
+    std::vector<std::vector<size_t>> computeSquareGroups(size_t root);
+
+    /**
      * Computes a vector of cell groups specified by a string which "maps" each cell position
      * to a unique group.
      * 

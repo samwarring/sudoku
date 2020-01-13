@@ -29,6 +29,25 @@ namespace sudoku
         return result;
     }
 
+    std::vector<std::vector<size_t>> computeSquareGroups(size_t root)
+    {
+        // Each square has its own "square-row" and "square-column" separate from
+        // the "cell-row" and "cell-column". For example, 9x9 sudokus' first three
+        // "cell-rows" are all within the first "square-row".
+        const size_t cellCount = root * root * root * root;
+        const size_t maxCellValue = root * root;
+        std::vector<std::vector<size_t>> result(root * root);
+        for (size_t cellPos = 0; cellPos < cellCount; ++cellPos) {
+            size_t row = cellPos / maxCellValue;
+            size_t column = cellPos % maxCellValue;
+            size_t squareRow = row / root;
+            size_t squareColumn = column / root;
+            size_t squareIndex = (squareRow * root) + squareColumn;
+            result[squareIndex].push_back(cellPos);
+        }
+        return result;
+    }
+
     std::vector<std::vector<size_t>> computeGroupsFromMap(const std::string& groupMap)
     {
         std::istringstream iss(groupMap);
