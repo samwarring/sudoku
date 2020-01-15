@@ -52,3 +52,34 @@ BOOST_AUTO_TEST_CASE(SquareFormatter_Root3)
     std::string actual = fmt.format(cellValues);
     BOOST_REQUIRE_EQUAL(expected, actual);
 }
+
+BOOST_AUTO_TEST_CASE(SquareFormatter_Root4)
+{
+    // The first square with double-digit placeholders.
+        sudoku::square::Dimensions dims(4);
+    sudoku::square::Formatter fmt(dims);
+    std::vector<size_t> cellValues(256, 0);
+    std::string expected = 
+        " 0  0  0  0 |  0  0  0  0 |  0  0  0  0 |  0  0  0  0\n"
+        " 0  0  0  0 |  0  0  0  0 |  0  0  0  0 |  0  0  0  0\n"
+        " 0  0  0  0 |  0  0  0  0 |  0  0  0  0 |  0  0  0  0\n"
+        " 0  0  0  0 |  0  0  0  0 |  0  0  0  0 |  0  0  0  0\n"
+        "------------+-------------+-------------+------------\n"
+        " 0  0  0  0 |  0  0  0  0 |  0  0  0  0 |  0  0  0  0\n"
+        " 0  0  0  0 |  0  0  0  0 |  0  0  0  0 |  0  0  0  0\n"
+        " 0  0  0  0 |  0  0  0  0 |  0  0  0  0 |  0  0  0  0\n"
+        " 0  0  0  0 |  0  0  0  0 |  0  0  0  0 |  0  0  0  0\n"
+        "------------+-------------+-------------+------------\n"
+        " 0  0  0  0 |  0  0  0  0 |  0  0  0  0 |  0  0  0  0\n"
+        " 0  0  0  0 |  0  0  0  0 |  0  0  0  0 |  0  0  0  0\n"
+        " 0  0  0  0 |  0  0  0  0 |  0  0  0  0 |  0  0  0  0\n"
+        " 0  0  0  0 |  0  0  0  0 |  0  0  0  0 |  0  0  0  0\n"
+        "------------+-------------+-------------+------------\n"
+        " 0  0  0  0 |  0  0  0  0 |  0  0  0  0 |  0  0  0  0\n"
+        " 0  0  0  0 |  0  0  0  0 |  0  0  0  0 |  0  0  0  0\n"
+        " 0  0  0  0 |  0  0  0  0 |  0  0  0  0 |  0  0  0  0\n"
+        " 0  0  0  0 |  0  0  0  0 |  0  0  0  0 |  0  0  0  0";
+    std::string actual = fmt.format(cellValues);
+    BOOST_REQUIRE_EQUAL(expected, actual);
+
+}
