@@ -1,5 +1,6 @@
 #include <sstream>
 #include <algorithm>
+#include <iomanip>
 #include <sudoku/formatter.h>
 
 namespace sudoku
@@ -9,10 +10,26 @@ namespace sudoku
         , formatString_(std::move(formatString))
         , placeholders_(placeholders)
     {
+        // Number of digits required to represent the max cell value.
+        std::ostringstream sout;
+        sout << dims_.getMaxCellValue();
+        maxDigits_ = sout.str().length();
+
         // Validate the format string
         size_t numPlaceholders = 0;
         for(size_t i = 0; i < formatString_.length(); ++i) {
+            
+            // If char is placeholder, then following maxDigits-1 chars should
+            // also be placeholder.
             if (isPlaceholder(formatString_[i])) {
+                for (int j = 1; j < maxDigits_ && i + j < formatString_.length(); ++j) {
+                    if (!isPlaceholder(formatString_[i + j])) {
+                        throw FormatterException("Encountered format string with invalid placeholder");
+                    }
+                }
+
+                // Found required number of placeholder chars for a single cell.
+                i += (maxDigits_ - 1);
                 numPlaceholders++;
             }
         }
@@ -32,7 +49,8 @@ namespace sudoku
         for (size_t i = 0; i < formatString_.length(); ++i) {
             char ch = formatString_[i];
             if (isPlaceholder(ch)) {
-                sout << cellValues[cellValuePos++];
+                sout << std::setw(maxDigits_) << std::right << cellValues[cellValuePos++];
+                i += (maxDigits_ - 1);
             }
             else {
                 sout << ch;

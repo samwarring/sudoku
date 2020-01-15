@@ -23,7 +23,9 @@ namespace sudoku
              * \param dims Dimensions of the sudoku
              * \param formatString String representation of the formatted sudoku.
              * \param placeholders String indicating which characters to replace
-             *                     with cell values.
+             *                     with cell values. Cell values are written in
+             *                     base 10. If the maxCellValue requres N digits,
+             *                     N placeholders must appear consecutively.
              * \throw FormatterError if the number of placeholders in formatString
              *        does not match the dimensions' cell count.
              */
@@ -43,6 +45,7 @@ namespace sudoku
             const Dimensions& dims_;
             const std::string formatString_;
             const std::string placeholders_;
+            size_t maxDigits_;
     };
 }
 

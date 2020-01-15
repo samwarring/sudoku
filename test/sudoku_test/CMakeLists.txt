@@ -11,6 +11,7 @@ add_executable(
     cell_value_parser_test.cpp
     formatter_test.cpp
     solution_queue_test.cpp
+    square_test.cpp
 )
 
 target_include_directories(

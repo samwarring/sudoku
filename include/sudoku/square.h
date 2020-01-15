@@ -4,6 +4,7 @@
 #include <vector>
 #include <sudoku/dimensions.h>
 #include <sudoku/groups.h>
+#include <sudoku/formatter.h>
 
 namespace sudoku
 {
@@ -30,9 +31,31 @@ namespace sudoku
                             computeRowGroups(root * root, root * root),
                             computeColumnGroups(root * root, root * root),
                             computeSquareGroups(root)
-                        })
+                        }))
+                    , root_(root)
+                {}
+
+                /**
+                 * Get the root value of the square
+                 */
+                size_t getRoot() const { return root_; }
+
+            private:
+                size_t root_;
+        };
+
+        class Formatter : public sudoku::Formatter
+        {
+            public:
+                Formatter(const Dimensions& dims)
+                    : sudoku::Formatter(
+                        dims,
+                        computeFormatString(dims)
                     )
                 {}
+
+            private:
+                static std::string computeFormatString(const Dimensions& dims);
         };
     }
 }

@@ -7,6 +7,7 @@ add_library(
     cell_value_parser.cpp
     formatter.cpp
     solution_queue.cpp
+    square.cpp
 )
 
 target_include_directories(
