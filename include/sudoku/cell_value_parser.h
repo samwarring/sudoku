@@ -24,13 +24,22 @@ namespace sudoku
      * \param valueString The string to parse cell values from. Whitespace characters, periods (.),
      *                    and commas (,) are ignored.
      * 
-     * \throw CellValueParseException if (1) valueString is NULL, (2) valueString contains an
-     *                                unrecognized character, (3) valueString contains a value
-     *                                beyond maxCellValue, (4) maxCellValue > 15.
+     * \param ignoreChars The parser ignores these characters in a value string.
+     * 
+     * \throw CellValueParseException if (1) valueString contains an unrecognized character,
+     *                                (2) valueString contains a value beyond maxCellValue.
+     * 
+     * \note if maxCellValue representable by >1 digits, then values must be separated by at least
+     *       one ignoreChar. If representable by 1 digit, then values can appear consecutively.
      */
-    std::vector<size_t> parseCellValues(size_t cellCount, size_t maxCellValue, const char* valueString);
+    std::vector<size_t> parseCellValues(
+        size_t cellCount,
+        size_t maxCellValue,
+        const std::string& valueString,
+        const std::string& ignoreChars="., \t\n\r"
+    );
 
-    std::vector<size_t> parseCellValues(const sudoku::Dimensions& dims, const char* valueString);
+    std::vector<size_t> parseCellValues(const Dimensions& dims, const std::string& valueString);
 }
 
 #endif
