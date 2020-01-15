@@ -13,6 +13,7 @@ ProgramOptions::ProgramOptions(int argc, char** argv)
         ("num-solutions,n", bpo::value<size_t>(), "Compute up to this many solutions")
         ("output-format,f", bpo::value<std::string>(), "Choose from `pretty` (default) or `serial`")
         ("input-file,I", bpo::value<std::string>(), "Read multiple initial value strings from input file")
+        ("square-dim-root,s", bpo::value<size_t>(), "Set dimensions to a square sudoku with given root value")
         ; // end of options
 
     bpo::store(bpo::parse_command_line(argc, argv, description_), optionMap_);
@@ -86,5 +87,15 @@ std::string ProgramOptions::getInputFile() const
     }
     else {
         return {};
+    }
+}
+
+size_t ProgramOptions::getSquareDimensionRoot() const
+{
+    if (optionMap_.count("square-dim-root")) {
+        return optionMap_["square-dim-root"].as<size_t>();
+    }
+    else {
+        return 3;
     }
 }

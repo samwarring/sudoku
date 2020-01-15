@@ -28,6 +28,8 @@ class ProgramOptions
 
         std::string getInputFile() const;
 
+        size_t getSquareDimensionRoot() const;
+
     private:
     
         boost::program_options::options_description description_;

@@ -17,16 +17,13 @@ int handleOptions(const ProgramOptions& options)
         return 0;
     }
 
-    // Using standard dimensions only
-    sudoku::standard::Dimensions standardDims;
+    // Using square dimensions only
+    sudoku::square::Dimensions dims(options.getSquareDimensionRoot());
 
     // Parse cell values from --input or --input-file
     std::vector<std::vector<size_t>> inputValues;
     if (!options.getInput().empty()) {
-        inputValues.push_back(sudoku::parseCellValues(
-            standardDims,
-            options.getInput().c_str()
-        ));
+        inputValues.push_back(sudoku::parseCellValues(dims, options.getInput().c_str()));
     }
     else if (!options.getInputFile().empty()) {
         std::ifstream fin(options.getInputFile());
@@ -35,10 +32,7 @@ int handleOptions(const ProgramOptions& options)
             if (std::all_of(line.begin(), line.end(), isspace)) {
                 continue;
             }
-            inputValues.push_back(sudoku::parseCellValues(
-                standardDims,
-                line.c_str()
-            ));
+            inputValues.push_back(sudoku::parseCellValues(dims, line.c_str()));
         }
     }
 
@@ -46,23 +40,10 @@ int handleOptions(const ProgramOptions& options)
     std::optional<sudoku::Formatter> formatter;
     switch (options.getOutputFormat()) {
         case ProgramOptions::OutputFormat::PRETTY:
-            formatter.emplace(
-                standardDims,
-                "0 0 0 | 0 0 0 | 0 0 0\n"
-                "0 0 0 | 0 0 0 | 0 0 0\n"
-                "0 0 0 | 0 0 0 | 0 0 0\n"
-                "------+-------+------\n"
-                "0 0 0 | 0 0 0 | 0 0 0\n"
-                "0 0 0 | 0 0 0 | 0 0 0\n"
-                "0 0 0 | 0 0 0 | 0 0 0\n"
-                "------+-------+------\n"
-                "0 0 0 | 0 0 0 | 0 0 0\n"
-                "0 0 0 | 0 0 0 | 0 0 0\n"
-                "0 0 0 | 0 0 0 | 0 0 0\n"
-            );
+            formatter.emplace(sudoku::square::Formatter(dims));
             break;
         case ProgramOptions::OutputFormat::SERIAL:
-            formatter.emplace(standardDims, std::string(81, '0'));
+            formatter.emplace(dims, std::string(dims.getCellCount(), '0'));
             break;
     }
 
@@ -74,7 +55,7 @@ int handleOptions(const ProgramOptions& options)
         std::cout << "Input " << (inputNum + 1) << ":\n" << formatter->format(curInput) << '\n';
 
         // Find the first N solutions
-        sudoku::Solver solver(standardDims, curInput);
+        sudoku::Solver solver(dims, curInput);
         size_t numSolutionsFound = 0;
         while (numSolutionsFound < options.getNumSolutions() && solver.computeNextSolution()) {
             numSolutionsFound++;
