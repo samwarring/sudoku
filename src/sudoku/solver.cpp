@@ -98,12 +98,19 @@ namespace sudoku
     {
         size_t leadingPos = dims_.getCellCount();
         size_t leadingNumBlocked = 0;
-        for (size_t cellPos = 0; cellPos < dims_.getCellCount(); ++cellPos) {
+        const size_t cellCount = dims_.getCellCount();
+        const size_t maxCellValue = dims_.getMaxCellValue();
+        for (size_t cellPos = 0; cellPos < cellCount; ++cellPos) {
             if (cellValues_[cellPos] == 0) {
                 size_t amountBlocked = cellPotentials_[cellPos].getAmountBlocked();
                 if (leadingNumBlocked <= amountBlocked) {
                     leadingPos = cellPos;
                     leadingNumBlocked = amountBlocked;
+                    // Optimization: If we found an empty cell completely blocked,
+                    // don't look at the rest of the cells.
+                    if (leadingNumBlocked == maxCellValue) {
+                        break;
+                    }
                 }
             }
         }
