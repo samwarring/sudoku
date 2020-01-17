@@ -8,6 +8,7 @@ add_library(
     formatter.cpp
     solution_queue.cpp
     square.cpp
+    parallel_solver.cpp
 )
 
 target_include_directories(

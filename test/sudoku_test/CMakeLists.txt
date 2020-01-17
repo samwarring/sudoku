@@ -12,6 +12,7 @@ add_executable(
     formatter_test.cpp
     solution_queue_test.cpp
     square_test.cpp
+    parallel_solver_test.cpp
 )
 
 target_include_directories(

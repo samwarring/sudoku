@@ -15,5 +15,6 @@
 #include <sudoku/formatter.h>
 #include <sudoku/solver.h>
 #include <sudoku/square.h>
+#include <sudoku/parallel_solver.h>
 
 #endif
