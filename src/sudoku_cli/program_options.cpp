@@ -14,6 +14,7 @@ ProgramOptions::ProgramOptions(int argc, char** argv)
         ("output-format,f", bpo::value<std::string>(), "Choose from `pretty` (default) or `serial`")
         ("input-file,I", bpo::value<std::string>(), "Read multiple initial value strings from input file")
         ("square-dim-root,s", bpo::value<size_t>(), "Set dimensions to a square sudoku with given root value")
+        ("threads,j", bpo::value<size_t>(), "Solve with this many worker threads");
         ; // end of options
 
     bpo::store(bpo::parse_command_line(argc, argv, description_), optionMap_);
@@ -34,12 +35,17 @@ ProgramOptions::ProgramOptions(int argc, char** argv)
     }
 
     // --input or --input-file is required ...
-    if (!optionMap_.count("input") && !optionMap_.count("input-file")) {
+    if (!optionMap_.count("input") && !optionMap_.count("input-file") &&!optionMap_.count("help")) {
         throw bpo::error("--input or --inputFile is required");
     }
     // ... but they cannot both appear
     if (optionMap_.count("input") && optionMap_.count("input-file")) {
         throw bpo::error("--input and --input-file are mutually exclusive");
+    }
+
+    // Require non-zero number of threads
+    if (getThreadCount() == 0) {
+        throw bpo::error("--threads must be greater than 0");
     }
 }
 
@@ -97,5 +103,15 @@ size_t ProgramOptions::getSquareDimensionRoot() const
     }
     else {
         return 3;
+    }
+}
+
+size_t ProgramOptions::getThreadCount() const
+{
+    if (optionMap_.count("threads")) {
+        return optionMap_["threads"].as<size_t>();
+    }
+    else {
+        return 1;
     }
 }

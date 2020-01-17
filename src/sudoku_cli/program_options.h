@@ -30,6 +30,8 @@ class ProgramOptions
 
         size_t getSquareDimensionRoot() const;
 
+        size_t getThreadCount() const;
+
     private:
     
         boost::program_options::options_description description_;

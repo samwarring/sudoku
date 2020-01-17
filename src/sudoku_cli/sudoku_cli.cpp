@@ -55,24 +55,36 @@ int handleOptions(const ProgramOptions& options)
         std::cout << "Input " << (inputNum + 1) << ":\n" << formatter->format(curInput) << '\n';
 
         // Find the first N solutions
-        sudoku::Solver solver(dims, curInput);
-        size_t numSolutionsFound = 0;
-        while (numSolutionsFound < options.getNumSolutions() && solver.computeNextSolution()) {
-            numSolutionsFound++;
-            auto duration = solver.getSolutionDuration();
-            auto durationMilli = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
-            std::cout << "Input " << (inputNum + 1) << ", ";
-            std::cout << "Solution " << numSolutionsFound << ", ";
-            std::cout << "Total Guesses: " << solver.getTotalGuesses() << ", ";
-            std::cout << "Total Backtracks: " << solver.getTotalBacktracks() << ", ";
-            std::cout << "Total Stack Ops: " << solver.getTotalGuesses() + solver.getTotalBacktracks() << ", ";
-            std::cout << "Duration: " << durationMilli.count() << " ms, ";
-            std::cout << "Guess Rate: " << (solver.getTotalGuesses() * 1.0 / durationMilli.count()) << " guesses/ms\n";
-            std::cout << formatter->format(solver.getCellValues()) << '\n';
-        }
+        if (options.getThreadCount() == 1) {
+            sudoku::Solver solver(dims, curInput);
+            size_t numSolutionsFound = 0;
+            while (numSolutionsFound < options.getNumSolutions() && solver.computeNextSolution()) {
+                numSolutionsFound++;
+                auto duration = solver.getSolutionDuration();
+                auto durationMilli = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
+                std::cout << "Input " << (inputNum + 1) << ", ";
+                std::cout << "Solution " << numSolutionsFound << ", ";
+                std::cout << "Total Guesses: " << solver.getTotalGuesses() << ", ";
+                std::cout << "Total Backtracks: " << solver.getTotalBacktracks() << ", ";
+                std::cout << "Total Stack Ops: " << solver.getTotalGuesses() + solver.getTotalBacktracks() << ", ";
+                std::cout << "Duration: " << durationMilli.count() << " ms, ";
+                std::cout << "Guess Rate: " << (solver.getTotalGuesses() * 1.0 / durationMilli.count()) << " guesses/ms\n";
+                std::cout << formatter->format(solver.getCellValues()) << '\n';
+            }
 
-        if (numSolutionsFound == 0) {
-            std::cout << "No solution after " << solver.getTotalGuesses() << " guesses.\n";
+            if (numSolutionsFound == 0) {
+                std::cout << "No solution after " << solver.getTotalGuesses() << " guesses.\n";
+            }
+        }
+        else { // options.getThreadCount > 1
+            sudoku::ParallelSolver solver(dims, curInput, options.getThreadCount(), 8);
+            auto solutionCount = 0;
+            while (solutionCount < options.getNumSolutions() && solver.computeNextSolution()) {
+                solutionCount++;
+                std::cout << "Input " << (inputNum + 1) << ", ";
+                std::cout << "Solution " << solutionCount << '\n';
+                std::cout << formatter->format(solver.getCellValues()) << '\n';
+            }
         }
     }
 

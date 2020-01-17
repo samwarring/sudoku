@@ -52,3 +52,17 @@ BOOST_AUTO_TEST_CASE(ParallelSolver_empty9x9_16Threads)
         BOOST_CHECK(solutionOcurrences == 1);
     }
 }
+
+BOOST_AUTO_TEST_CASE(ParallelSolver_25x25_2threads, * boost::unit_test::disabled())
+{
+    // I encountered this situation by coincidence. One thread quickly
+    // finds a solution, but the others take forever. If the user only
+    // wants a single solution, the ParallelSolver destructor hangs
+    // because the worker threads are still working and haven't "checked in"
+    // with the condition variable.
+
+    sudoku::square::Dimensions dims(5);
+    std::vector<size_t> cellValues(dims.getCellCount(), 0);
+    sudoku::ParallelSolver solver(dims, cellValues, 2, 1);
+    BOOST_REQUIRE(solver.computeNextSolution());
+}
