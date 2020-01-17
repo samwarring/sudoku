@@ -22,7 +22,7 @@ namespace sudoku
             // If char is placeholder, then following maxDigits-1 chars should
             // also be placeholder.
             if (isPlaceholder(formatString_[i])) {
-                for (int j = 1; j < maxDigits_ && i + j < formatString_.length(); ++j) {
+                for (size_t j = 1; j < maxDigits_ && i + j < formatString_.length(); ++j) {
                     if (!isPlaceholder(formatString_[i + j])) {
                         throw FormatterException("Encountered format string with invalid placeholder");
                     }
