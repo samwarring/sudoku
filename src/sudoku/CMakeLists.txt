@@ -19,4 +19,12 @@ target_compile_features(
     sudoku
     PUBLIC cxx_template_template_parameters
            cxx_range_for
+	   cxx_std_14
+)
+
+# Using std::thread
+find_package(Threads)
+target_link_libraries(
+    sudoku
+    PUBLIC Threads::Threads
 )
