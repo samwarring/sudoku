@@ -203,9 +203,11 @@ namespace sudoku
         if (numPeers + 1 < availableValues.size()) {
             return forkManyValuesPerPeer(forkPos, availableValues, numPeers);
         }
-        else {
-            // For now, don't attempt to make more solvers than we have available values.
+        else if (numPeers + 1 == availableValues.size()) {
             return forkOneValuePerPeer(forkPos, availableValues);
+        }
+        else {
+            return forkMorePeersThanValues(forkPos, availableValues, numPeers);
         }
     }
 
@@ -283,4 +285,52 @@ namespace sudoku
         return peerSolvers;
     }
 
+    
+    std::vector<std::unique_ptr<Solver>> Solver::forkMorePeersThanValues(
+        size_t forkPos,
+        const std::vector<size_t>& availableValues,
+        size_t numPeers)
+    {
+        // We have more peers than available values. (e.g. solving a
+        // 9x9 sudoku with 25 peers). 
+
+        // Fork peers for all available values
+        auto peers = forkOneValuePerPeer(forkPos, availableValues);
+        auto remainingNumPeers = numPeers - peers.size();
+
+        // Will use this lambda to extend one vector of peers with another.
+        auto extendPeers = [](auto& peers, auto& morePeers) {
+            for (size_t i = 0; i < morePeers.size(); ++i) {
+                peers.emplace_back(std::move(morePeers[i]));
+            }
+        };
+        
+        // Each of the peers we just created can themselves be forked to
+        // make up the rest. Divide the remaining (aka "recursive") peers
+        // as evenly as possible.
+        auto quotient = remainingNumPeers / (peers.size() + 1);
+        auto remainder = remainingNumPeers % (peers.size() + 1);
+
+        // Fork *this solver first.
+        auto thisNumRecursivePeers = quotient;
+        if (remainder > 0) {
+            thisNumRecursivePeers++;
+        }
+        auto allRecursivePeers = fork(thisNumRecursivePeers);
+        allRecursivePeers.reserve(remainingNumPeers);
+        
+        // Fork the original peers next.
+        for (size_t peerNum = 0; peerNum < peers.size(); ++peerNum) {
+            auto numRecursivePeers = quotient;
+            if (peerNum + 1 < remainder) {
+                numRecursivePeers++;
+            }
+            auto recursivePeers = peers[peerNum]->fork(numRecursivePeers);
+            extendPeers(allRecursivePeers, recursivePeers);
+        }
+
+        // Return a vector containing the initial peers and recursive peers.
+        extendPeers(peers, allRecursivePeers);
+        return peers;
+    }
 }

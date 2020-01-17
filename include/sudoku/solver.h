@@ -114,6 +114,12 @@ namespace sudoku
                 size_t numPeers
             );
 
+            std::vector<std::unique_ptr<Solver>> forkMorePeersThanValues(
+                size_t forkPos,
+                const std::vector<size_t>& availableValues,
+                size_t numPeers
+            );
+
             const Dimensions& dims_;
             std::vector<size_t> cellValues_;
             std::stack<std::pair<size_t, size_t>> guesses_;  ///< pairs of (position, value)

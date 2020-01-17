@@ -135,9 +135,10 @@ BOOST_DATA_TEST_CASE(Solver_fork9x9, testCases_fork9x9)
     sudoku::Solver solver(dims, cellValues);
     auto peers = solver.fork(numPeers);
     
-    // Test that we obtained at least 1 peer.
-    // TODO: We should be able to generate a bunch of peers...
-    BOOST_REQUIRE_GT(peers.size(), 0u);
+    // Test that we obtained the requested number of peers.
+    // For some sudokus, this may not be possible, but an empty
+    // 9x9 sudoku should not have a problem.
+    BOOST_REQUIRE_EQUAL(peers.size(), numPeers);
 
     // Each peer (and the original solver) should all be solvable.
     BOOST_REQUIRE(solver.computeNextSolution());
