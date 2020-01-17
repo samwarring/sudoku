@@ -2,9 +2,10 @@
 #define INCLUDED_SUDOKU_SOLVER_H
 
 #include <chrono>
-#include <vector>
+#include <memory>
 #include <stack>
 #include <stdexcept>
+#include <vector>
 #include <sudoku/dimensions.h>
 #include <sudoku/potential.h>
 
@@ -50,12 +51,37 @@ namespace sudoku
              * Read the current cell values of the sudoku. If \ref computeNextSolution
              * has not been called, this returns the initial cell values.
              */
-            const std::vector<size_t>& getCellValues() const;
+            const std::vector<size_t>& getCellValues() const { return cellValues_; }
+
+            /**
+             * Fork the solver into multiple solver objects, each searching
+             * a non-overlapping portion of the solution space.
+             * 
+             * \param numPeers Number of additional objects to produce (at most).
+             * 
+             * \return a vector of additional Solver objects. The current
+             *         object maintains a unique portion of the solution-space
+             *         not covered by the returned objects.
+             * 
+             * \note If the sudoku was obviously solvable/unsolvable, fork() will
+             *       return an empty vector. In this case, caller should check if
+             *       the sudoku was solved, or found to be no-solution using the
+             *       \ref computeNextSolution() method.
+             * 
+             * \note The resulting vector will never contain more than maxCellCount
+             *       solvers. This can be improved in a later version.
+             */
+            std::vector<std::unique_ptr<Solver>> fork(size_t numPeers);
 
             /**
              * Get the number of total guesses made so far.
              */
             size_t getTotalGuesses() const { return totalGuesses_; }
+
+            /**
+             * Get the number of total backtracks made so far.
+             */
+            size_t getTotalBacktracks() const { return totalBacktracks_; }
 
             /**
              * Get the total time spent computing solutions
@@ -75,11 +101,14 @@ namespace sudoku
 
             bool sequentialSolve();
 
+            size_t selectForkCell();
+
             const Dimensions& dims_;
             std::vector<size_t> cellValues_;
             std::stack<std::pair<size_t, size_t>> guesses_;  ///< pairs of (position, value)
             std::vector<Potential> cellPotentials_;
-            size_t totalGuesses_ = 0;  ///< Number of guesses made. Does not decrease.
+            size_t totalGuesses_ = 0;
+            size_t totalBacktracks_ = 0;
             Duration solutionDuration_{0};
     };
 }

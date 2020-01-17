@@ -1,10 +1,12 @@
 #include <iostream>
 #include <stdexcept>
+#include <unordered_map>
 #include <vector>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <sudoku/solver.h>
 #include <sudoku/standard.h>
+#include <sudoku/square.h>
 #include <sudoku/cell_value_parser.h>
 #include "util.h"
 
@@ -119,4 +121,49 @@ BOOST_DATA_TEST_CASE(Solver_testCases, testCases)
         }
     }
     BOOST_REQUIRE(!"Did not find a matching solution");
+}
+
+// Each test case represents the number of peers to request.
+std::vector<size_t> testCases_fork9x9{ 1, 3, 6, 8, 16 };
+
+BOOST_DATA_TEST_CASE(Solver_fork9x9, testCases_fork9x9)
+{
+    // Initialize a solver and fork it!
+    const size_t numPeers = sample;
+    sudoku::square::Dimensions dims(3);
+    std::vector<size_t> cellValues(dims.getCellCount(), 0);
+    sudoku::Solver solver(dims, cellValues);
+    auto peers = solver.fork(numPeers);
+    
+    // Test that we obtained at least 1 peer.
+    // TODO: We should be able to generate a bunch of peers...
+    BOOST_REQUIRE_GT(peers.size(), 0u);
+
+    // Each peer (and the original solver) should all be solvable.
+    BOOST_REQUIRE(solver.computeNextSolution());
+    for (const auto& peer : peers) {
+        BOOST_REQUIRE(peer->computeNextSolution());
+    }
+
+    // Each peer's solution should be unique from all the others.
+    // Use a hashmap of (solution) -> (# occurances) to determine
+    // if all solutions are unique.
+    std::unordered_map<std::string, size_t> solutions;
+
+    // Add original solver's solution to the hash map.
+    std::string formatString(dims.getCellCount(), '0');
+    sudoku::Formatter fmt(dims, formatString);
+    solutions[fmt.format(solver.getCellValues())]++;
+
+    // Add peers' solutions to the hash map.
+    for (const auto& peer : peers) {
+        std::string solution = fmt.format(peer->getCellValues());
+        solutions[solution]++;
+    }
+
+    // Verify number of solution occurances is 1 for all solutions.
+    for (auto it = solutions.begin(); it != solutions.end(); ++it) {
+        size_t solutionOcurrances = it->second;
+        BOOST_CHECK(solutionOcurrances == 1);
+    }
 }
