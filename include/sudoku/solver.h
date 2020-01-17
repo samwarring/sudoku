@@ -103,6 +103,17 @@ namespace sudoku
 
             size_t selectForkCell();
 
+            std::vector<std::unique_ptr<Solver>> forkOneValuePerPeer(
+                size_t forkPos,
+                const std::vector<size_t>& availableValues
+            );
+
+            std::vector<std::unique_ptr<Solver>> forkManyValuesPerPeer(
+                size_t forkPos,
+                const std::vector<size_t>& availableValues,
+                size_t numPeers
+            );
+
             const Dimensions& dims_;
             std::vector<size_t> cellValues_;
             std::stack<std::pair<size_t, size_t>> guesses_;  ///< pairs of (position, value)
