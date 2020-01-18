@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(ParallelSolver_empty9x9_16Threads)
     }
 }
 
-BOOST_AUTO_TEST_CASE(ParallelSolver_25x25_2threads, * boost::unit_test::disabled())
+BOOST_AUTO_TEST_CASE(ParallelSolver_25x25_2threads)
 {
     // I encountered this situation by coincidence. One thread quickly
     // finds a solution, but the others take forever. If the user only

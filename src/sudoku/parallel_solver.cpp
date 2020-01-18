@@ -15,7 +15,17 @@ namespace sudoku
 
     ParallelSolver::~ParallelSolver()
     {
+        // Destroy the consumer. Threads waiting to push their solution
+        // will shut down.
         consumer_.reset();
+
+        // Halt the solvers. Threads endlessly searching a vast solution
+        // space will shut down.
+        for (auto& solver : solvers_) {
+            solver->halt();
+        }
+
+        // Join the threads.
         for (auto& thread : threads_) {
             thread.join();
         }

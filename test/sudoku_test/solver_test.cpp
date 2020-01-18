@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdexcept>
+#include <thread>
 #include <unordered_map>
 #include <vector>
 #include <boost/test/unit_test.hpp>
@@ -167,4 +168,25 @@ BOOST_DATA_TEST_CASE(Solver_fork9x9, testCases_fork9x9)
         size_t solutionOcurrances = it->second;
         BOOST_CHECK(solutionOcurrances == 1);
     }
+}
+
+BOOST_AUTO_TEST_CASE(Solver_halt)
+{
+    // Prepare a large sudoku
+    sudoku::square::Dimensions dims(6);
+    std::vector<size_t> cellValues(dims.getCellCount(), 0);
+    sudoku::Solver solver(dims, cellValues);
+
+    // Attempt to solve it in another thread. This should
+    // take a while...
+    std::thread thread([&]() {
+        solver.computeNextSolution();
+    });
+
+    // Halt the solver on the main thread.
+    solver.halt();
+
+    // Now, computeNextSolution on the spawned thread should
+    // exit gracefully, letting us join quickly.
+    thread.join();
 }

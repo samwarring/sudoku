@@ -1,6 +1,7 @@
 #ifndef INCLUDED_SUDOKU_SOLVER_H
 #define INCLUDED_SUDOKU_SOLVER_H
 
+#include <atomic>
 #include <chrono>
 #include <memory>
 #include <stack>
@@ -74,6 +75,12 @@ namespace sudoku
             std::vector<std::unique_ptr<Solver>> fork(size_t numPeers);
 
             /**
+             * Halt any occurance of \ref computeNextSolution() that may be
+             * consuming another thread.
+             */
+            void halt() { haltEvent_.store(true); }
+
+            /**
              * Get the number of total guesses made so far.
              */
             size_t getTotalGuesses() const { return totalGuesses_; }
@@ -124,6 +131,7 @@ namespace sudoku
             std::vector<size_t> cellValues_;
             std::stack<std::pair<size_t, size_t>> guesses_;  ///< pairs of (position, value)
             std::vector<Potential> cellPotentials_;
+            std::atomic<bool> haltEvent_;
             size_t totalGuesses_ = 0;
             size_t totalBacktracks_ = 0;
             Duration solutionDuration_{0};

@@ -5,6 +5,7 @@ namespace sudoku
     Solver::Solver(const Dimensions& dims, std::vector<size_t> cellValues)
         : dims_(dims)
         , cellValues_(std::move(cellValues))
+        , haltEvent_(false)
     {
         if (cellValues_.size() != dims_.getCellCount()) {
             throw SolverException("Number of initial values does not match dimensions");
@@ -130,6 +131,14 @@ namespace sudoku
         }
 
         while (cellPos != dims_.getCellCount()) {
+            
+            // Check if the solver should stop searching.
+            // TODO: If performance becomes an issue, a couple ideas:
+            //       1. examine other memory orders (e.g. std::memory_order_relaxed)
+            //       2. don't check the event for _every_ iteration of the loop.
+            if (haltEvent_.load()) {
+                return false;
+            }
 
             // Does this cell have any remaining potential values?
             size_t cellValue = cellPotentials_[cellPos].getNextAvailableValue(minCellValue);
