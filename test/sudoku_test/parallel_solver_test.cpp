@@ -77,3 +77,18 @@ BOOST_AUTO_TEST_CASE(ParalellSolver_9x9_2threads_noSolution)
     sudoku::ParallelSolver solver(dims, cellValues, 2, 1);
     BOOST_REQUIRE(!solver.computeNextSolution());
 }
+
+BOOST_AUTO_TEST_CASE(ParallelSolver_findsAllSolutions)
+{
+    // Using the single-threaded solver, I found 288 total solutions with
+    // a 4x4 square sudoku. This test verifies that none of the solutions
+    // are lost when using a parallel solver.
+    sudoku::square::Dimensions dims(2);
+    std::vector<size_t> cellValues(dims.getCellCount(), 0);
+    sudoku::ParallelSolver solver(dims, cellValues, 4, 10);
+    auto solutionCount = 0;
+    while (solver.computeNextSolution()) {
+        solutionCount++;
+    }
+    BOOST_REQUIRE_EQUAL(solutionCount, 288);
+}
