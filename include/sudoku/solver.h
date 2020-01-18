@@ -119,6 +119,11 @@ namespace sudoku
             std::vector<Potential> cellPotentials_;
             std::atomic<bool> haltEvent_;
             Metrics metrics_;
+
+            // Set this flag to true if the solver contains a solution not yet reported
+            // by computeNextSolution. E.g. the solver was initialized with an already-
+            // solved sudoku; or a solution was reached in a call to fork.
+            bool unreportedSolution_ = false;
     };
 }
 

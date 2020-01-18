@@ -190,3 +190,67 @@ BOOST_AUTO_TEST_CASE(Solver_halt)
     // exit gracefully, letting us join quickly.
     thread.join();
 }
+
+BOOST_AUTO_TEST_CASE(Solver_oneCellRemaining_fork)
+{
+    sudoku::square::Dimensions dims(2);
+    std::vector<size_t> cellValues{
+        1, 2, 3, 4,
+        3, 4, 1, 2,
+        2, 1, 4, 3,
+        4, 3, 2, 0 // last remaining cell. Should be set to 1.
+    };
+    sudoku::Solver solver(dims, cellValues);
+    auto peers = solver.fork(3);
+
+    // Even though we requested 3 peers, there was only one
+    // remaining value. This means we expect 0 peers created.
+    BOOST_REQUIRE_EQUAL(peers.size(), 0);
+
+    // We want computeNextSolution() to produce the solution
+    // obtained during fork() instead of popping the last
+    // guess and continuing (which would yield no more
+    // solutions in this case).
+    BOOST_REQUIRE(solver.computeNextSolution());
+    std::vector<size_t> expectedSolution = {
+        1, 2, 3, 4,
+        3, 4, 1, 2,
+        2, 1, 4, 3,
+        4, 3, 2, 1
+    };
+    BOOST_REQUIRE_EQUAL_VECTORS(expectedSolution, solver.getCellValues());
+
+    // The next attempt to compute a solution should find no
+    // more solutions.
+    BOOST_REQUIRE(!solver.computeNextSolution());
+}
+
+BOOST_AUTO_TEST_CASE(Solver_fork_peerInitializedWithSolution)
+{
+    // In this example, the last remaining cell has multiple
+    // available values (since there are no groups). This will
+    // cause fork() to produce 3 peers, where each is initialized
+    // with a complete solution.
+    sudoku::Dimensions dims(4, 4, {});
+    std::vector<size_t> cellValues{1, 2, 3, 0};
+    sudoku::Solver solver(dims, cellValues);
+    auto peers = solver.fork(3);
+    BOOST_REQUIRE_EQUAL(peers.size(), 3);
+    BOOST_CHECK(solver.computeNextSolution());
+    for (auto& peer : peers) {
+        BOOST_CHECK(peer->computeNextSolution());
+    }
+}
+
+BOOST_AUTO_TEST_CASE(Solver_alreadySolved_computeNextSolutionSucceedsOnce)
+{
+    // If initializing an already-solved sudoku, the solver
+    // should return true on the first call to computeNextSolution(),
+    // and should return false after that.
+    sudoku::Dimensions dims(4, 4, {});
+    std::vector<size_t> cellValues{1, 2, 3, 4};
+    sudoku::Solver solver(dims, cellValues);
+    BOOST_REQUIRE(solver.computeNextSolution());
+    BOOST_REQUIRE_EQUAL(solver.getCellValues(), cellValues);
+    BOOST_REQUIRE(!solver.computeNextSolution());
+}

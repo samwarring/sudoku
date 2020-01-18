@@ -12,6 +12,12 @@ namespace sudoku
         }
         initializeCellPotentials();
         validateCellValues();
+        
+        // Check if already solved. If so, the first call to computeNextSolution
+        // should return true.
+        if (selectNextCell() == dims_.getCellCount()) {
+            unreportedSolution_ = true;
+        }
     }
 
     bool Solver::computeNextSolution()
@@ -116,13 +122,21 @@ namespace sudoku
 
     bool Solver::sequentialSolve()
     {
+        if (unreportedSolution_) {
+            // We previously found a solution without sequentialSolve().
+            // Future calls to sequentialSolve() will continue searching,
+            // but not this one.
+            unreportedSolution_ = false;
+            return true;
+        }
+
         size_t cellPos = selectNextCell();
         size_t minCellValue = 0;
 
         // If already solved, pop the last guess.
         if (cellPos == dims_.getCellCount()) {
             if (guesses_.size() == 0) {
-                // Nothing to pop. No solution.
+                // Nothing to pop. No more solutions.
                 return false;
             }
             auto prevGuess = popGuess();
@@ -171,6 +185,9 @@ namespace sudoku
             cellPos = selectNextCell();
             if (cellPos == dims_.getCellCount()) {
                 // No more empty cells. The sudoku is already solved.
+                // Mark the solution as un-reported so it can be returned
+                // from the next call to computeNextSolution().
+                unreportedSolution_ = true;
                 return dims_.getCellCount();
             }
             if (cellPotentials_[cellPos].getAmountBlocked() == dims_.getMaxCellValue()) {
@@ -247,6 +264,11 @@ namespace sudoku
         // first ones that were assigned to the peers.
         availableValue = cellPotentials_[forkPos].getNextAvailableValue(availableValue);
         pushGuess(forkPos, availableValue);
+
+        // This guess might have solved the sudoku. Let's make sure.
+        if (selectNextCell() == dims_.getCellCount()) {
+            unreportedSolution_ = true;
+        }
 
         return peerSolvers;
     }
