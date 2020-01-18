@@ -66,3 +66,14 @@ BOOST_AUTO_TEST_CASE(ParallelSolver_25x25_2threads)
     sudoku::ParallelSolver solver(dims, cellValues, 2, 1);
     BOOST_REQUIRE(solver.computeNextSolution());
 }
+
+BOOST_AUTO_TEST_CASE(ParalellSolver_9x9_2threads_noSolution)
+{
+    sudoku::standard::Dimensions dims;
+    auto cellValues = sudoku::parseCellValues(dims, 
+        "1 2 3 4 5 6 7 8 0 " // note last cell in row is blocked for all values.
+        "0 0 0 0 0 0 0 0 9 "
+    );
+    sudoku::ParallelSolver solver(dims, cellValues, 2, 1);
+    BOOST_REQUIRE(!solver.computeNextSolution());
+}

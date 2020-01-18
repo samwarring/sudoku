@@ -170,8 +170,11 @@ namespace sudoku
         while (true) {
             cellPos = selectNextCell();
             if (cellPos == dims_.getCellCount()) {
-                // Found a cell with no options; therefore, no solution.
-                // In this case, there is no fork cell.
+                // No more empty cells. The sudoku is already solved.
+                return dims_.getCellCount();
+            }
+            if (cellPotentials_[cellPos].getAmountBlocked() == dims_.getMaxCellValue()) {
+                // Found a completely-blocked cell. No solution.
                 return dims_.getCellCount();
             }
             if (cellPotentials_[cellPos].getAmountBlocked() == dims_.getMaxCellValue() - 1) {
