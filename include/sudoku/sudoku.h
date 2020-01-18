@@ -16,5 +16,6 @@
 #include <sudoku/solver.h>
 #include <sudoku/square.h>
 #include <sudoku/parallel_solver.h>
+#include <sudoku/metrics.h>
 
 #endif

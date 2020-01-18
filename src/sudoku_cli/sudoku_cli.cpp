@@ -9,6 +9,18 @@
 #include <sudoku/sudoku.h>
 #include "program_options.h"
 
+std::string formatMetrics(sudoku::Metrics metrics)
+{
+    std::ostringstream sout;
+    auto durationMilli = std::chrono::duration_cast<std::chrono::milliseconds>(metrics.duration);
+    sout << "Total Guesses: " << metrics.totalGuesses << ", ";
+    sout << "Total Backtracks: " << metrics.totalBacktracks << ", ";
+    sout << "Total Stack Ops: " << metrics.totalGuesses + metrics.totalBacktracks << ", ";
+    sout << "Duration: " << durationMilli.count() << " ms, ";
+    sout << "Guess Rate: " << (metrics.totalGuesses * 1.0 / durationMilli.count()) << " guesses/ms";
+    return sout.str();
+}
+
 int handleOptions(const ProgramOptions& options)
 {    
     // Print --help if necessary
@@ -60,20 +72,14 @@ int handleOptions(const ProgramOptions& options)
             size_t numSolutionsFound = 0;
             while (numSolutionsFound < options.getNumSolutions() && solver.computeNextSolution()) {
                 numSolutionsFound++;
-                auto duration = solver.getSolutionDuration();
-                auto durationMilli = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
                 std::cout << "Input " << (inputNum + 1) << ", ";
                 std::cout << "Solution " << numSolutionsFound << ", ";
-                std::cout << "Total Guesses: " << solver.getTotalGuesses() << ", ";
-                std::cout << "Total Backtracks: " << solver.getTotalBacktracks() << ", ";
-                std::cout << "Total Stack Ops: " << solver.getTotalGuesses() + solver.getTotalBacktracks() << ", ";
-                std::cout << "Duration: " << durationMilli.count() << " ms, ";
-                std::cout << "Guess Rate: " << (solver.getTotalGuesses() * 1.0 / durationMilli.count()) << " guesses/ms\n";
+                std::cout << formatMetrics(solver.getMetrics()) << '\n';
                 std::cout << formatter->format(solver.getCellValues()) << '\n';
             }
 
             if (numSolutionsFound == 0) {
-                std::cout << "No solution after " << solver.getTotalGuesses() << " guesses.\n";
+                std::cout << "No solution after " << solver.getMetrics().totalGuesses << " guesses.\n";
             }
         }
         else { // options.getThreadCount > 1
@@ -84,6 +90,10 @@ int handleOptions(const ProgramOptions& options)
                 std::cout << "Input " << (inputNum + 1) << ", ";
                 std::cout << "Solution " << solutionCount << '\n';
                 std::cout << formatter->format(solver.getCellValues()) << '\n';
+            }
+
+            if (solutionCount == 0) {
+                std::cout << "No solution.\n";
             }
         }
     }

@@ -9,6 +9,7 @@
 #include <vector>
 #include <sudoku/dimensions.h>
 #include <sudoku/potential.h>
+#include <sudoku/metrics.h>
 
 namespace sudoku
 {
@@ -26,11 +27,6 @@ namespace sudoku
     class Solver
     {
         public:
-
-            /**
-             * Underlying type for time durations.
-             */
-            using Duration = std::chrono::high_resolution_clock::duration;
 
             /**
              * \param dims dimensions of the sudoku
@@ -81,19 +77,9 @@ namespace sudoku
             void halt() { haltEvent_.store(true); }
 
             /**
-             * Get the number of total guesses made so far.
+             * Get the metrics collected so far while solving.
              */
-            size_t getTotalGuesses() const { return totalGuesses_; }
-
-            /**
-             * Get the number of total backtracks made so far.
-             */
-            size_t getTotalBacktracks() const { return totalBacktracks_; }
-
-            /**
-             * Get the total time spent computing solutions
-             */
-            Duration getSolutionDuration() const { return solutionDuration_; }
+            Metrics getMetrics() const { return metrics_; }
 
         private:
             void initializeCellPotentials();
@@ -132,9 +118,7 @@ namespace sudoku
             std::stack<std::pair<size_t, size_t>> guesses_;  ///< pairs of (position, value)
             std::vector<Potential> cellPotentials_;
             std::atomic<bool> haltEvent_;
-            size_t totalGuesses_ = 0;
-            size_t totalBacktracks_ = 0;
-            Duration solutionDuration_{0};
+            Metrics metrics_;
     };
 }
 

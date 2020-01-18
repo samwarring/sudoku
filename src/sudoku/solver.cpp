@@ -16,10 +16,10 @@ namespace sudoku
 
     bool Solver::computeNextSolution()
     {
-        auto startTime = std::chrono::high_resolution_clock::now();
+        auto startTime = Metrics::now();
         bool result = sequentialSolve();
-        auto stopTime = std::chrono::high_resolution_clock::now();
-        solutionDuration_ += (stopTime - startTime);
+        auto stopTime = Metrics::now();
+        metrics_.duration += (stopTime - startTime);
         return result;
     }
 
@@ -72,7 +72,7 @@ namespace sudoku
             }
         }
         guesses_.push({ cellPos, cellValue });
-        totalGuesses_++;
+        metrics_.totalGuesses++;
     }
 
     std::pair<size_t, size_t> Solver::popGuess()
@@ -87,7 +87,7 @@ namespace sudoku
                 cellPotentials_[relatedCellPos].unblock(cellValue);
             }
         }
-        totalBacktracks_++;
+        metrics_.totalBacktracks++;
         return prevGuess;
     }
 
