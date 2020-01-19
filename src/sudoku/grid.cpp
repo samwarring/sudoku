@@ -8,10 +8,12 @@ namespace sudoku
         for (size_t cellPos = 0; cellPos < dims_.getCellCount(); ++cellPos) {
             cellPotentials_.emplace_back(dims_.getMaxCellValue());
         }
+        cellValues_.resize(dims_.getCellCount());
     }
 
     void Grid::setCellValue(size_t cellPos, size_t cellValue)
     {
+        cellValues_[cellPos] = cellValue;
         for (auto groupNum : dims_.getGroupsForCell(cellPos)) {
             for (auto relatedPos : dims_.getCellsInGroup(groupNum)) {
                 cellPotentials_[relatedPos].block(cellValue);
@@ -19,8 +21,10 @@ namespace sudoku
         }
     }
 
-    void Grid::clearCellValue(size_t cellPos, size_t cellValue)
+    void Grid::clearCellValue(size_t cellPos)
     {
+        size_t cellValue = cellValues_[cellPos];
+        cellValues_[cellPos] = 0;
         for (auto groupNum : dims_.getGroupsForCell(cellPos)) {
             for (auto relatedPos : dims_.getCellsInGroup(groupNum)) {
                 cellPotentials_[relatedPos].unblock(cellValue);

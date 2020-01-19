@@ -15,6 +15,14 @@ BOOST_AUTO_TEST_CASE(Grid_initialPotentialsAllUnblocked)
     }
 }
 
+BOOST_AUTO_TEST_CASE(Grid_setAndGetValue)
+{
+    sudoku::square::Dimensions dims(2);
+    sudoku::Grid grid(dims);
+    grid.setCellValue(3, 3);
+    BOOST_REQUIRE_EQUAL(grid.getCellValue(3), 3);
+}
+
 BOOST_AUTO_TEST_CASE(Grid_setValues_valuesBlockedInGroup)
 {
     sudoku::square::Dimensions dims(2);
@@ -41,25 +49,25 @@ BOOST_AUTO_TEST_CASE(Grid_setAndClearValue)
     sudoku::Grid grid(dims);
 
     grid.setCellValue(0, 1); // 1 x 0 0 <-- x blocked on value 1
-                                      // 0 0 0 0
-                                      // 0 0 0 0
-                                      // 0 0 0 0
+                             // 0 0 0 0
+                             // 0 0 0 0
+                             // 0 0 0 0
 
     grid.setCellValue(13, 1); // 1 x 0 0 <-- x blocked on value 1
-                                       // 0 0 0 0
-                                       // 0 0 0 0
-                                       // 0 1 0 0
+                              // 0 0 0 0
+                              // 0 0 0 0
+                              // 0 1 0 0
     
     BOOST_REQUIRE(grid.getCellPotential(1).isBlocked(1));
     
     // Remove the 1 at position 0. The cell at 'x' should still
     // be blocked by the 1 at position 13.
-    grid.clearCellValue(0, 1);
+    grid.clearCellValue(0);
     BOOST_REQUIRE(grid.getCellPotential(1).isBlocked(1));
 
     // Remove the 1 at position 13. The cell at 'x' should now be
     // free again.
-    grid.clearCellValue(13, 1);
+    grid.clearCellValue(13);
     BOOST_REQUIRE(!grid.getCellPotential(1).isBlocked(1));
 }
 

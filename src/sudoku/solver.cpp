@@ -75,7 +75,7 @@ namespace sudoku
         guesses_.pop();
         size_t cellPos = prevGuess.first;
         size_t cellValue = prevGuess.second;
-        grid_.clearCellValue(cellPos, cellValue);
+        grid_.clearCellValue(cellPos);
         cellValues_[cellPos] = 0;
         metrics_.totalBacktracks++;
         return prevGuess;
