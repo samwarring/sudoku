@@ -9,7 +9,7 @@ add_library(
     solution_queue.cpp
     square.cpp
     parallel_solver.cpp
-    grid_potential.cpp
+    grid.cpp
 )
 
 target_include_directories(

@@ -13,7 +13,7 @@ add_executable(
     solution_queue_test.cpp
     square_test.cpp
     parallel_solver_test.cpp
-    grid_potential_test.cpp
+    grid_test.cpp
 )
 
 target_include_directories(
