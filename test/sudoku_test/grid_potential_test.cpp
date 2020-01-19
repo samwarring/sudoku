@@ -2,10 +2,10 @@
 #include <sudoku/grid_potential.h>
 #include <sudoku/standard.h>
 
-BOOST_AUTO_TEST_CASE(GridPotential_initialPotentialsAllUnblocked)
+BOOST_AUTO_TEST_CASE(Grid_initialPotentialsAllUnblocked)
 {
     sudoku::standard::Dimensions dims;
-    sudoku::GridPotential gridPotential(dims);
+    sudoku::Grid gridPotential(dims);
 
     // Each value of each cell should be available.
     for (size_t cellPos = 0; cellPos < dims.getCellCount(); ++cellPos) {
@@ -15,10 +15,10 @@ BOOST_AUTO_TEST_CASE(GridPotential_initialPotentialsAllUnblocked)
     }
 }
 
-BOOST_AUTO_TEST_CASE(GridPotential_setValues_valuesBlockedInGroup)
+BOOST_AUTO_TEST_CASE(Grid_setValues_valuesBlockedInGroup)
 {
     sudoku::square::Dimensions dims(2);
-    sudoku::GridPotential gridPotential(dims);
+    sudoku::Grid gridPotential(dims);
 
     // 1 2 | 0 0
     // 0 0 | 0 0
@@ -35,10 +35,10 @@ BOOST_AUTO_TEST_CASE(GridPotential_setValues_valuesBlockedInGroup)
     BOOST_CHECK(!gridPotential.getCellPotential(8).isBlocked(2)); // cell 27 not blocked by cell 1
 }
 
-BOOST_AUTO_TEST_CASE(GridPotential_setAndClearValue)
+BOOST_AUTO_TEST_CASE(Grid_setAndClearValue)
 {
     sudoku::square::Dimensions dims(2);
-    sudoku::GridPotential gridPotential(dims);
+    sudoku::Grid gridPotential(dims);
 
     gridPotential.setCellValue(0, 1); // 1 x 0 0 <-- x blocked on value 1
                                       // 0 0 0 0
@@ -63,10 +63,10 @@ BOOST_AUTO_TEST_CASE(GridPotential_setAndClearValue)
     BOOST_REQUIRE(!gridPotential.getCellPotential(1).isBlocked(1));
 }
 
-BOOST_AUTO_TEST_CASE(GridPotential_restrictValue)
+BOOST_AUTO_TEST_CASE(Grid_restrictValue)
 {
     sudoku::square::Dimensions dims(2);
-    sudoku::GridPotential gridPotential(dims);
+    sudoku::Grid gridPotential(dims);
 
     BOOST_REQUIRE(!gridPotential.getCellPotential(0).isBlocked(3));
     gridPotential.restrictCellValue(0, 3);

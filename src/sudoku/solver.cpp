@@ -5,7 +5,7 @@ namespace sudoku
     Solver::Solver(const Dimensions& dims, std::vector<size_t> cellValues)
         : dims_(dims)
         , cellValues_(std::move(cellValues))
-        , gridPotential_(dims)
+        , grid_(dims)
         , haltEvent_(false)
     {
         if (cellValues_.size() != dims_.getCellCount()) {
@@ -34,7 +34,7 @@ namespace sudoku
     {
         for (size_t cellPos = 0; cellPos < dims_.getCellCount(); ++cellPos) {
             if (cellValues_[cellPos] > 0) {
-                gridPotential_.setCellValue(cellPos, cellValues_[cellPos]);
+                grid_.setCellValue(cellPos, cellValues_[cellPos]);
             }
         }
     }
@@ -64,7 +64,7 @@ namespace sudoku
     void Solver::pushGuess(size_t cellPos, size_t cellValue)
     {
         cellValues_[cellPos] = cellValue;
-        gridPotential_.setCellValue(cellPos, cellValue);
+        grid_.setCellValue(cellPos, cellValue);
         guesses_.push({ cellPos, cellValue });
         metrics_.totalGuesses++;
     }
@@ -75,7 +75,7 @@ namespace sudoku
         guesses_.pop();
         size_t cellPos = prevGuess.first;
         size_t cellValue = prevGuess.second;
-        gridPotential_.clearCellValue(cellPos, cellValue);
+        grid_.clearCellValue(cellPos, cellValue);
         cellValues_[cellPos] = 0;
         metrics_.totalBacktracks++;
         return prevGuess;
@@ -89,7 +89,7 @@ namespace sudoku
         const size_t maxCellValue = dims_.getMaxCellValue();
         for (size_t cellPos = 0; cellPos < cellCount; ++cellPos) {
             if (cellValues_[cellPos] == 0) {
-                size_t amountBlocked = gridPotential_.getCellPotential(cellPos).getAmountBlocked();
+                size_t amountBlocked = grid_.getCellPotential(cellPos).getAmountBlocked();
                 if (leadingNumBlocked <= amountBlocked) {
                     leadingPos = cellPos;
                     leadingNumBlocked = amountBlocked;
@@ -139,7 +139,7 @@ namespace sudoku
             }
 
             // Does this cell have any remaining potential values?
-            size_t cellValue = gridPotential_.getCellPotential(cellPos).getNextAvailableValue(minCellValue);
+            size_t cellValue = grid_.getCellPotential(cellPos).getNextAvailableValue(minCellValue);
             if (cellValue == 0) {
                 // Backtrack
                 if (guesses_.size() == 0) {
@@ -174,14 +174,14 @@ namespace sudoku
                 unreportedSolution_ = true;
                 return dims_.getCellCount();
             }
-            if (gridPotential_.getCellPotential(cellPos).getAmountBlocked() == dims_.getMaxCellValue()) {
+            if (grid_.getCellPotential(cellPos).getAmountBlocked() == dims_.getMaxCellValue()) {
                 // Found a completely-blocked cell. No solution.
                 return dims_.getCellCount();
             }
-            if (gridPotential_.getCellPotential(cellPos).getAmountBlocked() == dims_.getMaxCellValue() - 1) {
+            if (grid_.getCellPotential(cellPos).getAmountBlocked() == dims_.getMaxCellValue() - 1) {
                 // Found a cell with only one possibility; don't fork here.
                 // Make the guess and try the next one.
-                pushGuess(cellPos, gridPotential_.getCellPotential(cellPos).getNextAvailableValue(0));
+                pushGuess(cellPos, grid_.getCellPotential(cellPos).getNextAvailableValue(0));
                 continue;
             }
             // Found an empty cell with multiple unblocked values.
@@ -207,7 +207,7 @@ namespace sudoku
         // Get the available values.
         std::vector<size_t> availableValues;
         for (size_t cellValue = 1; cellValue <= dims_.getMaxCellValue(); ++cellValue) {
-            if (!gridPotential_.getCellPotential(forkPos).isBlocked(cellValue)) {
+            if (!grid_.getCellPotential(forkPos).isBlocked(cellValue)) {
                 availableValues.push_back(cellValue);
             }
         }
@@ -238,14 +238,14 @@ namespace sudoku
             // Each peer starts with the same values as the current solver, except
             // they each have a different value for the fork cell.
             std::vector<size_t> newCellValues = cellValues_;
-            availableValue = gridPotential_.getCellPotential(forkPos).getNextAvailableValue(availableValue);
+            availableValue = grid_.getCellPotential(forkPos).getNextAvailableValue(availableValue);
             newCellValues[forkPos] = availableValue;
             peerSolvers.push_back(std::make_unique<Solver>(dims_, std::move(newCellValues)));
         }
 
         // This solver gets the last available value. That way, it skips over the
         // first ones that were assigned to the peers.
-        availableValue = gridPotential_.getCellPotential(forkPos).getNextAvailableValue(availableValue);
+        availableValue = grid_.getCellPotential(forkPos).getNextAvailableValue(availableValue);
         pushGuess(forkPos, availableValue);
 
         // This guess might have solved the sudoku. Let's make sure.
@@ -291,7 +291,7 @@ namespace sudoku
                     // ...except the current peer.
                     continue;
                 }
-                allSolvers[solverNum]->gridPotential_.restrictCellValue(forkPos, availableValue);
+                allSolvers[solverNum]->grid_.restrictCellValue(forkPos, availableValue);
             }
 
             // The next available value will be assigned to the next peer.

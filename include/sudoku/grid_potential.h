@@ -11,15 +11,11 @@ namespace sudoku
      * A GridPotential tracks the potential values of all cells in a
      * sudoku grid.
      */
-    class GridPotential
+    class Grid
     {
         public:
 
-            /**
-             * Creates an internal array of cell potentials for each
-             * cell in the dimensions
-             */
-            GridPotential(const Dimensions& dims);
+            Grid(const Dimensions& dims);
 
             /**
              * Get read-only access to a cell potential

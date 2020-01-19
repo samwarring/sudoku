@@ -116,7 +116,7 @@ namespace sudoku
             const Dimensions& dims_;
             std::vector<size_t> cellValues_;
             std::stack<std::pair<size_t, size_t>> guesses_;  ///< pairs of (position, value)
-            GridPotential gridPotential_;
+            Grid grid_;
             std::atomic<bool> haltEvent_;
             Metrics metrics_;
 
