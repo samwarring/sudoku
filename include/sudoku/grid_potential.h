@@ -24,7 +24,7 @@ namespace sudoku
             /**
              * Get read-only access to a cell potential
              */
-            const Potential& getCellPotential(size_t cellPos) { return cellPotentials_[cellPos]; }
+            const Potential& getCellPotential(size_t cellPos) const { return cellPotentials_[cellPos]; }
 
             /**
              * Blocks the given cell value for all cells that share a group

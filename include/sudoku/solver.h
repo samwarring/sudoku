@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <vector>
 #include <sudoku/dimensions.h>
-#include <sudoku/potential.h>
+#include <sudoku/grid_potential.h>
 #include <sudoku/metrics.h>
 
 namespace sudoku
@@ -116,7 +116,7 @@ namespace sudoku
             const Dimensions& dims_;
             std::vector<size_t> cellValues_;
             std::stack<std::pair<size_t, size_t>> guesses_;  ///< pairs of (position, value)
-            std::vector<Potential> cellPotentials_;
+            GridPotential gridPotential_;
             std::atomic<bool> haltEvent_;
             Metrics metrics_;
 
