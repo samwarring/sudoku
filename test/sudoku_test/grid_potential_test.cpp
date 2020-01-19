@@ -1,5 +1,5 @@
 #include <boost/test/unit_test.hpp>
-#include <sudoku/grid_potential.h>
+#include <sudoku/grid.h>
 #include <sudoku/standard.h>
 
 BOOST_AUTO_TEST_CASE(Grid_initialPotentialsAllUnblocked)

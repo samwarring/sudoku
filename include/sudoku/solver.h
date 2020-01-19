@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <vector>
 #include <sudoku/dimensions.h>
-#include <sudoku/grid_potential.h>
+#include <sudoku/grid.h>
 #include <sudoku/metrics.h>
 
 namespace sudoku

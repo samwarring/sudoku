@@ -1,4 +1,4 @@
-#include <sudoku/grid_potential.h>
+#include <sudoku/grid.h>
 
 namespace sudoku
 {
