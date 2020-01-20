@@ -54,6 +54,11 @@ namespace sudoku
              */
             size_t getNextAvailableValue(size_t minValue) const;
 
+            /**
+             * Gets a vector containing all available values.
+             */
+            std::vector<size_t> getAvailableValues() const;
+
         private:
             std::vector<size_t> block_counts_;
             size_t numCellValuesBlocked_ = 0;

@@ -1,4 +1,3 @@
-# 1.58.0 : WSL
 find_package(Boost REQUIRED unit_test_framework)
 
 add_executable(
@@ -14,6 +13,7 @@ add_executable(
     square_test.cpp
     parallel_solver_test.cpp
     grid_test.cpp
+    fork_test.cpp
 )
 
 target_include_directories(

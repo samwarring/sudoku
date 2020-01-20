@@ -6,6 +6,7 @@
 #include <thread>
 #include <vector>
 #include <sudoku/dimensions.h>
+#include <sudoku/grid.h>
 #include <sudoku/solver.h>
 #include <sudoku/solution_queue.h>
 
@@ -17,8 +18,7 @@ namespace sudoku
     {
         public:
             ParallelSolver(
-                const Dimensions& dims,
-                std::vector<size_t> cellValues,
+                sudoku::Grid grid,
                 size_t threadCount,
                 size_t queueSize
             );
@@ -27,13 +27,13 @@ namespace sudoku
 
             bool computeNextSolution();
 
-            const std::vector<size_t>& getCellValues() const { return cellValues_; }
+            const std::vector<size_t>& getCellValues() const;
 
         private:
             void startThreads();
 
-            const Dimensions& dims_;
-            std::vector<size_t> cellValues_;
+            sudoku::Grid grid_;
+            std::vector<size_t> solution_;
             std::vector<std::thread> threads_;
             std::vector<std::unique_ptr<Solver>> solvers_;
             SolutionQueue queue_;

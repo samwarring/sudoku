@@ -28,4 +28,17 @@ namespace sudoku
         }
         return 0;
     }
+
+    std::vector<size_t> Potential::getAvailableValues() const
+    {
+        const size_t maxCellValue = block_counts_.size();
+        std::vector<size_t> result;
+        result.reserve(maxCellValue - numCellValuesBlocked_);
+        for (size_t cellValue = 1; cellValue <= maxCellValue; ++cellValue) {
+            if (block_counts_[cellValue - 1] == 0) {
+                result.push_back(cellValue);
+            }
+        }
+        return result;
+    }
 }

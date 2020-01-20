@@ -23,7 +23,8 @@ BOOST_AUTO_TEST_CASE(ParallelSolver_example9x9_4threads)
         "269314785 548769231 731852649"
     );
 
-    sudoku::ParallelSolver solver(dims, cellValues, 4, 10);
+    sudoku::Grid grid(dims, cellValues);
+    sudoku::ParallelSolver solver(grid, 4, 10);
     BOOST_REQUIRE(solver.computeNextSolution());
     const auto& actualSolution = solver.getCellValues();
     BOOST_REQUIRE_EQUAL_VECTORS(expectedSolution, actualSolution);
@@ -33,7 +34,8 @@ BOOST_AUTO_TEST_CASE(ParallelSolver_empty9x9_16Threads)
 {
     sudoku::standard::Dimensions dims;
     std::vector<size_t> cellValues(dims.getCellCount(), 0);
-    sudoku::ParallelSolver solver(dims, cellValues, 16, 8);
+    sudoku::Grid grid(dims, cellValues);
+    sudoku::ParallelSolver solver(grid, 16, 8);
 
     // Compute 100 solutions. Each solution should be unique; use a
     // hash map to be sure.
@@ -63,7 +65,8 @@ BOOST_AUTO_TEST_CASE(ParallelSolver_25x25_2threads)
 
     sudoku::square::Dimensions dims(5);
     std::vector<size_t> cellValues(dims.getCellCount(), 0);
-    sudoku::ParallelSolver solver(dims, cellValues, 2, 1);
+    sudoku::Grid grid(dims, std::move(cellValues));
+    sudoku::ParallelSolver solver(std::move(grid), 2, 1);
     BOOST_REQUIRE(solver.computeNextSolution());
 }
 
@@ -74,7 +77,8 @@ BOOST_AUTO_TEST_CASE(ParalellSolver_9x9_2threads_noSolution)
         "1 2 3 4 5 6 7 8 0 " // note last cell in row is blocked for all values.
         "0 0 0 0 0 0 0 0 9 "
     );
-    sudoku::ParallelSolver solver(dims, cellValues, 2, 1);
+    sudoku::Grid grid(dims, std::move(cellValues));
+    sudoku::ParallelSolver solver(std::move(grid), 2, 1);
     BOOST_REQUIRE(!solver.computeNextSolution());
 }
 
@@ -85,7 +89,8 @@ BOOST_AUTO_TEST_CASE(ParallelSolver_findsAllSolutions)
     // are lost when using a parallel solver.
     sudoku::square::Dimensions dims(2);
     std::vector<size_t> cellValues(dims.getCellCount(), 0);
-    sudoku::ParallelSolver solver(dims, cellValues, 4, 10);
+    sudoku::Grid grid(dims, cellValues);
+    sudoku::ParallelSolver solver(grid, 4, 10);
     auto solutionCount = 0;
     while (solver.computeNextSolution()) {
         solutionCount++;

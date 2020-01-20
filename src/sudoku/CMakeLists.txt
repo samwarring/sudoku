@@ -10,6 +10,7 @@ add_library(
     square.cpp
     parallel_solver.cpp
     grid.cpp
+    fork.cpp
 )
 
 target_include_directories(

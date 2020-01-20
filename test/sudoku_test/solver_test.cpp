@@ -114,7 +114,8 @@ BOOST_DATA_TEST_CASE(Solver_testCases, testCases)
     const TestCase& tc = sample;
     auto inputValues = sudoku::parseCellValues(tc.dims, tc.inputValueString);
     auto expectedValues = sudoku::parseCellValues(tc.dims, tc.expectedValueString);
-    sudoku::Solver solver(tc.dims, std::move(inputValues));
+    sudoku::Grid grid(tc.dims, std::move(inputValues));
+    sudoku::Solver solver(std::move(grid));
     while (solver.computeNextSolution()) {
         // Found a solution, but is it the solution we're looking for?
         if (solver.getCellValues() == expectedValues) {
@@ -124,50 +125,10 @@ BOOST_DATA_TEST_CASE(Solver_testCases, testCases)
     BOOST_REQUIRE(!"Did not find a matching solution");
 }
 
-// Each test case represents the number of peers to request.
-std::vector<size_t> testCases_fork9x9{ 1, 3, 6, 8, 16 };
-
-BOOST_DATA_TEST_CASE(Solver_fork9x9, testCases_fork9x9)
+BOOST_AUTO_TEST_CASE(Solver_constructFromDims)
 {
-    // Initialize a solver and fork it!
-    const size_t numPeers = sample;
-    sudoku::square::Dimensions dims(3);
-    std::vector<size_t> cellValues(dims.getCellCount(), 0);
-    sudoku::Solver solver(dims, cellValues);
-    auto peers = solver.fork(numPeers);
-    
-    // Test that we obtained the requested number of peers.
-    // For some sudokus, this may not be possible, but an empty
-    // 9x9 sudoku should not have a problem.
-    BOOST_REQUIRE_EQUAL(peers.size(), numPeers);
-
-    // Each peer (and the original solver) should all be solvable.
-    BOOST_REQUIRE(solver.computeNextSolution());
-    for (const auto& peer : peers) {
-        BOOST_REQUIRE(peer->computeNextSolution());
-    }
-
-    // Each peer's solution should be unique from all the others.
-    // Use a hashmap of (solution) -> (# occurances) to determine
-    // if all solutions are unique.
-    std::unordered_map<std::string, size_t> solutions;
-
-    // Add original solver's solution to the hash map.
-    std::string formatString(dims.getCellCount(), '0');
-    sudoku::Formatter fmt(dims, formatString);
-    solutions[fmt.format(solver.getCellValues())]++;
-
-    // Add peers' solutions to the hash map.
-    for (const auto& peer : peers) {
-        std::string solution = fmt.format(peer->getCellValues());
-        solutions[solution]++;
-    }
-
-    // Verify number of solution occurances is 1 for all solutions.
-    for (auto it = solutions.begin(); it != solutions.end(); ++it) {
-        size_t solutionOcurrances = it->second;
-        BOOST_CHECK(solutionOcurrances == 1);
-    }
+    sudoku::Solver solver(simple4);
+    while (solver.computeNextSolution());
 }
 
 BOOST_AUTO_TEST_CASE(Solver_halt)
@@ -175,7 +136,8 @@ BOOST_AUTO_TEST_CASE(Solver_halt)
     // Prepare a large sudoku
     sudoku::square::Dimensions dims(6);
     std::vector<size_t> cellValues(dims.getCellCount(), 0);
-    sudoku::Solver solver(dims, cellValues);
+    sudoku::Grid grid(dims, std::move(cellValues));
+    sudoku::Solver solver(grid);
 
     // Attempt to solve it in another thread. This should
     // take a while...
@@ -191,57 +153,6 @@ BOOST_AUTO_TEST_CASE(Solver_halt)
     thread.join();
 }
 
-BOOST_AUTO_TEST_CASE(Solver_oneCellRemaining_fork)
-{
-    sudoku::square::Dimensions dims(2);
-    std::vector<size_t> cellValues{
-        1, 2, 3, 4,
-        3, 4, 1, 2,
-        2, 1, 4, 3,
-        4, 3, 2, 0 // last remaining cell. Should be set to 1.
-    };
-    sudoku::Solver solver(dims, cellValues);
-    auto peers = solver.fork(3);
-
-    // Even though we requested 3 peers, there was only one
-    // remaining value. This means we expect 0 peers created.
-    BOOST_REQUIRE_EQUAL(peers.size(), 0);
-
-    // We want computeNextSolution() to produce the solution
-    // obtained during fork() instead of popping the last
-    // guess and continuing (which would yield no more
-    // solutions in this case).
-    BOOST_REQUIRE(solver.computeNextSolution());
-    std::vector<size_t> expectedSolution = {
-        1, 2, 3, 4,
-        3, 4, 1, 2,
-        2, 1, 4, 3,
-        4, 3, 2, 1
-    };
-    BOOST_REQUIRE_EQUAL_VECTORS(expectedSolution, solver.getCellValues());
-
-    // The next attempt to compute a solution should find no
-    // more solutions.
-    BOOST_REQUIRE(!solver.computeNextSolution());
-}
-
-BOOST_AUTO_TEST_CASE(Solver_fork_peerInitializedWithSolution)
-{
-    // In this example, the last remaining cell has multiple
-    // available values (since there are no groups). This will
-    // cause fork() to produce 3 peers, where each is initialized
-    // with a complete solution.
-    sudoku::Dimensions dims(4, 4, {});
-    std::vector<size_t> cellValues{1, 2, 3, 0};
-    sudoku::Solver solver(dims, cellValues);
-    auto peers = solver.fork(3);
-    BOOST_REQUIRE_EQUAL(peers.size(), 3);
-    BOOST_CHECK(solver.computeNextSolution());
-    for (auto& peer : peers) {
-        BOOST_CHECK(peer->computeNextSolution());
-    }
-}
-
 BOOST_AUTO_TEST_CASE(Solver_alreadySolved_computeNextSolutionSucceedsOnce)
 {
     // If initializing an already-solved sudoku, the solver
@@ -249,7 +160,8 @@ BOOST_AUTO_TEST_CASE(Solver_alreadySolved_computeNextSolutionSucceedsOnce)
     // and should return false after that.
     sudoku::Dimensions dims(4, 4, {});
     std::vector<size_t> cellValues{1, 2, 3, 4};
-    sudoku::Solver solver(dims, cellValues);
+    sudoku::Grid grid(dims, cellValues);
+    sudoku::Solver solver(grid);
     BOOST_REQUIRE(solver.computeNextSolution());
     BOOST_REQUIRE_EQUAL(solver.getCellValues(), cellValues);
     BOOST_REQUIRE(!solver.computeNextSolution());

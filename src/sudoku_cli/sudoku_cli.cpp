@@ -59,21 +59,26 @@ int handleOptions(const ProgramOptions& options)
             break;
     }
 
+    // Create a hashing object.
+    std::hash<std::string> hasher;
+
     // Solve each set of input values
     for (size_t inputNum = 0; inputNum < inputValues.size(); ++inputNum) {
         const std::vector<size_t>& curInput = inputValues[inputNum];
+        sudoku::Grid grid(dims, std::move(curInput));
         
         // Print the input values
-        std::cout << "Input " << (inputNum + 1) << ":\n" << formatter->format(curInput) << '\n';
+        std::cout << "Input " << (inputNum + 1) << ":\n" << formatter->format(grid.getCellValues()) << '\n';
 
         // Find the first N solutions
         if (options.getThreadCount() == 1) {
-            sudoku::Solver solver(dims, curInput);
+            sudoku::Solver solver(std::move(grid));
             size_t numSolutionsFound = 0;
             while (numSolutionsFound < options.getNumSolutions() && solver.computeNextSolution()) {
                 numSolutionsFound++;
-                std::cout << "Input " << (inputNum + 1) << ", ";
+                std::cout << "\nInput " << (inputNum + 1) << ", ";
                 std::cout << "Solution " << numSolutionsFound << ", ";
+                std::cout << "Hash: " << hasher(formatter->format(solver.getCellValues())) << ", ";
                 std::cout << formatMetrics(solver.getMetrics()) << '\n';
                 std::cout << formatter->format(solver.getCellValues()) << '\n';
             }
@@ -83,12 +88,13 @@ int handleOptions(const ProgramOptions& options)
             }
         }
         else { // options.getThreadCount > 1
-            sudoku::ParallelSolver solver(dims, curInput, options.getThreadCount(), 8);
+            sudoku::ParallelSolver solver(std::move(grid), options.getThreadCount(), 8);
             auto solutionCount = 0;
             while (solutionCount < options.getNumSolutions() && solver.computeNextSolution()) {
                 solutionCount++;
-                std::cout << "Input " << (inputNum + 1) << ", ";
-                std::cout << "Solution " << solutionCount << '\n';
+                std::cout << "\nInput " << (inputNum + 1) << ", ";
+                std::cout << "Solution " << solutionCount << ", ";
+                std::cout << "Hash: " << hasher(formatter->format(solver.getCellValues())) << '\n';
                 std::cout << formatter->format(solver.getCellValues()) << '\n';
             }
 
