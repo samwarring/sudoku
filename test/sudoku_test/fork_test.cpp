@@ -1,8 +1,8 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <boost/test/data/test_case.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
 #include <sudoku/dimensions.h>
 #include <sudoku/fork.h>
 #include <sudoku/formatter.h>
