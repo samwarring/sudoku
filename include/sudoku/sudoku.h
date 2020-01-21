@@ -17,5 +17,6 @@
 #include <sudoku/square.h>
 #include <sudoku/parallel_solver.h>
 #include <sudoku/metrics.h>
+#include <sudoku/fork.h>
 
 #endif

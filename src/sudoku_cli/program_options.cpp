@@ -14,7 +14,8 @@ ProgramOptions::ProgramOptions(int argc, char** argv)
         ("output-format,f", bpo::value<std::string>(), "Choose from `pretty` (default) or `serial`")
         ("input-file,I", bpo::value<std::string>(), "Read multiple initial value strings from input file")
         ("square-dim-root,s", bpo::value<size_t>(), "Set dimensions to a square sudoku with given root value")
-        ("threads,j", bpo::value<size_t>(), "Solve with this many worker threads");
+        ("threads,j", bpo::value<size_t>(), "Solve with this many worker threads")
+        ("fork,k", bpo::value<size_t>(), "Fork the input grid")
         ; // end of options
 
     bpo::store(bpo::parse_command_line(argc, argv, description_), optionMap_);
@@ -113,5 +114,15 @@ size_t ProgramOptions::getThreadCount() const
     }
     else {
         return 1;
+    }
+}
+
+size_t ProgramOptions::getForkCount() const
+{
+    if (optionMap_.count("fork")) {
+        return optionMap_["fork"].as<size_t>();
+    }
+    else {
+        return 0;
     }
 }

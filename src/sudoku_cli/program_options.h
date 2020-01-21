@@ -32,6 +32,8 @@ class ProgramOptions
 
         size_t getThreadCount() const;
 
+        size_t getForkCount() const;
+
     private:
     
         boost::program_options::options_description description_;

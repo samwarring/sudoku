@@ -70,6 +70,23 @@ int handleOptions(const ProgramOptions& options)
         // Print the input values
         std::cout << "Input " << (inputNum + 1) << ":\n" << formatter->format(grid.getCellValues()) << '\n';
 
+        // If --fork, fork the grid and print each forked grid.
+        if (options.getForkCount() > 0) {
+            auto grids = sudoku::fork(std::move(grid), options.getForkCount());
+            for (size_t gridNum = 0; gridNum < grids.size(); ++gridNum) {
+                std::cout << "\nPeer " << (gridNum + 1) << ":\n";
+                std::cout << formatter->format(grids[gridNum].getCellValues()) << '\n';
+                if (grids[gridNum].getRestrictions().size() > 0) {
+                    std::cout << "Restrictions:";
+                    for (auto restr : grids[gridNum].getRestrictions()) {
+                        std::cout << " (" << restr.first << ',' << restr.second << ')';
+                    }
+                    std::cout << '\n';
+                }
+            }
+            return 0;
+        }
+
         // Find the first N solutions
         if (options.getThreadCount() == 1) {
             sudoku::Solver solver(std::move(grid));
@@ -89,7 +106,7 @@ int handleOptions(const ProgramOptions& options)
         }
         else { // options.getThreadCount > 1
             sudoku::ParallelSolver solver(std::move(grid), options.getThreadCount(), 8);
-            auto solutionCount = 0;
+            size_t solutionCount = 0;
             while (solutionCount < options.getNumSolutions() && solver.computeNextSolution()) {
                 solutionCount++;
                 std::cout << "\nInput " << (inputNum + 1) << ", ";
