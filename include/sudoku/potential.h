@@ -43,7 +43,7 @@ namespace sudoku
             /**
              * Gets the number of cell values that are currently blocked.
              */
-            size_t getAmountBlocked() const { return numCellValuesBlocked_; }
+            int getAmountBlocked() const { return numCellValuesBlocked_; }
 
             // self-explanatory
             size_t getMaxCellValue() const { return block_counts_.size(); }
@@ -61,7 +61,7 @@ namespace sudoku
 
         private:
             std::vector<size_t> block_counts_;
-            size_t numCellValuesBlocked_ = 0;
+            int numCellValuesBlocked_ = 0;
     };
 }
 

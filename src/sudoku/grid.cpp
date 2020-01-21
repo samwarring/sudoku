@@ -87,10 +87,7 @@ namespace sudoku
 
         for (size_t cellPos = 0; cellPos < cellCount; ++cellPos) {
             if (cellValues_[cellPos] == 0) {
-                // TODO: Consider changing block count type from size_t to int. This
-                //       lets us easily compare the block cout to -1.
-                const size_t blockCountUnsigned = cellPotentials_[cellPos].getAmountBlocked();
-                const int blockCount = static_cast<int>(blockCountUnsigned);
+                const int blockCount = cellPotentials_[cellPos].getAmountBlocked();
                 if (maxBlock < blockCount) {
                     if (blockCount == maxCellValue) {
                         // If an empty cell is completely blocked, there is no greater
