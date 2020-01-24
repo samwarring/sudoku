@@ -16,10 +16,10 @@ sudoku::Dimensions simple4{4, 4, { {0, 1, 2, 3} } };
 
 struct TestCase
 {
-    const char* name = "default";
+    const char* name;
     const sudoku::Dimensions& dims;
-    const char* inputValueString = "";
-    const char* expectedValueString = "";
+    const char* inputValueString;
+    const char* expectedValueString;
 };
 
 std::ostream& operator<<(std::ostream& ostr, const TestCase& tc)

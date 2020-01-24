@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include <optional>
 #include <vector>
 #include <fstream>
 #include <algorithm>
@@ -49,13 +48,13 @@ int handleOptions(const ProgramOptions& options)
     }
 
     // Select the correct format
-    std::optional<sudoku::Formatter> formatter;
+    std::unique_ptr<sudoku::Formatter> formatter;
     switch (options.getOutputFormat()) {
         case ProgramOptions::OutputFormat::PRETTY:
-            formatter.emplace(sudoku::square::Formatter(dims));
+            formatter.reset(new sudoku::square::Formatter(dims));
             break;
         case ProgramOptions::OutputFormat::SERIAL:
-            formatter.emplace(dims, std::string(dims.getCellCount(), '0'));
+            formatter.reset(new sudoku::Formatter(dims, std::string(dims.getCellCount(), '0')));
             break;
     }
 

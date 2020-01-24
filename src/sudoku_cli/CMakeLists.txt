@@ -6,12 +6,6 @@ add_executable(
     program_options.cpp
 )
 
-# Required for std::optional
-set_property(
-    TARGET sudoku_cli
-    PROPERTY CXX_STANDARD 17
-)
-
 target_include_directories(
     sudoku_cli
     PRIVATE ${CMAKE_CURRENT_LISTS_DIR}
