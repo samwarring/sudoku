@@ -8,45 +8,42 @@ namespace sudoku
 {
     namespace cuda
     {
-        namespace compute_next_solution_kernel
+        class Dimensions
         {
-            class Dimensions
-            {
-                public:
-                    CUDA_HOST_AND_DEVICE
-                    Dimensions(Params kernelParams);
+            public:
+                CUDA_HOST_AND_DEVICE
+                Dimensions(KernelParams kernelParams);
 
-                    CUDA_HOST_AND_DEVICE
-                    size_t getCellCount() const;
+                CUDA_HOST_AND_DEVICE
+                size_t getCellCount() const;
 
-                    CUDA_HOST_AND_DEVICE
-                    size_t getMaxCellValue() const;
+                CUDA_HOST_AND_DEVICE
+                size_t getMaxCellValue() const;
 
-                    CUDA_HOST_AND_DEVICE
-                    size_t getGroupCount() const;
+                CUDA_HOST_AND_DEVICE
+                size_t getGroupCount() const;
 
-                    CUDA_HOST_AND_DEVICE
-                    size_t getCellsInGroupCount(size_t groupNum) const;
+                CUDA_HOST_AND_DEVICE
+                size_t getCellsInGroupCount(size_t groupNum) const;
 
-                    CUDA_HOST_AND_DEVICE
-                    const size_t* getCellsInGroup(size_t groupNum) const;
+                CUDA_HOST_AND_DEVICE
+                const size_t* getCellsInGroup(size_t groupNum) const;
 
-                    CUDA_HOST_AND_DEVICE
-                    size_t getGroupsForCellCount(size_t cellPos) const;
+                CUDA_HOST_AND_DEVICE
+                size_t getGroupsForCellCount(size_t cellPos) const;
 
-                    CUDA_HOST_AND_DEVICE
-                    const size_t* getGroupsForCell(size_t cellPos) const;
+                CUDA_HOST_AND_DEVICE
+                const size_t* getGroupsForCell(size_t cellPos) const;
 
-                private:
-                    size_t cellCount_;
-                    size_t maxCellValue_;
-                    size_t groupCount_;
-                    size_t* groupValues_;
-                    size_t* groupOffsets_;
-                    size_t* groupsForCellValues_;
-                    size_t* groupsForCellOffsets_;
-            };
-        }
+            private:
+                size_t cellCount_;
+                size_t maxCellValue_;
+                size_t groupCount_;
+                size_t* groupValues_;
+                size_t* groupOffsets_;
+                size_t* groupsForCellValues_;
+                size_t* groupsForCellOffsets_;
+        };
     }
 }
 

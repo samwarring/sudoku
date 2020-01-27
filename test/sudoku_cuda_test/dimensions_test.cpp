@@ -6,9 +6,9 @@
 struct StandardDimensionsTestFixture
 {
     sudoku::standard::Dimensions cpuDims;
-    sudoku::cuda::compute_next_solution_kernel::DimensionParams dimParams;
-    sudoku::cuda::compute_next_solution_kernel::Params kernelParams;
-    std::unique_ptr<sudoku::cuda::compute_next_solution_kernel::Dimensions> dims;
+    sudoku::cuda::DimensionParams dimParams;
+    sudoku::cuda::KernelParams kernelParams;
+    std::unique_ptr<sudoku::cuda::Dimensions> dims;
 
     StandardDimensionsTestFixture() : dimParams(cpuDims)
     {
@@ -19,7 +19,7 @@ struct StandardDimensionsTestFixture
         kernelParams.groupOffsets = dimParams.groupOffsets.data();
         kernelParams.groupsForCellValues = dimParams.groupsForCellValues.data();
         kernelParams.groupsForCellOffsets = dimParams.groupsForCellOffsets.data();
-        dims = std::make_unique<sudoku::cuda::compute_next_solution_kernel::Dimensions>(kernelParams);
+        dims = std::make_unique<sudoku::cuda::Dimensions>(kernelParams);
     }
 };
 

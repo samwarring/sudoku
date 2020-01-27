@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(kernel_standardDims_2threads)
 
     // Set up dimensions.
     sudoku::standard::Dimensions dims;
-    sudoku::cuda::compute_next_solution_kernel::DimensionParams dimParams(dims);
+    sudoku::cuda::DimensionParams dimParams(dims);
     sudoku::cuda::DeviceBuffer<size_t> groupValues(dimParams.groupValues);
     sudoku::cuda::DeviceBuffer<size_t> groupOffsets(dimParams.groupOffsets);
     sudoku::cuda::DeviceBuffer<size_t> groupsForCellValues(dimParams.groupsForCellValues);
@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(kernel_standardDims_2threads)
     for (size_t tn = 0; tn < threadCount; ++tn) {
         grids.emplace_back(dims);
     }
-    sudoku::cuda::compute_next_solution_kernel::GridParams gridParams(grids);
+    sudoku::cuda::GridParams gridParams(grids);
     sudoku::cuda::DeviceBuffer<size_t> cellValues(gridParams.cellValues);
     sudoku::cuda::DeviceBuffer<size_t> blockCounts(gridParams.blockCounts);
     sudoku::cuda::DeviceBuffer<size_t> restrictions(gridParams.restrictions);
@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(kernel_standardDims_2threads)
     results.copyToDevice();
 
     // Set up params.
-    sudoku::cuda::compute_next_solution_kernel::Params params;
+    sudoku::cuda::KernelParams params;
     params.cellCount = dimParams.cellCount;
     params.maxCellValue = dimParams.maxCellValue;
     params.groupCount = dimParams.groupCount;
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(kernel_standardDims_2threads)
     params.results = results.getDeviceData();
     
     // Execute kernel.
-    sudoku::cuda::compute_next_solution_kernel::kernelWrapper(1, threadCount, params);
+    sudoku::cuda::kernelWrapper(1, threadCount, params);
 
     // Copy results back to host.
     results.copyToHost();
