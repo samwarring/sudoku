@@ -14,7 +14,6 @@ add_executable(
     parallel_solver_test.cpp
     grid_test.cpp
     fork_test.cpp
-    cuda_dimensions_test.cpp
 )
 
 target_include_directories(
@@ -25,7 +24,6 @@ target_include_directories(
 target_link_libraries(
     sudoku_test
     PRIVATE sudoku
-            sudoku_cuda
             Boost::unit_test_framework
 )
 
