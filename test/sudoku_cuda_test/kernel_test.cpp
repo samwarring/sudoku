@@ -44,9 +44,9 @@ BOOST_AUTO_TEST_CASE(kernel_standardDims_2threads)
 
     // Set up params.
     sudoku::cuda::compute_next_solution_kernel::Params params;
-    params.cellCount = dims.getCellCount();
-    params.maxCellValue = dims.getMaxCellValue();
-    params.groupCount = dims.getNumGroups();
+    params.cellCount = dimParams.cellCount;
+    params.maxCellValue = dimParams.maxCellValue;
+    params.groupCount = dimParams.groupCount;
     params.groupValues = groupValues.begin();
     params.groupOffsets = groupOffsets.begin();
     params.groupsForCellValues = groupsForCellValues.begin();

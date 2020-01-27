@@ -4,6 +4,7 @@ add_executable(
     sudoku_cuda_test
     sudoku_cuda_test.cpp
     kernel_test.cpp
+    dimensions_test.cpp
 )
 
 target_link_libraries(

@@ -14,6 +14,9 @@ namespace sudoku
         {
             struct DimensionParams
             {
+                size_t cellCount;
+                size_t maxCellValue;
+                size_t groupCount;
                 std::vector<size_t> groupValues;
                 std::vector<size_t> groupOffsets;
                 std::vector<size_t> groupsForCellValues;

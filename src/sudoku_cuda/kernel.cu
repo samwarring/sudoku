@@ -1,6 +1,7 @@
 #include <cassert>
 #include <sudoku/cuda/error.h>
 #include <sudoku/cuda/kernel.h>
+#include <sudoku/cuda/dimensions.h>
 
 namespace sudoku
 {
@@ -10,6 +11,7 @@ namespace sudoku
         {
             __global__ static void kernel(Params params)
             {
+                Dimensions dims(params);
                 params.results[threadIdx.x] = Result::OK_TIMED_OUT;
             }
 
@@ -21,8 +23,12 @@ namespace sudoku
 
             DimensionParams::DimensionParams(const sudoku::Dimensions& dims)
             {
+                cellCount = dims.getCellCount();
+                maxCellValue = dims.getMaxCellValue();
+                groupCount = dims.getNumGroups();
+
                 // Concatenate groups.
-                for (size_t gn = 0; gn < dims.getNumGroups(); ++gn) {
+                for (size_t gn = 0; gn < groupCount; ++gn) {
                     groupOffsets.push_back(groupValues.size());
                     for (auto cellPos : dims.getCellsInGroup(gn)) {
                         groupValues.push_back(cellPos);
@@ -31,7 +37,7 @@ namespace sudoku
                 groupOffsets.push_back(groupValues.size());
 
                 // Concatenate groups for each cell.
-                for (size_t cp = 0; cp < dims.getCellCount(); ++cp) {
+                for (size_t cp = 0; cp < cellCount; ++cp) {
                     groupsForCellOffsets.push_back(groupsForCellValues.size());
                     for (auto gn : dims.getGroupsForCell(cp)) {
                         groupsForCellValues.push_back(gn);
