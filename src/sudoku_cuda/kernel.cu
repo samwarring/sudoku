@@ -2,6 +2,7 @@
 #include <sudoku/cuda/error.h>
 #include <sudoku/cuda/kernel.h>
 #include <sudoku/cuda/dimensions.h>
+#include <sudoku/cuda/grid.h>
 
 namespace sudoku
 {
@@ -9,8 +10,11 @@ namespace sudoku
     {
         __global__ static void kernel(KernelParams params)
         {
+            size_t threadNum = threadIdx.x;
             Dimensions dims(params);
-            params.results[threadIdx.x] = Result::OK_TIMED_OUT;
+            Grid grid(dims, params, threadNum);
+            Result* result = params.results + threadNum;
+            *result = Result::OK_TIMED_OUT;
         }
 
         void kernelWrapper(unsigned blockCount, unsigned threadsPerBlock, KernelParams params)
@@ -44,7 +48,7 @@ namespace sudoku
             groupsForCellOffsets.push_back(groupsForCellValues.size());
         }
 
-        GridParams::GridParams(const std::vector<Grid> grids)
+        GridParams::GridParams(const std::vector<sudoku::Grid> grids)
         {
             assert(grids.size() > 0);
 
@@ -56,7 +60,7 @@ namespace sudoku
                     grid.getCellValues().cend()
                 );
             }
-            
+
             // Concatenate restrictions
             for (const auto& grid : grids) {
                 restrictionsOffsets.push_back(restrictions.size());

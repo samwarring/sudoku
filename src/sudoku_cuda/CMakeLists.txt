@@ -3,6 +3,7 @@ add_library(
     kernel.cu
     result.cpp
     dimensions.cu
+    grid.cu
 )
 
 target_include_directories(

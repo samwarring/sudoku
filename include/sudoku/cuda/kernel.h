@@ -30,7 +30,7 @@ namespace sudoku
             std::vector<size_t> restrictionsOffsets;
             std::vector<size_t> blockCounts;
 
-            GridParams(const std::vector<Grid> grids);
+            GridParams(const std::vector<sudoku::Grid> grids);
         };
 
         struct KernelParams
@@ -38,10 +38,10 @@ namespace sudoku
             size_t cellCount;             ///< e.g. 81
             size_t maxCellValue;          ///< e.g. 9
             size_t groupCount;            ///< e.g. 27
-            size_t* groupValues;          ///< e.g. { (group0, 9 values) (group1 9 values) ... }
-            size_t* groupOffsets;         ///< e.g. { [group0 offset=0] [group1 offset=9] ... [group27 offset=243] }
-            size_t* groupsForCellValues;  ///< e.g. { (cell0 groups, 3 values) (cell1 groups, 3 values) ... }
-            size_t* groupsForCellOffsets; ///< e.g. { [cell0 offset=0] [cell1 offset=3] ... [cell81 offset=243] }
+            const size_t* groupValues;          ///< e.g. { (group0, 9 values) (group1 9 values) ... }
+            const size_t* groupOffsets;         ///< e.g. { [group0 offset=0] [group1 offset=9] ... [group27 offset=243] }
+            const size_t* groupsForCellValues;  ///< e.g. { (cell0 groups, 3 values) (cell1 groups, 3 values) ... }
+            const size_t* groupsForCellOffsets; ///< e.g. { [cell0 offset=0] [cell1 offset=3] ... [cell81 offset=243] }
             size_t* cellValues;           ///< e.g. { (grid0 cells, 81 values) (grid2 cells, 81 values) ... }
             size_t* restrictions;         ///< e.g. { (grid0 restrictions, 2 pairs=4values) ... }
             size_t* restrictionsOffsets;  ///< e.g. { (grid0 restrictions offset=0) ... }

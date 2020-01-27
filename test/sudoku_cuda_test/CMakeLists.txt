@@ -5,12 +5,19 @@ add_executable(
     sudoku_cuda_test.cpp
     kernel_test.cpp
     dimensions_test.cpp
+    grid_test.cpp
+    util.cpp
 )
 
 target_link_libraries(
     sudoku_cuda_test
     PRIVATE sudoku_cuda
             Boost::unit_test_framework
+)
+
+target_include_directories(
+    sudoku_cuda_test
+    PRIVATE .
 )
 
 # Boost tests must define BOOST_TEST_DYN_LINK if not linking statically.

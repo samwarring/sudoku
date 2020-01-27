@@ -39,10 +39,10 @@ namespace sudoku
                 size_t cellCount_;
                 size_t maxCellValue_;
                 size_t groupCount_;
-                size_t* groupValues_;
-                size_t* groupOffsets_;
-                size_t* groupsForCellValues_;
-                size_t* groupsForCellOffsets_;
+                const size_t* groupValues_;
+                const size_t* groupOffsets_;
+                const size_t* groupsForCellValues_;
+                const size_t* groupsForCellOffsets_;
         };
     }
 }
