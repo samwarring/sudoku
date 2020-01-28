@@ -2,6 +2,8 @@
 #define INCLUDED_SUDOKU_CUDA_KERNEL_H
 
 #include <vector>
+#include <sudoku/cuda/device_buffer.h>
+#include <sudoku/cuda/mirror_buffer.h>
 #include <sudoku/cuda/result.h>
 #include <sudoku/dimensions.h>
 #include <sudoku/grid.h>
@@ -47,6 +49,28 @@ namespace sudoku
             size_t* restrictionsOffsets;  ///< e.g. { (grid0 restrictions offset=0) ... }
             size_t* blockCounts;          ///< e.g. { [grid0,cell0,blockCount] [grid0,cell0,value1count] ... }
             Result* results;              ///< e.g. { Result::OK_TIMED_OUT, Result::OK_FOUND_SOLUTION, ... }
+        };
+
+        class DeviceKernelParams
+        {
+            public:
+                DeviceKernelParams(DimensionParams dimParams, GridParams gridParams, size_t threadCount);
+
+                KernelParams getKernelParams() const { return kernelParams_; }
+
+                Result getThreadResult(size_t threadNum);
+
+            private:
+                DeviceBuffer<size_t> groupValues_;
+                DeviceBuffer<size_t> groupOffsets_;
+                DeviceBuffer<size_t> groupsForCellValues_;
+                DeviceBuffer<size_t> groupsForCellOffsets_;
+                DeviceBuffer<size_t> cellValues_;
+                DeviceBuffer<size_t> restrictions_;
+                DeviceBuffer<size_t> restrictionsOffsets_;
+                DeviceBuffer<size_t> blockCounts_;
+                MirrorBuffer<Result> results_;
+                KernelParams kernelParams_;
         };
 
         void kernelWrapper(unsigned blockCount, unsigned threadsPerBlock, KernelParams params);

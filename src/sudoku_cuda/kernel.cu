@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cassert>
 #include <sudoku/cuda/error.h>
 #include <sudoku/cuda/kernel.h>
@@ -74,6 +75,40 @@ namespace sudoku
             // Allocate space for block counts (initialize to 0)
             const auto& dims = grids[0].getDimensions();
             blockCounts.resize(grids.size() * dims.getCellCount() * (1 + dims.getMaxCellValue()));
+        }
+
+        DeviceKernelParams::DeviceKernelParams(DimensionParams dimParams, GridParams gridParams, size_t threadCount)
+            : groupValues_(dimParams.groupValues)
+            , groupOffsets_(dimParams.groupOffsets)
+            , groupsForCellValues_(dimParams.groupsForCellValues)
+            , groupsForCellOffsets_(dimParams.groupsForCellOffsets)
+            , cellValues_(gridParams.cellValues)
+            , restrictions_(gridParams.restrictions)
+            , restrictionsOffsets_(gridParams.restrictionsOffsets)
+            , blockCounts_(gridParams.blockCounts)
+            , results_(threadCount)
+        {
+            kernelParams_.cellCount = dimParams.cellCount;
+            kernelParams_.maxCellValue = dimParams.maxCellValue;
+            kernelParams_.groupCount = dimParams.groupCount;
+            kernelParams_.groupValues = groupValues_.begin();
+            kernelParams_.groupOffsets = groupOffsets_.begin();
+            kernelParams_.groupsForCellValues = groupsForCellValues_.begin();
+            kernelParams_.groupsForCellOffsets = groupsForCellOffsets_.begin();
+            kernelParams_.cellValues = cellValues_.begin();
+            kernelParams_.restrictions = restrictions_.begin();
+            kernelParams_.restrictionsOffsets = restrictionsOffsets_.begin();
+            kernelParams_.blockCounts = blockCounts_.begin();
+            kernelParams_.results = results_.getDeviceData();
+            std::fill(results_.getHostData(), results_.getHostData() + results_.getItemCount(),
+                      Result::ERROR_NOT_SET);
+            results_.copyToDevice();
+        }
+
+        Result DeviceKernelParams::getThreadResult(size_t threadNum)
+        {
+            results_.copyToHost();
+            return results_.getHostData()[threadNum];
         }
     }
 }

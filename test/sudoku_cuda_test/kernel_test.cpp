@@ -15,54 +15,12 @@ namespace std
     }
 }
 
-BOOST_AUTO_TEST_CASE(kernel_standardDims_2threads)
+BOOST_AUTO_TEST_CASE(DeviceKernelParams_4threads)
 {
-    const size_t threadCount = 2;
-
-    // Set up dimensions.
+    unsigned threadCount = 4;
     sudoku::standard::Dimensions dims;
-    sudoku::cuda::DimensionParams dimParams(dims);
-    sudoku::cuda::DeviceBuffer<size_t> groupValues(dimParams.groupValues);
-    sudoku::cuda::DeviceBuffer<size_t> groupOffsets(dimParams.groupOffsets);
-    sudoku::cuda::DeviceBuffer<size_t> groupsForCellValues(dimParams.groupsForCellValues);
-    sudoku::cuda::DeviceBuffer<size_t> groupsForCellOffsets(dimParams.groupsForCellOffsets);
-
-    // Set up grids.
-    std::vector<sudoku::Grid> grids;
-    for (size_t tn = 0; tn < threadCount; ++tn) {
-        grids.emplace_back(dims);
-    }
-    sudoku::cuda::GridParams gridParams(grids);
-    sudoku::cuda::DeviceBuffer<size_t> cellValues(gridParams.cellValues);
-    sudoku::cuda::DeviceBuffer<size_t> blockCounts(gridParams.blockCounts);
-    sudoku::cuda::DeviceBuffer<size_t> restrictions(gridParams.restrictions);
-    sudoku::cuda::DeviceBuffer<size_t> restrictionsOffsets(gridParams.restrictionsOffsets);
-
-    // Set up results.
-    sudoku::cuda::MirrorBuffer<sudoku::cuda::Result> results(threadCount);
-    results.copyToDevice();
-
-    // Set up params.
-    sudoku::cuda::KernelParams params;
-    params.cellCount = dimParams.cellCount;
-    params.maxCellValue = dimParams.maxCellValue;
-    params.groupCount = dimParams.groupCount;
-    params.groupValues = groupValues.begin();
-    params.groupOffsets = groupOffsets.begin();
-    params.groupsForCellValues = groupsForCellValues.begin();
-    params.groupsForCellOffsets = groupsForCellOffsets.begin();
-    params.cellValues = cellValues.begin();
-    params.restrictions = restrictions.begin();
-    params.restrictionsOffsets = restrictionsOffsets.begin();
-    params.blockCounts = blockCounts.begin();
-    params.results = results.getDeviceData();
-    
-    // Execute kernel.
-    sudoku::cuda::kernelWrapper(1, threadCount, params);
-
-    // Copy results back to host.
-    results.copyToHost();
-
-    // Compare results to expected value.
-    BOOST_REQUIRE_EQUAL(results.getHostData()[0], sudoku::cuda::Result::OK_TIMED_OUT);
+    std::vector<sudoku::Grid> grids(threadCount, dims);
+    sudoku::cuda::DeviceKernelParams params(dims, grids, threadCount);
+    sudoku::cuda::kernelWrapper(1, threadCount, params.getKernelParams());
+    BOOST_REQUIRE_EQUAL(params.getThreadResult(0), sudoku::cuda::Result::OK_TIMED_OUT);
 }
