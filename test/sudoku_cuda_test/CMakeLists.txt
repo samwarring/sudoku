@@ -6,7 +6,6 @@ add_executable(
     kernel_test.cpp
     dimensions_test.cpp
     grid_test.cpp
-    util.cpp
 )
 
 target_link_libraries(
