@@ -15,6 +15,7 @@ namespace sudoku
             {
                 Dimensions dims(data.dimsData);
                 Grid grid(dims, data.gridData, threadIdx.x);
+                GuessStack guesses(data.guessStackData, threadIdx.x);
                 data.results[threadIdx.x] = (threadIdx.x % 2 ? Result::OK_FOUND_SOLUTION : Result::OK_TIMED_OUT);
             }
 
@@ -27,20 +28,24 @@ namespace sudoku
             HostData::HostData(const sudoku::Dimensions& dims, const std::vector<sudoku::Grid>& grids)
                 : hostDims_(dims)
                 , hostGrid_(hostDims_.getData(), grids)
+                , hostGuessStack_(grids)
                 , hostResults_(grids.size(), Result::ERROR_NOT_SET)
             {
                 data_.dimsData = hostDims_.getData();
                 data_.gridData = hostGrid_.getData();
+                data_.guessStackData = hostGuessStack_.getData();
                 data_.results = hostResults_.data();
             }
 
             DeviceData::DeviceData(const HostData& hostData)
                 : deviceDims_(hostData.hostDims_)
                 , deviceGrid_(hostData.hostGrid_)
+                , deviceGuessStack_(hostData.hostGuessStack_)
                 , deviceResults_(hostData.hostResults_)
             {
                 data_.dimsData = deviceDims_.getData();
                 data_.gridData = deviceGrid_.getData();
+                data_.guessStackData = deviceGuessStack_.getData();
                 data_.results = deviceResults_.getDeviceData();
             }
 

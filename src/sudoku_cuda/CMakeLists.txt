@@ -4,6 +4,7 @@ add_library(
     result.cpp
     dimensions.cu
     grid.cu
+    guess_stack.cu
 )
 
 target_include_directories(

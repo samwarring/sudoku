@@ -6,6 +6,7 @@
 #include <sudoku/cuda/mirror_buffer.h>
 #include <sudoku/cuda/dimensions.h>
 #include <sudoku/cuda/grid.h>
+#include <sudoku/cuda/guess_stack.h>
 #include <sudoku/cuda/result.h>
 #include <sudoku/dimensions.h>
 #include <sudoku/grid.h>
@@ -20,6 +21,7 @@ namespace sudoku
             {
                 Dimensions::Data dimsData;
                 Grid::Data gridData;
+                GuessStack::Data guessStackData;
                 Result* results;
             };
 
@@ -37,6 +39,7 @@ namespace sudoku
                 private:
                     Dimensions::HostData hostDims_;
                     Grid::HostData hostGrid_;
+                    GuessStack::HostData hostGuessStack_;
                     std::vector<Result> hostResults_;
                     Data data_;
             };
@@ -51,6 +54,7 @@ namespace sudoku
                 private:
                     Dimensions::DeviceData deviceDims_;
                     Grid::DeviceData deviceGrid_;
+                    GuessStack::DeviceData deviceGuessStack_;
                     MirrorBuffer<Result> deviceResults_;
                     Data data_;
             };

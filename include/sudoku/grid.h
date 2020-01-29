@@ -113,6 +113,11 @@ namespace sudoku
              */
             bool isFull() const { return getMaxBlockEmptyCell() == dims_->getCellCount(); }
 
+            /**
+             * \return number of empty cells
+             */
+            size_t getEmptyCellCount() const;
+
         private:
             const Dimensions* dims_;
             std::vector<Potential> cellPotentials_;

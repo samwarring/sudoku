@@ -102,4 +102,9 @@ namespace sudoku
 
         return maxBlockPos;
     }
+
+    size_t Grid::getEmptyCellCount() const
+    {
+        return std::count(cellValues_.begin(), cellValues_.end(), 0);
+    }
 }
