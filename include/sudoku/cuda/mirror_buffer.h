@@ -1,8 +1,9 @@
 #ifndef INCLUDED_SUDOKU_CUDA_MIRROR_BUFFER_H
 #define INCLUDED_SUDOKU_CUDA_MIRROR_BUFFER_H
 
-#include <stdexcept>
+#include <vector>
 #include <sudoku/cuda/error.h>
+#include <sudoku/cuda/device_buffer.h>
 
 namespace sudoku
 {
@@ -12,17 +13,11 @@ namespace sudoku
         class MirrorBuffer
         {
             public:
-                MirrorBuffer(size_t itemCount)
-                {
-                    byteCount_ = sizeof(T) * itemCount;
-                    hostData_ = new T[byteCount_];
-                    errorCheck_ << cudaMalloc(&deviceData_, byteCount_);
-                }
+                MirrorBuffer(size_t itemCount) : hostData_(itemCount), deviceData_(itemCount) {}
 
-                ~MirrorBuffer()
+                MirrorBuffer(std::vector<T> items) : hostData_(std::move(items)), deviceData_(hostData_.size())
                 {
-                    errorCheck_ << cudaFree(deviceData_);
-                    delete [] hostData_;
+                    copyToDevice();
                 }
 
                 MirrorBuffer(const MirrorBuffer&) = delete;
@@ -32,39 +27,36 @@ namespace sudoku
 
                 void copyToDevice()
                 {
-                    errorCheck_ << cudaMemcpy(deviceData_, hostData_, byteCount_, cudaMemcpyHostToDevice);
+                    ErrorCheck() << cudaMemcpy(deviceData_.begin(), hostData_.data(),
+                                               sizeof(T) * hostData_.size(),
+                                               cudaMemcpyHostToDevice);
                 }
 
                 void copyToHost()
                 {
-                    errorCheck_ << cudaMemcpy(hostData_, deviceData_, byteCount_, cudaMemcpyDeviceToHost);
+                    ErrorCheck() << cudaMemcpy(hostData_.data(), deviceData_.begin(),
+                                               sizeof(T) * hostData_.size(),
+                                               cudaMemcpyDeviceToHost);
                 }
 
                 T* getHostData()
                 {
-                    return hostData_;
+                    return hostData_.data();
                 }
 
                 T* getDeviceData()
                 {
-                    return deviceData_;
+                    return deviceData_.begin();
                 }
 
-                size_t getItemCount() const
+                size_t getSize()
                 {
-                    return byteCount_ / sizeof(T);
-                }
-
-                size_t getByteCount() const
-                {
-                    return byteCount_;
+                    return hostData_.size();
                 }
 
             private:
-                size_t byteCount_;
-                T* hostData_;
-                T* deviceData_;
-                ErrorCheck errorCheck_;
+                std::vector<T> hostData_;
+                DeviceBuffer<T> deviceData_;
         };
     }
 }

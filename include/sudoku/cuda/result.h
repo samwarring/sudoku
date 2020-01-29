@@ -1,6 +1,7 @@
 #ifndef INCLUDED_SUDOKU_CUDA_RESULT_H
 #define INCLUDED_SUDOKU_CUDA_RESULT_H
 
+#include <iostream>
 #include <string>
 
 namespace sudoku
@@ -17,6 +18,11 @@ namespace sudoku
 
         std::string toString(Result result);
     }
+}
+
+namespace std
+{
+    ostream& operator<<(ostream& out, sudoku::cuda::Result result);
 }
 
 #endif

@@ -3,8 +3,10 @@
 
 #include <vector>
 #include <sudoku/cuda/device_buffer.h>
+#include <sudoku/cuda/mirror_buffer.h>
 #include <sudoku/cuda/dimensions.h>
 #include <sudoku/cuda/grid.h>
+#include <sudoku/cuda/result.h>
 #include <sudoku/dimensions.h>
 #include <sudoku/grid.h>
 
@@ -18,6 +20,7 @@ namespace sudoku
             {
                 Dimensions::Data dimsData;
                 Grid::Data gridData;
+                Result* results;
             };
 
             class DeviceData;
@@ -29,10 +32,12 @@ namespace sudoku
                 public:
                     HostData(const sudoku::Dimensions& dims, const std::vector<sudoku::Grid>& grids);
                     Data getData() const { return data_; }
+                    Result getResult(size_t threadNum) const { return hostResults_[threadNum]; }
 
                 private:
                     Dimensions::HostData hostDims_;
                     Grid::HostData hostGrid_;
+                    std::vector<Result> hostResults_;
                     Data data_;
             };
 
@@ -41,10 +46,12 @@ namespace sudoku
                 public:
                     DeviceData(const HostData& hostData);
                     Data getData() const { return data_; }
+                    Result getResult(size_t threadNum);
 
                 private:
                     Dimensions::DeviceData deviceDims_;
                     Grid::DeviceData deviceGrid_;
+                    MirrorBuffer<Result> deviceResults_;
                     Data data_;
             };
 

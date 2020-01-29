@@ -21,3 +21,12 @@ namespace sudoku
         }
     }
 }
+
+namespace std
+{
+    ostream& operator<<(ostream& out, sudoku::cuda::Result result)
+    {
+        out << sudoku::cuda::toString(result);
+        return out;
+    }
+}
