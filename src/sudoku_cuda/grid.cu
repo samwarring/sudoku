@@ -8,14 +8,12 @@ namespace sudoku
         {
             serialize(dims, grids);
             data_.cellValues = cellValues_.data();
-            data_.restrictions = restrictions_.data();
-            data_.restrictionsOffsets = restrictionsOffsets_.data();
             data_.blockCounts = blockCounts_.data();
 
             // Now that the grid has been serialized, we can construct cuda::Grid objects
             // from the serialized data. The cell values and restrictions have been copied
             // but the "potentials" are still all 0. Initialize them now.
-            initBlockCounts(dims, grids.size());
+            initBlockCounts(dims, grids);
         }
 
         void Grid::HostData::serialize(Dimensions dims, const std::vector<sudoku::Grid>& grids)
@@ -31,37 +29,26 @@ namespace sudoku
                 );
             }
 
-            // Concatenate restrictions
-            for (const auto& grid : grids) {
-                restrictionsOffsets_.push_back(restrictions_.size());
-                for (auto restr : grid.getRestrictions()) {
-                    restrictions_.push_back(restr.first);
-                    restrictions_.push_back(restr.second);
-                }
-            }
-            restrictionsOffsets_.push_back(restrictions_.size());
-
             // Allocate space for block counts (initialize to 0)
             blockCounts_.resize(grids.size() * dims.getCellCount() * (1 + dims.getMaxCellValue()));
         }
 
-        void Grid::HostData::initBlockCounts(Dimensions dims, size_t threadCount)
+        void Grid::HostData::initBlockCounts(Dimensions dims, const std::vector<sudoku::Grid>& grids)
         {
-            for (size_t i = 0; i < threadCount; ++i) {
+            for (size_t i = 0; i < grids.size(); ++i) {
                 Grid grid(dims, data_, i);
                 grid.initBlockCounts();
+                for (auto restr : grids[i].getRestrictions()) {
+                    grid.blockCellValue(restr.first, restr.second);
+                }
             }
         }
 
         Grid::DeviceData::DeviceData(const HostData& hostData)
             : cellValues_(hostData.cellValues_)
-            , restrictions_(hostData.restrictions_)
-            , restrictionsOffsets_(hostData.restrictionsOffsets_)
             , blockCounts_(hostData.blockCounts_)
         {
             data_.cellValues = cellValues_.begin();
-            data_.restrictions = restrictions_.begin();
-            data_.restrictionsOffsets = restrictionsOffsets_.begin();
             data_.blockCounts = blockCounts_.begin();
         }
 
@@ -100,6 +87,25 @@ namespace sudoku
                 }
             }
             return 0;
+        }
+
+        CUDA_HOST_AND_DEVICE
+        size_t Grid::getMaxBlockEmptyCell()
+        {
+            size_t maxBlockCount = 0;
+            size_t maxBlockPos = dims_->getCellCount();
+            for (size_t cellPos = 0; cellPos < dims_->getCellCount(); ++cellPos) {
+                size_t blockCount = *getBlockCount(cellPos);
+                size_t cellValue = getCellValue(cellPos);
+                if (cellValue == 0 && blockCount >= maxBlockCount) {
+                    maxBlockCount = blockCount;
+                    maxBlockPos = cellPos;
+                    if (maxBlockCount == dims_->getMaxCellValue()) {
+                        break;
+                    }
+                }
+            }
+            return maxBlockPos;
         }
 
         CUDA_HOST_AND_DEVICE

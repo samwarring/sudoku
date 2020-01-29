@@ -17,10 +17,8 @@ namespace sudoku
                 /// Provided to kernel.
                 struct Data
                 {
-                    size_t* cellValues;           ///< e.g. { (grid0 cells, 81 values) (grid2 cells, 81 values) ... }
-                    size_t* restrictions;         ///< e.g. { (grid0 restrictions, 2 pairs=4values) ... }
-                    size_t* restrictionsOffsets;  ///< e.g. { (grid0 restrictions offset=0) ... }
-                    size_t* blockCounts;          ///< e.g. { [grid0,cell0,blockCount] [grid0,cell0,value1count] ... }
+                    size_t* cellValues;   ///< e.g. { (grid0 cells, 81 values) (grid2 cells, 81 values) ... }
+                    size_t* blockCounts;  ///< e.g. { [grid0,cell0,blockCount] [grid0,cell0,value1count] ... }
                 };
 
                 // Forward declaration required to use as friend.
@@ -37,10 +35,8 @@ namespace sudoku
 
                     private:
                         void serialize(Dimensions dims, const std::vector<sudoku::Grid>& grids);
-                        void initBlockCounts(Dimensions dims, size_t threadCount);
+                        void initBlockCounts(Dimensions dims, const std::vector<sudoku::Grid>& grids);
                         std::vector<size_t> cellValues_;
-                        std::vector<size_t> restrictions_;
-                        std::vector<size_t> restrictionsOffsets_;
                         std::vector<size_t> blockCounts_;
                         Data data_;
                 };
@@ -53,8 +49,6 @@ namespace sudoku
 
                     private:
                         DeviceBuffer<size_t> cellValues_;
-                        DeviceBuffer<size_t> restrictions_;
-                        DeviceBuffer<size_t> restrictionsOffsets_;
                         DeviceBuffer<size_t> blockCounts_;
                         Data data_;
                 };
@@ -75,6 +69,9 @@ namespace sudoku
 
                 CUDA_HOST_AND_DEVICE
                 size_t getNextAvailableValue(size_t cellPos, size_t cellValue);
+
+                CUDA_HOST_AND_DEVICE
+                size_t getMaxBlockEmptyCell();
 
             private:
                 /**
