@@ -36,6 +36,7 @@ namespace sudoku
                         Data getData() const { return data_; }
 
                     private:
+                        void serialize(const std::vector<sudoku::Grid>& grids);
                         std::vector<size_t> cellValues_;
                         std::vector<size_t> restrictions_;
                         std::vector<size_t> restrictionsOffsets_;

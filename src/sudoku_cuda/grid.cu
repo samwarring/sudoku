@@ -6,6 +6,15 @@ namespace sudoku
     {
         Grid::HostData::HostData(const std::vector<sudoku::Grid>& grids)
         {
+            serialize(grids);
+            data_.cellValues = cellValues_.data();
+            data_.restrictions = restrictions_.data();
+            data_.restrictionsOffsets = restrictionsOffsets_.data();
+            data_.blockCounts = blockCounts_.data();
+        }
+
+        void Grid::HostData::serialize(const std::vector<sudoku::Grid>& grids)
+        {
             assert(grids.size() > 0);
 
             // Concatenate cell values
