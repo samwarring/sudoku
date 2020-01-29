@@ -26,7 +26,7 @@ namespace sudoku
 
             HostData::HostData(const sudoku::Dimensions& dims, const std::vector<sudoku::Grid>& grids)
                 : hostDims_(dims)
-                , hostGrid_(grids)
+                , hostGrid_(hostDims_.getData(), grids)
                 , hostResults_(grids.size(), Result::ERROR_NOT_SET)
             {
                 data_.dimsData = hostDims_.getData();

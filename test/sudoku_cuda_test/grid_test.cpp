@@ -14,7 +14,61 @@ BOOST_AUTO_TEST_CASE(Grid_singleEmptyGrid)
     for (size_t i = 0; i < dims.getCellCount(); ++i) {
         BOOST_REQUIRE_EQUAL(deviceGrid.getCellValue(i), 0);
     }
+}
 
-    deviceGrid.setCellValue(3, 3);
-    BOOST_REQUIRE_EQUAL(deviceGrid.getCellValue(3), 3);
+BOOST_AUTO_TEST_CASE(Grid_setAndGetValue_4threads)
+{
+    sudoku::square::Dimensions dims(2);
+    sudoku::cuda::kernel::HostData hostData(dims, {4, dims});
+    sudoku::cuda::Dimensions deviceDims(hostData.getData().dimsData);
+    std::vector<sudoku::cuda::Grid> deviceGrids;
+    for (size_t i = 0; i < 4; ++i) {
+        deviceGrids.emplace_back(deviceDims, hostData.getData().gridData, i);
+        deviceGrids[i].setCellValue(i, i);
+        BOOST_REQUIRE_EQUAL(deviceGrids[i].getCellValue(i), i);
+        deviceGrids[i].clearCellValue(i);
+        BOOST_REQUIRE_EQUAL(deviceGrids[i].getCellValue(i), 0);
+    }
+}
+
+BOOST_AUTO_TEST_CASE(Grid_getNextAvailableValue)
+{
+    sudoku::square::Dimensions dims(2);
+    sudoku::cuda::kernel::HostData hostData(dims, {dims});
+    sudoku::cuda::Grid grid(hostData.getData().dimsData, hostData.getData().gridData, 0);
+    
+    // 0 0 | 0 0 ...
+    BOOST_REQUIRE_EQUAL(grid.getNextAvailableValue(0, 0), 1);
+
+    // 0 1 | 0 0 ...
+    grid.setCellValue(1, 1);
+    BOOST_REQUIRE_EQUAL(grid.getNextAvailableValue(0, 0), 2);
+
+    // 0 1 | 0 0
+    // 2 0 | 0 0 ...
+    grid.setCellValue(4, 2);
+    BOOST_REQUIRE_EQUAL(grid.getNextAvailableValue(0, 0), 3);
+
+    // 0 1 | 0 0
+    // 2 3 | 0 0 ...
+    grid.setCellValue(5, 3);
+    BOOST_REQUIRE_EQUAL(grid.getNextAvailableValue(0, 0), 4);
+
+    // 0 1 | 4 0
+    // 2 3 | 0 0 ...
+    grid.setCellValue(2, 4);
+    BOOST_REQUIRE_EQUAL(grid.getNextAvailableValue(0, 0), 0);
+}
+
+BOOST_AUTO_TEST_CASE(Grid_getNextAvailableValue_hasInitialValues)
+{
+    // 0 0 | 0 1
+    // 2 0 | 0 0 ...
+    sudoku::square::Dimensions dims(2);
+    std::vector<sudoku::Grid> grids(1, dims);
+    grids[0].setCellValue(3, 1);
+    grids[0].setCellValue(4, 2);
+    sudoku::cuda::kernel::HostData hostData(dims, grids);
+    sudoku::cuda::Grid grid(hostData.getData().dimsData, hostData.getData().gridData, 0);
+    BOOST_REQUIRE_EQUAL(grid.getNextAvailableValue(0, 0), 3);
 }

@@ -32,11 +32,12 @@ namespace sudoku
                     friend class DeviceData;
 
                     public:
-                        HostData(const std::vector<sudoku::Grid>& grids);
+                        HostData(Dimensions dims, const std::vector<sudoku::Grid>& grids);
                         Data getData() const { return data_; }
 
                     private:
-                        void serialize(const std::vector<sudoku::Grid>& grids);
+                        void serialize(Dimensions dims, const std::vector<sudoku::Grid>& grids);
+                        void initBlockCounts(Dimensions dims, size_t threadCount);
                         std::vector<size_t> cellValues_;
                         std::vector<size_t> restrictions_;
                         std::vector<size_t> restrictionsOffsets_;
@@ -72,7 +73,18 @@ namespace sudoku
                 CUDA_HOST_AND_DEVICE
                 void clearCellValue(size_t cellPos);
 
+                CUDA_HOST_AND_DEVICE
+                size_t getNextAvailableValue(size_t cellPos, size_t cellValue);
+
             private:
+                /**
+                 * On construction, the Grid simply points to data. It doesn't
+                 * intialize the block counts. Calling this method will do so.
+                 * This should only be called by the host during serialization,
+                 * so that the device does not need to do it.
+                 */
+                void initBlockCounts();
+
                 /**
                  * Assign value to a cell (without updating block counts)
                  */

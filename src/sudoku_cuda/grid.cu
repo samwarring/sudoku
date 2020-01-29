@@ -4,16 +4,21 @@ namespace sudoku
 {
     namespace cuda
     {
-        Grid::HostData::HostData(const std::vector<sudoku::Grid>& grids)
+        Grid::HostData::HostData(Dimensions dims, const std::vector<sudoku::Grid>& grids)
         {
-            serialize(grids);
+            serialize(dims, grids);
             data_.cellValues = cellValues_.data();
             data_.restrictions = restrictions_.data();
             data_.restrictionsOffsets = restrictionsOffsets_.data();
             data_.blockCounts = blockCounts_.data();
+
+            // Now that the grid has been serialized, we can construct cuda::Grid objects
+            // from the serialized data. The cell values and restrictions have been copied
+            // but the "potentials" are still all 0. Initialize them now.
+            initBlockCounts(dims, grids.size());
         }
 
-        void Grid::HostData::serialize(const std::vector<sudoku::Grid>& grids)
+        void Grid::HostData::serialize(Dimensions dims, const std::vector<sudoku::Grid>& grids)
         {
             assert(grids.size() > 0);
 
@@ -37,8 +42,15 @@ namespace sudoku
             restrictionsOffsets_.push_back(restrictions_.size());
 
             // Allocate space for block counts (initialize to 0)
-            const auto& dims = grids[0].getDimensions();
             blockCounts_.resize(grids.size() * dims.getCellCount() * (1 + dims.getMaxCellValue()));
+        }
+
+        void Grid::HostData::initBlockCounts(Dimensions dims, size_t threadCount)
+        {
+            for (size_t i = 0; i < threadCount; ++i) {
+                Grid grid(dims, data_, i);
+                grid.initBlockCounts();
+            }
         }
 
         Grid::DeviceData::DeviceData(const HostData& hostData)
@@ -75,6 +87,19 @@ namespace sudoku
             CUDA_HOST_ASSERT(cellPos < dims_->getCellCount());
             unblockRelatedCells(cellPos, *getCell(cellPos));
             *getCell(cellPos) = 0;
+        }
+
+        CUDA_HOST_AND_DEVICE
+        size_t Grid::getNextAvailableValue(size_t cellPos, size_t cellValue)
+        {
+            CUDA_HOST_ASSERT(cellPos < dims_->getCellCount());
+            CUDA_HOST_ASSERT(cellValue <= dims_->getMaxCellValue());
+            for (size_t v = cellValue + 1; v <= dims_->getMaxCellValue(); ++v) {
+                if (*getBlockCount(cellPos, v) == 0) {
+                    return v;
+                }
+            }
+            return 0;
         }
 
         CUDA_HOST_AND_DEVICE
@@ -139,6 +164,16 @@ namespace sudoku
                 for (size_t j = 0; j < groupSize; ++j) {
                     size_t relatedPos = dims_->getCellInGroup(groupNum, j);
                     unblockCellValue(relatedPos, cellValue);
+                }
+            }
+        }
+
+        void Grid::initBlockCounts()
+        {
+            for (size_t cellPos = 0; cellPos < dims_->getCellCount(); ++cellPos) {
+                const size_t cellValue = getCellValue(cellPos);
+                if (cellValue > 0) {
+                    blockRelatedCells(cellPos, cellValue);
                 }
             }
         }
