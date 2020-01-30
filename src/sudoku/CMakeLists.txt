@@ -11,6 +11,7 @@ add_library(
     parallel_solver.cpp
     grid.cpp
     fork.cpp
+    block_count_tracker.cpp
 )
 
 target_include_directories(
