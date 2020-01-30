@@ -41,6 +41,14 @@ namespace sudoku
              */
             void markCellEmpty(size_t cellPos);
 
+            /**
+             * Get the number of values blocked for an empty cell.
+             * 
+             * \warning If the cell is occupied, the block count is undefined.
+             *          Caller should first check that the cell is empty.
+             */
+            int getBlockCount(size_t cellPos) const;
+
         private:
             /**
              * Heap layout convenience functions.

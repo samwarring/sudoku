@@ -50,6 +50,12 @@ namespace sudoku
         onBlockCountIncrease(cellPos);
     }
 
+    int BlockCountTracker::getBlockCount(size_t cellPos) const
+    {
+        assert(blockCounts_[cellPos] >= 0);
+        return blockCounts_[cellPos];
+    }
+
     size_t BlockCountTracker::getLeftHeapChild(size_t heapIndex)
     {
         return heapIndex * 2;

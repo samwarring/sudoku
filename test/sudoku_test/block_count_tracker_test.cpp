@@ -72,3 +72,19 @@ BOOST_AUTO_TEST_CASE(BlockCountTracker_occupyAndEmptyCell)
     tracker.markCellEmpty(6);
     BOOST_REQUIRE_EQUAL(tracker.getMaxBlockEmptyCell(), 6);
 }
+
+BOOST_AUTO_TEST_CASE(BlockCountTracker_getBlockCount)
+{
+    sudoku::square::Dimensions dims(2);
+    sudoku::BlockCountTracker tracker(dims);
+    BOOST_REQUIRE_EQUAL(tracker.getBlockCount(7), 0);
+    
+    alterBlockCount(tracker, 7, 3);
+    BOOST_REQUIRE_EQUAL(tracker.getBlockCount(7), 3);
+
+    alterBlockCount(tracker, 7, 1);
+    BOOST_REQUIRE_EQUAL(tracker.getBlockCount(7), 4);
+
+    alterBlockCount(tracker, 7, -2);
+    BOOST_REQUIRE_EQUAL(tracker.getBlockCount(7), 2);
+}
