@@ -14,6 +14,7 @@ namespace sudoku
             ERROR_NOT_SET = 0,
             OK_FOUND_SOLUTION = 1,
             OK_TIMED_OUT = 2,
+            OK_NO_SOLUTION = 3,
         };
 
         std::string toString(Result result);

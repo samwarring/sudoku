@@ -15,6 +15,8 @@ namespace sudoku
                     return "Found solution";
                 case Result::OK_TIMED_OUT:
                     return "Timed out";
+                case Result::OK_NO_SOLUTION:
+                    return "No solution";
                 default:
                     return "Undefined";
             }

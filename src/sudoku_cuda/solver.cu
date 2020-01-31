@@ -12,7 +12,7 @@ namespace sudoku
         {}
 
         CUDA_HOST_AND_DEVICE
-        bool Solver::computeNextSolution(size_t maxGuessCount)
+        Result Solver::computeNextSolution(size_t maxGuessCount)
         {
             size_t cellPos = grid_.getMaxBlockEmptyCell();
             size_t minCellValue = 0;
@@ -20,7 +20,7 @@ namespace sudoku
                 
                 if (maxGuessCount == 0) {
                     // Out of guesses
-                    return false;
+                    return Result::OK_TIMED_OUT;
                 }
 
                 size_t cellValue = grid_.getNextAvailableValue(cellPos, minCellValue);
@@ -28,7 +28,7 @@ namespace sudoku
                     // No more available values. Backtrack.
                     if (guessStack_.getSize() == 0) {
                         // No solution.
-                        return false;
+                        return Result::OK_NO_SOLUTION;
                     }
                     // Pop last guess; clear guess from grid; continue.
                     size_t prevGuessPos = guessStack_.pop();
@@ -47,7 +47,7 @@ namespace sudoku
             }
 
             // No more empty cells. Sudoku is solved!
-            return true;
+            return Result::OK_FOUND_SOLUTION;
         }
     }
 }
