@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cassert>
 #include <numeric>
 #include <sudoku/block_count_tracker.h>
@@ -88,30 +89,35 @@ namespace sudoku
         size_t rightChildIndex = getRightHeapChild(heapIndex);
         for(;;) {
             if (leftChildIndex >= posHeap_.size()) {
-                // No children. Don't swap anything.
-                return;
+                // 0 children
+                break;
             }
             else if (rightChildIndex >= posHeap_.size()) {
-                // Only 1 left child. Attempt one swap and return.
+                // 1 child
                 trySwap(leftChildIndex, heapIndex);
-                return;
+                break;
             }
-            else if (trySwap(leftChildIndex, heapIndex)) {
-                // left child was swapped.
-                heapIndex = leftChildIndex;
-                leftChildIndex = getLeftHeapChild(heapIndex);
-                rightChildIndex = getRightHeapChild(heapIndex);
-                continue;
+            else {
+                // 2 children
+                auto leftValue = blockCounts_[posHeap_[leftChildIndex]];
+                auto rightValue = blockCounts_[posHeap_[rightChildIndex]];
+                if (leftValue > rightValue && trySwap(leftChildIndex, heapIndex)) {
+                    // left child is greatest of parent and children
+                    heapIndex = leftChildIndex;
+                    leftChildIndex = getLeftHeapChild(heapIndex);
+                    rightChildIndex = getRightHeapChild(heapIndex);
+                    continue;
+                }
+                else if (trySwap(rightChildIndex, heapIndex)) {
+                    // right child is greatest of parent and children
+                    heapIndex = rightChildIndex;
+                    leftChildIndex = getLeftHeapChild(heapIndex);
+                    rightChildIndex = getRightHeapChild(heapIndex);
+                    continue;
+                }
+                // parent greater than both children.
+                break;
             }
-            else if (trySwap(rightChildIndex, heapIndex)) {
-                // right child was swapped.
-                heapIndex = rightChildIndex;
-                leftChildIndex = getLeftHeapChild(heapIndex);
-                rightChildIndex = getRightHeapChild(heapIndex);
-                continue;
-            }
-            // No children, or nothing was swapped.
-            return;
         }
     }
 

@@ -19,8 +19,7 @@ namespace sudoku
         size_t cellPos = grid.getMaxBlockEmptyCell();
         while (cellPos != dims.getCellCount()) {
             
-            const auto& potential = grid.getCellPotential(cellPos);
-            auto blockCount = potential.getAmountBlocked();
+            auto blockCount = grid.getBlockCount(cellPos);
             if (blockCount == dims.getMaxCellValue()) {
                 // Found a completely blocked cell.
                 return cellPos;
@@ -28,7 +27,7 @@ namespace sudoku
             else if (blockCount == dims.getMaxCellValue() - 1) {
                 // Found an "obvious" empty cell with exactly one available value
                 // Assume this value, and try the next empty cell.
-                grid.setCellValue(cellPos, potential.getNextAvailableValue(0));
+                grid.setCellValue(cellPos, grid.getCellPotential(cellPos).getNextAvailableValue(0));
                 cellPos = grid.getMaxBlockEmptyCell();
                 continue;
             }

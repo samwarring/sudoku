@@ -88,3 +88,18 @@ BOOST_AUTO_TEST_CASE(BlockCountTracker_getBlockCount)
     alterBlockCount(tracker, 7, -2);
     BOOST_REQUIRE_EQUAL(tracker.getBlockCount(7), 2);
 }
+
+BOOST_AUTO_TEST_CASE(BlockCountTracker_rightChildGreaterInHeap)
+{
+    sudoku::Dimensions dims(3, 3, {});
+    sudoku::BlockCountTracker tracker(dims);
+    alterBlockCount(tracker, 0, 3);  //     0(=3)
+    alterBlockCount(tracker, 1, 1);  //     |   |
+    alterBlockCount(tracker, 2, 2);  // 1(=1)   2(=2)
+    
+    BOOST_REQUIRE_EQUAL(tracker.getMaxBlockEmptyCell(), 0);
+    tracker.markCellOccupied(0); // right child should swap up
+    BOOST_REQUIRE_EQUAL(tracker.getMaxBlockEmptyCell(), 2);
+    tracker.markCellOccupied(2);  // left child should swap up
+    BOOST_REQUIRE_EQUAL(tracker.getMaxBlockEmptyCell(), 1);
+}
