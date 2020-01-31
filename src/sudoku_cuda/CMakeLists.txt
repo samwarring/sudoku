@@ -5,6 +5,7 @@ add_library(
     dimensions.cu
     grid.cu
     guess_stack.cu
+    solver.cu
 )
 
 target_include_directories(

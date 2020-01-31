@@ -97,10 +97,12 @@ namespace sudoku
             public:
                 HostData(Dimensions dims, const std::vector<sudoku::Grid>& grids);
                 Data getData() const { return data_; }
+                std::vector<size_t> getCellValues(size_t threadNum) const;
 
             private:
-                void serialize(Dimensions dims, const std::vector<sudoku::Grid>& grids);
-                void initBlockCounts(Dimensions dims, const std::vector<sudoku::Grid>& grids);
+                void serialize(const std::vector<sudoku::Grid>& grids);
+                void initBlockCounts(const std::vector<sudoku::Grid>& grids);
+                Dimensions dims_;
                 std::vector<size_t> cellValues_;
                 std::vector<size_t> blockCounts_;
                 Data data_;
@@ -117,7 +119,6 @@ namespace sudoku
                 DeviceBuffer<size_t> blockCounts_;
                 Data data_;
         };
-
     }
 }
 

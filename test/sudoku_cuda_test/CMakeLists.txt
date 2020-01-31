@@ -7,6 +7,7 @@ add_executable(
     dimensions_test.cpp
     grid_test.cpp
     guess_stack_test.cpp
+    solver_test.cpp
 )
 
 target_link_libraries(

@@ -5,18 +5,19 @@ namespace sudoku
     namespace cuda
     {
         Grid::HostData::HostData(Dimensions dims, const std::vector<sudoku::Grid>& grids)
+            : dims_(dims)
         {
-            serialize(dims, grids);
+            serialize(grids);
             data_.cellValues = cellValues_.data();
             data_.blockCounts = blockCounts_.data();
 
             // Now that the grid has been serialized, we can construct cuda::Grid objects
             // from the serialized data. The cell values and restrictions have been copied
             // but the "potentials" are still all 0. Initialize them now.
-            initBlockCounts(dims, grids);
+            initBlockCounts(grids);
         }
 
-        void Grid::HostData::serialize(Dimensions dims, const std::vector<sudoku::Grid>& grids)
+        void Grid::HostData::serialize(const std::vector<sudoku::Grid>& grids)
         {
             assert(grids.size() > 0);
 
@@ -30,18 +31,28 @@ namespace sudoku
             }
 
             // Allocate space for block counts (initialize to 0)
-            blockCounts_.resize(grids.size() * dims.getCellCount() * (1 + dims.getMaxCellValue()));
+            blockCounts_.resize(grids.size() * dims_.getCellCount() * (1 + dims_.getMaxCellValue()));
         }
 
-        void Grid::HostData::initBlockCounts(Dimensions dims, const std::vector<sudoku::Grid>& grids)
+        void Grid::HostData::initBlockCounts(const std::vector<sudoku::Grid>& grids)
         {
             for (size_t i = 0; i < grids.size(); ++i) {
-                Grid grid(dims, data_, i);
+                Grid grid(dims_, data_, i);
                 grid.initBlockCounts();
                 for (auto restr : grids[i].getRestrictions()) {
                     grid.blockCellValue(restr.first, restr.second);
                 }
             }
+        }
+
+        std::vector<size_t> Grid::HostData::getCellValues(size_t threadNum) const
+        {
+            Grid grid(dims_, data_, threadNum);
+            std::vector<size_t> result(dims_.getCellCount());
+            for (size_t cellPos = 0; cellPos < dims_.getCellCount(); ++cellPos) {
+                result[cellPos] = grid.getCellValue(cellPos);
+            }
+            return result;
         }
 
         Grid::DeviceData::DeviceData(const HostData& hostData)
