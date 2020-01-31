@@ -136,7 +136,8 @@ namespace sudoku
         size_t* Grid::getBlockCount(size_t cellPos)
         {
             CUDA_HOST_ASSERT(cellPos < dims_->getCellCount());
-            return data_.blockCounts + (cellPos * (dims_->getMaxCellValue() + 1));
+            const size_t perThread = dims_->getCellCount() * (dims_->getMaxCellValue() + 1);
+            return data_.blockCounts + (threadNum_ * perThread) + (cellPos * (dims_->getMaxCellValue() + 1));
         }
 
         CUDA_HOST_AND_DEVICE

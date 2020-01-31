@@ -103,3 +103,19 @@ BOOST_AUTO_TEST_CASE(Grid_getMaxBlockCount_withInitialRestrictions)
     BOOST_REQUIRE_EQUAL(grid.getMaxBlockEmptyCell(), 6);
     BOOST_REQUIRE_EQUAL(grid.getNextAvailableValue(6, 0), 3);
 }
+
+BOOST_AUTO_TEST_CASE(Grid_4x4_fork_2threads)
+{
+    size_t threadCount = 2;
+    sudoku::square::Dimensions dims(2);
+    auto grids = sudoku::fork(dims, threadCount);
+    sudoku::cuda::kernel::HostData hostData(dims, grids);
+    for (size_t threadNum = 0; threadNum < threadCount; ++threadNum) {
+        sudoku::cuda::Dimensions threadDims(hostData.getData().dimsData);
+        sudoku::cuda::Grid threadGrid(threadDims, hostData.getData().gridData, threadNum);
+        size_t maxBlockEmptyCell = threadGrid.getMaxBlockEmptyCell();
+        BOOST_REQUIRE_NE(maxBlockEmptyCell, dims.getCellCount());
+        BOOST_REQUIRE_EQUAL(threadGrid.getCellValue(maxBlockEmptyCell), 0);
+        BOOST_REQUIRE_NE(threadGrid.getNextAvailableValue(maxBlockEmptyCell, 0), 0);
+    }
+}
