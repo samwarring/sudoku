@@ -25,40 +25,8 @@ namespace sudoku
                     const size_t* groupsForCellOffsets; ///< e.g. { [cell0 offset=0] [cell1 offset=3] ... [cell81 offset=243] }
                 };
 
-                // Forward declaration required to use as friend.
+                class HostData;
                 class DeviceData;
-
-                class HostData
-                {
-                    /// Allow DeviceData to copy the private buffers.
-                    friend class DeviceData;
-
-                    public:
-                        HostData(const sudoku::Dimensions& dims);
-                        Data getData() const { return data_; }
-
-                    private:
-                        void serialize(const sudoku::Dimensions& dims);
-                        std::vector<size_t> groupValues_;
-                        std::vector<size_t> groupOffsets_;
-                        std::vector<size_t> groupsForCellValues_;
-                        std::vector<size_t> groupsForCellOffsets_;
-                        Data data_;
-                };
-
-                class DeviceData
-                {
-                    public:
-                        DeviceData(const HostData& hostData);
-                        Data getData() const { return data_; }
-
-                    private:
-                        DeviceBuffer<size_t> groupValues_;
-                        DeviceBuffer<size_t> groupOffsets_;
-                        DeviceBuffer<size_t> groupsForCellValues_;
-                        DeviceBuffer<size_t> groupsForCellOffsets_;
-                        Data data_;
-                };
 
             public:
                 CUDA_HOST_AND_DEVICE
@@ -86,6 +54,38 @@ namespace sudoku
                 size_t getGroupForCell(size_t cellPos, size_t itemNum) const;
 
             private:
+                Data data_;
+        };
+
+        class Dimensions::HostData
+        {
+            /// Allow DeviceData to copy the private buffers.
+            friend class DeviceData;
+
+            public:
+                HostData(const sudoku::Dimensions& dims);
+                Data getData() const { return data_; }
+
+            private:
+                void serialize(const sudoku::Dimensions& dims);
+                std::vector<size_t> groupValues_;
+                std::vector<size_t> groupOffsets_;
+                std::vector<size_t> groupsForCellValues_;
+                std::vector<size_t> groupsForCellOffsets_;
+                Data data_;
+        };
+
+        class Dimensions::DeviceData
+        {
+            public:
+                DeviceData(const HostData& hostData);
+                Data getData() const { return data_; }
+
+            private:
+                DeviceBuffer<size_t> groupValues_;
+                DeviceBuffer<size_t> groupOffsets_;
+                DeviceBuffer<size_t> groupsForCellValues_;
+                DeviceBuffer<size_t> groupsForCellOffsets_;
                 Data data_;
         };
     }

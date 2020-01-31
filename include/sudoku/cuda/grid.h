@@ -21,37 +21,8 @@ namespace sudoku
                     size_t* blockCounts;  ///< e.g. { [grid0,cell0,blockCount] [grid0,cell0,value1count] ... }
                 };
 
-                // Forward declaration required to use as friend.
+                class HostData;
                 class DeviceData;
-
-                class HostData
-                {
-                    /// Allow DeviceData to copy the private buffers.
-                    friend class DeviceData;
-
-                    public:
-                        HostData(Dimensions dims, const std::vector<sudoku::Grid>& grids);
-                        Data getData() const { return data_; }
-
-                    private:
-                        void serialize(Dimensions dims, const std::vector<sudoku::Grid>& grids);
-                        void initBlockCounts(Dimensions dims, const std::vector<sudoku::Grid>& grids);
-                        std::vector<size_t> cellValues_;
-                        std::vector<size_t> blockCounts_;
-                        Data data_;
-                };
-
-                class DeviceData
-                {
-                    public:
-                        DeviceData(const HostData& hostData);
-                        Data getData() const { return data_; }
-
-                    private:
-                        DeviceBuffer<size_t> cellValues_;
-                        DeviceBuffer<size_t> blockCounts_;
-                        Data data_;
-                };
 
             public:
                 CUDA_HOST_AND_DEVICE
@@ -117,6 +88,36 @@ namespace sudoku
                 Data data_;
                 size_t threadNum_;
         };
+
+        class Grid::HostData
+        {
+            /// Allow DeviceData to copy the private buffers.
+            friend class DeviceData;
+
+            public:
+                HostData(Dimensions dims, const std::vector<sudoku::Grid>& grids);
+                Data getData() const { return data_; }
+
+            private:
+                void serialize(Dimensions dims, const std::vector<sudoku::Grid>& grids);
+                void initBlockCounts(Dimensions dims, const std::vector<sudoku::Grid>& grids);
+                std::vector<size_t> cellValues_;
+                std::vector<size_t> blockCounts_;
+                Data data_;
+        };
+
+        class Grid::DeviceData
+        {
+            public:
+                DeviceData(const HostData& hostData);
+                Data getData() const { return data_; }
+
+            private:
+                DeviceBuffer<size_t> cellValues_;
+                DeviceBuffer<size_t> blockCounts_;
+                Data data_;
+        };
+
     }
 }
 
