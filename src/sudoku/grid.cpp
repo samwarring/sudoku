@@ -8,25 +8,22 @@ namespace sudoku
         std::vector<size_t> cellValues,
         std::vector<std::pair<size_t, size_t>> restrictions)
         : dims_(&dims)
-        , cellValues_(std::move(cellValues))
+        , blockCountTracker_(dims)
+        , cellValues_(dims.getCellCount())
     {
-        // If given empty vector of cell values, treat as an empty grid.
-        if (cellValues_.size() == 0) {
-            cellValues_.resize(dims.getCellCount());
-        }
-
         // Initialize cell potentials.
         cellPotentials_.reserve(dims_->getCellCount());
         for (size_t cellPos = 0; cellPos < dims_->getCellCount(); ++cellPos) {
             cellPotentials_.emplace_back(dims_->getMaxCellValue());
         }
 
-        // Verify cell values and set initial potentials.
-        if (cellValues_.size() != dims.getCellCount()) {
+        // Verify cell values and set initial potentials. If given empty vector
+        // of cell values, treat as an empty grid.
+        if (cellValues.size() != 0 && cellValues.size() != dims.getCellCount()) {
             throw GridException("Incorrect number of initial values");
         }
-        for (size_t cellPos = 0; cellPos < dims.getCellCount(); ++cellPos) {
-            auto cellValue = cellValues_[cellPos];
+        for (size_t cellPos = 0; cellPos < cellValues.size(); ++cellPos) {
+            auto cellValue = cellValues[cellPos];
             if (cellValue != 0) {
                 if (cellValue > dims.getMaxCellValue()) {
                     throw GridException("Initial cell value out of range");
@@ -54,9 +51,12 @@ namespace sudoku
     void Grid::setCellValue(size_t cellPos, size_t cellValue)
     {
         cellValues_[cellPos] = cellValue;
+        blockCountTracker_.markCellOccupied(cellPos);
         for (auto groupNum : dims_->getGroupsForCell(cellPos)) {
             for (auto relatedPos : dims_->getCellsInGroup(groupNum)) {
-                cellPotentials_[relatedPos].block(cellValue);
+                if (cellPotentials_[relatedPos].block(cellValue)) {
+                    blockCountTracker_.incrementBlockCount(relatedPos);
+                }
             }
         }
     }
@@ -65,42 +65,32 @@ namespace sudoku
     {
         size_t cellValue = cellValues_[cellPos];
         cellValues_[cellPos] = 0;
+        blockCountTracker_.markCellEmpty(cellPos);
         for (auto groupNum : dims_->getGroupsForCell(cellPos)) {
             for (auto relatedPos : dims_->getCellsInGroup(groupNum)) {
-                cellPotentials_[relatedPos].unblock(cellValue);
+                if (cellPotentials_[relatedPos].unblock(cellValue)) {
+                    blockCountTracker_.derementBlockCount(relatedPos);
+                }
             }
         }
     }
 
     void Grid::restrictCellValue(size_t cellPos, size_t cellValue)
     {
-        cellPotentials_[cellPos].block(cellValue);
+        if (cellPotentials_[cellPos].block(cellValue)) {
+            blockCountTracker_.incrementBlockCount(cellPos);
+        }
         restrictions_.emplace_back(cellPos, cellValue);
     }
 
     size_t Grid::getMaxBlockEmptyCell() const
     {
-        const size_t cellCount = dims_->getCellCount();
-        const size_t maxCellValue = dims_->getMaxCellValue();
-        int maxBlock = -1;
-        size_t maxBlockPos = cellCount;
-
-        for (size_t cellPos = 0; cellPos < cellCount; ++cellPos) {
-            if (cellValues_[cellPos] == 0) {
-                const int blockCount = cellPotentials_[cellPos].getAmountBlocked();
-                if (maxBlock < blockCount) {
-                    if (blockCount == maxCellValue) {
-                        // If an empty cell is completely blocked, there is no greater
-                        // block count to search for.
-                        return cellPos;
-                    }
-                    maxBlock = blockCount;
-                    maxBlockPos = cellPos;
-                }
-            }
+        size_t candidate = blockCountTracker_.getMaxBlockEmptyCell();
+        if (cellValues_[candidate]) {
+            // No more empty cells
+            return dims_->getCellCount();
         }
-
-        return maxBlockPos;
+        return candidate;
     }
 
     size_t Grid::getEmptyCellCount() const

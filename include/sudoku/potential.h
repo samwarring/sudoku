@@ -23,30 +23,26 @@ namespace sudoku
             /**
              * Indicate that a related cell position claimed `cellValue`.
              * If previously available, this cellValue is now blocked.
+             * 
+             * \return true if the value was previously unblocked.
              */
-            void block(size_t cellValue);
+            bool block(size_t cellValue);
 
             /**
              * Indicate that a related cell position previously set to
              * `cellValue` has reset. If the related cell position was
              * the only position blocking this value, then the value is
              * now available.
+             * 
+             * \return true if the value was previously blocked.
              */
-            void unblock(size_t cellValue);
+            bool unblock(size_t cellValue);
 
             /**
              * Checks if at least one related cell is blocking the given
              * `cellValue`.
              */
             bool isBlocked(size_t cellValue) const { return block_counts_[cellValue - 1] > 0; }
-
-            /**
-             * Gets the number of cell values that are currently blocked.
-             */
-            int getAmountBlocked() const { return numCellValuesBlocked_; }
-
-            // self-explanatory
-            size_t getMaxCellValue() const { return block_counts_.size(); }
 
             /**
              * Gets the next available cell value greater than `minValue`.
@@ -61,7 +57,6 @@ namespace sudoku
 
         private:
             std::vector<size_t> block_counts_;
-            int numCellValuesBlocked_ = 0;
     };
 }
 

@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <vector>
+#include <sudoku/block_count_tracker.h>
 #include <sudoku/dimensions.h>
 #include <sudoku/potential.h>
 
@@ -118,8 +119,14 @@ namespace sudoku
              */
             size_t getEmptyCellCount() const;
 
+            /**
+             * Get the number of values that are blocked for a cell.
+             */
+            int getBlockCount(size_t cellPos) const { return blockCountTracker_.getBlockCount(cellPos); }
+
         private:
             const Dimensions* dims_;
+            BlockCountTracker blockCountTracker_;
             std::vector<Potential> cellPotentials_;
             std::vector<size_t> cellValues_;
             std::vector<Restriction> restrictions_;

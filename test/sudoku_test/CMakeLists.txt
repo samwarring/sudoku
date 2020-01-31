@@ -14,6 +14,7 @@ add_executable(
     parallel_solver_test.cpp
     grid_test.cpp
     fork_test.cpp
+    block_count_tracker_test.cpp
 )
 
 target_include_directories(
