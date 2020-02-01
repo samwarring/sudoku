@@ -1,9 +1,10 @@
 #include <algorithm>
 #include <cassert>
-#include <sudoku/cuda/error.h>
-#include <sudoku/cuda/kernel.h>
 #include <sudoku/cuda/dimensions.h>
+#include <sudoku/cuda/error.h>
 #include <sudoku/cuda/grid.h>
+#include <sudoku/cuda/kernel.h>
+#include <sudoku/cuda/solver.h>
 
 namespace sudoku
 {
@@ -15,14 +16,16 @@ namespace sudoku
             {
                 Dimensions dims(data.dimsData);
                 Grid grid(dims, data.gridData, threadIdx.x);
-                GuessStack guesses(data.guessStackData, threadIdx.x);
-                data.results[threadIdx.x] = (threadIdx.x % 2 ? Result::OK_FOUND_SOLUTION : Result::OK_TIMED_OUT);
+                GuessStack guessStack(data.guessStackData, threadIdx.x);
+                Solver solver(dims, grid, guessStack);
+                data.results[threadIdx.x] = solver.computeNextSolution(100000);
             }
 
-            void launch(unsigned blockCount, unsigned threadsPerBlock, const DeviceData& deviceData)
+            void launch(unsigned blockCount, unsigned threadsPerBlock, DeviceData& deviceData)
             {
                 kernel<<<blockCount, threadsPerBlock>>>(deviceData.getData());
                 ErrorCheck() << cudaGetLastError();
+                deviceData.copyToHost();
             }
 
             HostData::HostData(const sudoku::Dimensions& dims, const std::vector<sudoku::Grid>& grids)
@@ -49,10 +52,20 @@ namespace sudoku
                 data_.results = deviceResults_.getDeviceData();
             }
 
-            Result DeviceData::getResult(size_t threadNum)
+            void DeviceData::copyToHost()
             {
+                deviceGrid_.copyToHost();
                 deviceResults_.copyToHost();
+            }
+
+            Result DeviceData::getResult(size_t threadNum) const
+            {
                 return deviceResults_.getHostData()[threadNum];
+            }
+
+            std::vector<size_t> DeviceData::getCellValues(size_t threadNum) const
+            {
+                return deviceGrid_.getCellValues(threadNum);
             }
         }
     }

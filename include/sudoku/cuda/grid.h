@@ -4,6 +4,7 @@
 #include <vector>
 #include <sudoku/cuda/device_buffer.h>
 #include <sudoku/cuda/dimensions.h>
+#include <sudoku/cuda/mirror_buffer.h>
 #include <sudoku/cuda/result.h>
 #include <sudoku/grid.h>
 
@@ -19,6 +20,7 @@ namespace sudoku
                 {
                     size_t* cellValues;   ///< e.g. { (grid0 cells, 81 values) (grid2 cells, 81 values) ... }
                     size_t* blockCounts;  ///< e.g. { [grid0,cell0,blockCount] [grid0,cell0,value1count] ... }
+                    size_t cellCount;     ///< required for reading results
                 };
 
                 class HostData;
@@ -113,9 +115,11 @@ namespace sudoku
             public:
                 DeviceData(const HostData& hostData);
                 Data getData() const { return data_; }
+                void copyToHost();
+                std::vector<size_t> getCellValues(size_t threadNum) const;
 
             private:
-                DeviceBuffer<size_t> cellValues_;
+                MirrorBuffer<size_t> cellValues_;
                 DeviceBuffer<size_t> blockCounts_;
                 Data data_;
         };

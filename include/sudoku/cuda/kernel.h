@@ -50,7 +50,9 @@ namespace sudoku
                 public:
                     DeviceData(const HostData& hostData);
                     Data getData() const { return data_; }
-                    Result getResult(size_t threadNum);
+                    void copyToHost();
+                    Result getResult(size_t threadNum) const;
+                    std::vector<size_t> getCellValues(size_t threadNum) const;
 
                 private:
                     Dimensions::DeviceData deviceDims_;
@@ -60,7 +62,7 @@ namespace sudoku
                     Data data_;
             };
 
-            void launch(unsigned blockCount, unsigned threadsPerBlock, const DeviceData& deviceData);
+            void launch(unsigned blockCount, unsigned threadsPerBlock, DeviceData& deviceData);
         }
     }
 }

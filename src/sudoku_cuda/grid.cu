@@ -10,6 +10,7 @@ namespace sudoku
             serialize(grids);
             data_.cellValues = cellValues_.data();
             data_.blockCounts = blockCounts_.data();
+            data_.cellCount = dims.getCellCount();
 
             // Now that the grid has been serialized, we can construct cuda::Grid objects
             // from the serialized data. The cell values and restrictions have been copied
@@ -58,9 +59,23 @@ namespace sudoku
         Grid::DeviceData::DeviceData(const HostData& hostData)
             : cellValues_(hostData.cellValues_)
             , blockCounts_(hostData.blockCounts_)
+            , data_(hostData.data_)
         {
-            data_.cellValues = cellValues_.begin();
+            data_.cellValues = cellValues_.getDeviceData();
             data_.blockCounts = blockCounts_.begin();
+        }
+
+        void Grid::DeviceData::copyToHost()
+        {
+            cellValues_.copyToHost();
+        }
+
+        std::vector<size_t> Grid::DeviceData::getCellValues(size_t threadNum) const
+        {
+            return {
+                cellValues_.getHostData() + (threadNum * data_.cellCount),
+                cellValues_.getHostData() + (threadNum * data_.cellCount) + data_.cellCount
+            };
         }
 
         CUDA_HOST_AND_DEVICE

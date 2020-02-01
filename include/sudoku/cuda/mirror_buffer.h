@@ -44,6 +44,11 @@ namespace sudoku
                     return hostData_.data();
                 }
 
+                const T* getHostData() const
+                {
+                    return hostData_.data();
+                }
+
                 T* getDeviceData()
                 {
                     return deviceData_.begin();
