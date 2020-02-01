@@ -58,6 +58,7 @@ namespace sudoku
             public:
                 HostData(const std::vector<sudoku::Grid>& grids);
                 Data getData() const { return data_; }
+                size_t getAllocatedSize() const;
 
             private:
                 std::vector<size_t> values_;

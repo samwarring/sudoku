@@ -100,6 +100,7 @@ namespace sudoku
                 HostData(Dimensions dims, const std::vector<sudoku::Grid>& grids);
                 Data getData() const { return data_; }
                 std::vector<size_t> getCellValues(size_t threadNum) const;
+                size_t getAllocatedSize() const;
 
             private:
                 void serialize(const std::vector<sudoku::Grid>& grids);

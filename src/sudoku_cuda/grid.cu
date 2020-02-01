@@ -56,6 +56,14 @@ namespace sudoku
             return result;
         }
 
+        size_t Grid::HostData::getAllocatedSize() const
+        {
+            return (
+                (sizeof(size_t) * cellValues_.size()) +
+                (sizeof(size_t) * blockCounts_.size())
+            );
+        }
+
         Grid::DeviceData::DeviceData(const HostData& hostData)
             : cellValues_(hostData.cellValues_)
             , blockCounts_(hostData.blockCounts_)

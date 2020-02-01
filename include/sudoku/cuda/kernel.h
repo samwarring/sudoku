@@ -36,7 +36,8 @@ namespace sudoku
                     Data getData() const { return data_; }
                     Result getResult(size_t threadNum) const { return hostResults_[threadNum]; }
                     std::vector<size_t> getCellValues(size_t threadNum) { return hostGrid_.getCellValues(threadNum); }
-
+                    size_t getAllocatedSize() const;
+                    
                 private:
                     Dimensions::HostData hostDims_;
                     Grid::HostData hostGrid_;

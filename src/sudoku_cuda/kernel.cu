@@ -40,6 +40,16 @@ namespace sudoku
                 data_.results = hostResults_.data();
             }
 
+            size_t HostData::getAllocatedSize() const
+            {
+                return (
+                    hostDims_.getAllocatedSize() +
+                    hostGrid_.getAllocatedSize() +
+                    hostGuessStack_.getAllocatedSize() +
+                    (sizeof(Result) * hostResults_.size())
+                );
+            }
+
             DeviceData::DeviceData(const HostData& hostData)
                 : deviceDims_(hostData.hostDims_)
                 , deviceGrid_(hostData.hostGrid_)

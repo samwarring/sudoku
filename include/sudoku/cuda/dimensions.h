@@ -65,6 +65,7 @@ namespace sudoku
             public:
                 HostData(const sudoku::Dimensions& dims);
                 Data getData() const { return data_; }
+                size_t getAllocatedSize() const;
 
             private:
                 void serialize(const sudoku::Dimensions& dims);

@@ -37,6 +37,16 @@ namespace sudoku
             groupsForCellOffsets_.push_back(groupsForCellValues_.size());
         }
 
+        size_t Dimensions::HostData::getAllocatedSize() const
+        {
+            return (
+                (sizeof(size_t) * groupValues_.size()) +
+                (sizeof(size_t) * groupOffsets_.size()) +
+                (sizeof(size_t) * groupsForCellValues_.size()) + 
+                (sizeof(size_t) * groupsForCellOffsets_.size())
+            );
+        }
+
         Dimensions::DeviceData::DeviceData(const Dimensions::HostData& hostData)
             : groupValues_(hostData.groupValues_)
             , groupOffsets_(hostData.groupOffsets_)

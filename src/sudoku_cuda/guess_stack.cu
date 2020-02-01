@@ -28,6 +28,14 @@ namespace sudoku
             data_.threadCount = grids.size();
         }
 
+        size_t GuessStack::HostData::getAllocatedSize() const
+        {
+            return (
+                (sizeof(size_t) * values_.size()) +
+                (sizeof(size_t) * sizes_.size())
+            );
+        }
+
         GuessStack::DeviceData::DeviceData(const HostData& hostData)
             : values_(hostData.values_)
             , sizes_(hostData.sizes_)
