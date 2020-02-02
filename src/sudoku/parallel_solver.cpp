@@ -39,7 +39,7 @@ namespace sudoku
         }
 
         // Wait for the next solution in the queue.
-        if (!consumer_->pop(solution_)) {
+        if (!consumer_->pop(solution_, metrics_)) {
             // No more producers. Likely because all the threads
             // have terminated. No more solutions!
             return false;
@@ -77,7 +77,7 @@ namespace sudoku
             // queue is closed, or until the solver finds no more solutions.
             auto threadProc = [solver = solvers_[threadNum].get(), producer = std::move(producer)]() mutable {
                  while (solver->computeNextSolution()) {
-                     if (!producer.push(solver->getCellValues())) {
+                     if (!producer.push(solver->getCellValues(), solver->getMetrics())) {
                          // No more consumers. Likely because the ParallelSolver
                          // is being destroyed.
                          return;

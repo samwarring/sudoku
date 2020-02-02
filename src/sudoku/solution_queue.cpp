@@ -36,13 +36,13 @@ namespace sudoku
         }
     }
 
-    bool SolutionQueue::Producer::push(std::vector<size_t> solution)
+    bool SolutionQueue::Producer::push(std::vector<size_t> solution, Metrics metrics)
     {
         // Wait until the queue has free capacity, or until there are
         // no more consumers.
         std::unique_lock<std::mutex> lock(queue_.mutex_);
         queue_.condVar_.wait(lock, [&](){
-            return (queue_.queue_.size() < queue_.maxSize_) || (queue_.numConsumers_ == 0);
+            return (queue_.valuesQueue_.size() < queue_.maxSize_) || (queue_.numConsumers_ == 0);
         });
 
         // If there are no consumers, then return false now.
@@ -52,7 +52,8 @@ namespace sudoku
 
         // There must be free capacity in the queue. Add the solution to the
         // queue, and notify a consumer thread which may be waiting.
-        queue_.queue_.emplace(std::move(solution));
+        queue_.valuesQueue_.emplace(std::move(solution));
+        queue_.metricsQueue_.push(metrics);
         queue_.condVar_.notify_one();
         return true;
     }
@@ -87,27 +88,29 @@ namespace sudoku
         }
     }
 
-    bool SolutionQueue::Consumer::pop(std::vector<size_t>& solution)
+    bool SolutionQueue::Consumer::pop(std::vector<size_t>& solution, Metrics& metrics)
     {
         // Wait until the queue contains at least one element, or until
         // there are no more producers.
         std::unique_lock<std::mutex> lock(queue_.mutex_);
         queue_.condVar_.wait(lock, [&](){
-            return (queue_.queue_.size() > 0) || (queue_.numProducers_ == 0);
+            return (queue_.valuesQueue_.size() > 0) || (queue_.numProducers_ == 0);
         });
 
         // If there are no more producers, there still may be solutions left
         // to proces in the queue. We only quit if there are no more producers
         // AND the queue is empty.
-        if (queue_.numProducers_ == 0 && queue_.queue_.size() == 0) {
+        if (queue_.numProducers_ == 0 && queue_.valuesQueue_.size() == 0) {
             return false;
         }
 
         // We know there is at least one producer, and the queue is not empty.
         // Retrieve the front of the queue. Notify a consumer which may be
         // waiting to write the the queue.
-        solution = std::move(queue_.queue_.front());
-        queue_.queue_.pop();
+        solution = std::move(queue_.valuesQueue_.front());
+        metrics = queue_.metricsQueue_.front();
+        queue_.valuesQueue_.pop();
+        queue_.metricsQueue_.pop();
         queue_.condVar_.notify_one();
         return true;
     }

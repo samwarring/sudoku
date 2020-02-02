@@ -12,11 +12,12 @@ std::string formatMetrics(sudoku::Metrics metrics)
 {
     std::ostringstream sout;
     auto durationMilli = std::chrono::duration_cast<std::chrono::milliseconds>(metrics.duration);
-    sout << "Total Guesses: " << metrics.totalGuesses << ", ";
-    sout << "Total Backtracks: " << metrics.totalBacktracks << ", ";
-    sout << "Total Stack Ops: " << metrics.totalGuesses + metrics.totalBacktracks << ", ";
-    sout << "Duration: " << durationMilli.count() << " ms, ";
-    sout << "Guess Rate: " << (metrics.totalGuesses * 1.0 / durationMilli.count()) << " guesses/ms";
+    auto totalGuessesAndBacktracks = metrics.totalGuesses + metrics.totalBacktracks;
+    sout << metrics.totalGuesses << " G, ";
+    sout << metrics.totalBacktracks << " BT, ";
+    sout << totalGuessesAndBacktracks << " G+BT, ";
+    sout << durationMilli.count() << " ms, ";
+    sout << (totalGuessesAndBacktracks * 1.0 / durationMilli.count()) << " G+BT/ms";
     return sout.str();
 }
 
@@ -95,7 +96,7 @@ int handleOptions(const ProgramOptions& options)
                 std::cout << "\nInput " << (inputNum + 1) << ", ";
                 std::cout << "Solution " << numSolutionsFound << ", ";
                 std::cout << "Hash: " << hasher(formatter->format(solver.getCellValues())) << ", ";
-                std::cout << formatMetrics(solver.getMetrics()) << '\n';
+                std::cout << "Metrics: " << formatMetrics(solver.getMetrics()) << '\n';
                 std::cout << formatter->format(solver.getCellValues()) << '\n';
             }
 
@@ -110,7 +111,8 @@ int handleOptions(const ProgramOptions& options)
                 solutionCount++;
                 std::cout << "\nInput " << (inputNum + 1) << ", ";
                 std::cout << "Solution " << solutionCount << ", ";
-                std::cout << "Hash: " << hasher(formatter->format(solver.getCellValues())) << '\n';
+                std::cout << "Hash: " << hasher(formatter->format(solver.getCellValues())) << ", ";
+                std::cout << "Metrics: " << formatMetrics(solver.getMetrics()) << '\n';
                 std::cout << formatter->format(solver.getCellValues()) << '\n';
             }
 

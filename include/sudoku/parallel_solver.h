@@ -7,6 +7,7 @@
 #include <vector>
 #include <sudoku/dimensions.h>
 #include <sudoku/grid.h>
+#include <sudoku/metrics.h>
 #include <sudoku/solver.h>
 #include <sudoku/solution_queue.h>
 
@@ -29,6 +30,8 @@ namespace sudoku
 
             const std::vector<size_t>& getCellValues() const;
 
+            Metrics getMetrics() const { return metrics_; }
+
         private:
             void startThreads();
 
@@ -39,6 +42,7 @@ namespace sudoku
             SolutionQueue queue_;
             std::unique_ptr<SolutionQueue::Consumer> consumer_;
             size_t threadCount_;
+            Metrics metrics_;
     };
 }
 

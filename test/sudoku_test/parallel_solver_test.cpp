@@ -28,6 +28,10 @@ BOOST_AUTO_TEST_CASE(ParallelSolver_example9x9_4threads)
     BOOST_REQUIRE(solver.computeNextSolution());
     const auto& actualSolution = solver.getCellValues();
     BOOST_REQUIRE_EQUAL_VECTORS(expectedSolution, actualSolution);
+    auto metrics = solver.getMetrics();
+    BOOST_CHECK_GT(metrics.duration.count(), 0);
+    BOOST_CHECK_GT(metrics.totalBacktracks, 0);
+    BOOST_CHECK_GT(metrics.totalGuesses, 0);
 }
 
 BOOST_AUTO_TEST_CASE(ParallelSolver_empty9x9_16Threads)
