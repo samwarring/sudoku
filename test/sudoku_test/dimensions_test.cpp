@@ -86,3 +86,19 @@ BOOST_AUTO_TEST_CASE(Dimensions_constructor_MaxCellValueIsZero)
         sudoku::DimensionsException
     );
 }
+
+BOOST_AUTO_TEST_CASE(Dimensions_getMaxGroupsForCellCount)
+{
+    sudoku::Dimensions dims(8, 4, {
+        {0, 1, 2, 3}, // group 0
+        {4, 5, 6, 7}, // group 1
+        {0, 4},       // group 2
+        {1, 5},       // group 3
+        {2, 6},       // group 4
+        {3, 7},       // group 5
+        {0, 7},       // group 6
+    });
+
+    // All cells belong to 2 groups - except for positions 0 and 7 which belong to 3.
+    BOOST_REQUIRE_EQUAL(dims.getMaxGroupsForCellCount(), 3);
+}

@@ -1,4 +1,20 @@
 add_library(
     sudoku_cuda
-    solver.cu
+    sudoku_cuda.cu
+)
+
+target_include_directories(
+    sudoku_cuda
+    PRIVATE ${CMAKE_CURRENT_LIST_DIR}
+)
+
+target_link_libraries(
+    sudoku_cuda
+    PUBLIC sudoku
+)
+
+set_target_properties(
+    sudoku_cuda
+    PROPERTIES CUDA_SEPARABLE_COMPILATION TRUE
+               CUDA_RESOLVE_DEVICE_SYMBOLS TRUE
 )

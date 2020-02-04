@@ -81,6 +81,11 @@ namespace sudoku
              */
             const std::vector<size_t>& getGroupsForCell(size_t cellPos) const { return groupsForEachCell_[cellPos]; }
 
+            /**
+             * Gets the maximum number of groups associated with a cell.
+             */
+            size_t getMaxGroupsForCellCount() const;
+
         private:
 
             /**

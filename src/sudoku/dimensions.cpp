@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <sudoku/dimensions.h>
 
 namespace sudoku
@@ -35,5 +36,17 @@ namespace sudoku
                 }
             }
         }
+    }
+
+    size_t Dimensions::getMaxGroupsForCellCount() const
+    {
+        auto iter = std::max_element(
+            groupsForEachCell_.cbegin(),
+            groupsForEachCell_.cend(),
+            [](const auto& groups1, const auto& groups2) {
+                return groups1.size() < groups2.size();
+            }
+        );
+        return iter->size();
     }
 }
