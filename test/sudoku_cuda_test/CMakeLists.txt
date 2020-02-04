@@ -9,6 +9,8 @@ add_executable(
     related_groups_kernels.cu
     grid_test.cpp
     grid_kernels.cu
+    guess_stack_test.cpp
+    guess_stack_kernels.cu
 )
 
 target_include_directories(
@@ -55,3 +57,4 @@ endfunction()
 add_sudoku_cuda_test(sudoku_cuda_test_block_counter  "BlockCounter*")
 add_sudoku_cuda_test(sudoku_cuda_test_related_groups "RelatedGroups*")
 add_sudoku_cuda_test(sudoku_cuda_test_grid           "Grid*")
+add_sudoku_cuda_test(sudoku_cuda_test_guess_stack    "GuessStack*")
