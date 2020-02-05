@@ -24,12 +24,6 @@ target_link_libraries(
             Boost::unit_test_framework
 )
 
-set_target_properties(
-    sudoku_cuda_test
-    PROPERTIES CUDA_SEPARABLE_COMPILATION TRUE
-               CUDA_RESOLVE_DEVICE_SYMBOLS TRUE
-)
-
 # Boost tests must define BOOST_TEST_DYN_LINK if not linking statically.
 if (NOT Boost_USE_STATIC_LIBS)
     target_compile_definitions(sudoku_cuda_test PRIVATE BOOST_TEST_DYN_LINK=1)

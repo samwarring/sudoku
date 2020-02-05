@@ -34,7 +34,7 @@ namespace sudoku
             {
                 return (cellCount * (cellValue - 1)) + cellPos;
             }
-            
+
             __device__ BlockCounter(CellCount cellCount, CellValue maxCellValue,
                                     CellBlockCount* globalCellBlockCounts,
                                     ValueBlockCount* globalValueBlockCounts)
