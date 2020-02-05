@@ -28,7 +28,8 @@ struct GridKernelObjects
     __device__ GridKernelObjects(RelatedGroupsKernelArgs relatedGroupsArgs,
                                  BlockCounterKernelArgs blockCounterArgs,
                                  GridKernelArgs gridArgs,
-                                 CellValue* sharedGroupUpdates)
+                                 CellValue* sharedGroupUpdates,
+                                 TestBlockCounter::Pair* sharedBlockCountReductionBuffer)
         : relatedGroups(relatedGroupsArgs.cellCount,
                         relatedGroupsArgs.totalGroupCount,
                         relatedGroupsArgs.groupCounts,
@@ -37,7 +38,8 @@ struct GridKernelObjects
         , blockCounter(blockCounterArgs.cellCount,
                        blockCounterArgs.maxCellValue,
                        blockCounterArgs.cellBlockCounts,
-                       blockCounterArgs.valueBlockCounts)
+                       blockCounterArgs.valueBlockCounts,
+                       sharedBlockCountReductionBuffer)
         , grid(relatedGroups,
                blockCounter,
                gridArgs.cellValues,
@@ -50,7 +52,7 @@ __global__ void gridInitBlockCountsKernel(RelatedGroupsKernelArgs relatedGroupsA
                                           GridKernelArgs gridArgs)
 {
     extern __shared__ CellValue sharedGroupUpdates[];
-    GridKernelObjects objs(relatedGroupsArgs, blockCounterArgs, gridArgs, sharedGroupUpdates);
+    GridKernelObjects objs(relatedGroupsArgs, blockCounterArgs, gridArgs, sharedGroupUpdates, nullptr);
     objs.grid.initBlockCounts();
 }
 
@@ -60,7 +62,7 @@ __global__ void gridSetCellValueKernel(RelatedGroupsKernelArgs relatedGroupsArgs
                                        CellCount cellPos, CellValue cellValue)
 {
     extern __shared__ CellValue sharedGroupUpdates[];
-    GridKernelObjects objs(relatedGroupsArgs, blockCounterArgs, gridArgs, sharedGroupUpdates);
+    GridKernelObjects objs(relatedGroupsArgs, blockCounterArgs, gridArgs, sharedGroupUpdates, nullptr);
     objs.grid.setCellValue(cellPos, cellValue);
 }
 
@@ -69,7 +71,7 @@ __global__ void gridClearCellValueKernel(RelatedGroupsKernelArgs relatedGroupsAr
                                          GridKernelArgs gridArgs, CellCount cellPos)
 {
     extern __shared__ CellValue sharedGroupUpdates[];
-    GridKernelObjects objs(relatedGroupsArgs, blockCounterArgs, gridArgs, sharedGroupUpdates);
+    GridKernelObjects objs(relatedGroupsArgs, blockCounterArgs, gridArgs, sharedGroupUpdates, nullptr);
     objs.grid.clearCellValue(cellPos);
 }
 
@@ -78,8 +80,8 @@ __global__ void gridGetMaxCellBlockCountPosKernel(RelatedGroupsKernelArgs relate
                                                  GridKernelArgs gridArgs, CellCount* outPos)
 {
     extern __shared__ TestBlockCounter::Pair sharedBlockCounterPairs[];
-    GridKernelObjects objs(relatedGroupsArgs, blockCounterArgs, gridArgs, nullptr); // no group updates needed for this kernel.
-    auto pair = objs.blockCounter.getMaxCellBlockCountPair(sharedBlockCounterPairs);
+    GridKernelObjects objs(relatedGroupsArgs, blockCounterArgs, gridArgs, nullptr, sharedBlockCounterPairs);
+    auto pair = objs.blockCounter.getMaxCellBlockCountPair();
     if (threadIdx.x == 0) {
         *outPos = pair.cellPos;
     }

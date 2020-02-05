@@ -8,14 +8,15 @@ using namespace sudoku::cuda;
 
 using TestBlockCounter = BlockCounter<100>;
 
-static __device__ TestBlockCounter construct(BlockCounterKernelArgs args)
+static __device__ TestBlockCounter construct(BlockCounterKernelArgs args, TestBlockCounter::Pair* sharedBuffer)
 {
-    return {args.cellCount, args.maxCellValue, args.cellBlockCounts, args.valueBlockCounts};
+    return {args.cellCount, args.maxCellValue, args.cellBlockCounts, args.valueBlockCounts, sharedBuffer};
 }
 
 __global__ void blockCounterBlockKernel(BlockCounterKernelArgs args, CellCount blockPos, CellValue blockValue)
 {
-    auto blockCounter = construct(args);
+    extern __shared__ TestBlockCounter::Pair sharedBuffer[];
+    auto blockCounter = construct(args, sharedBuffer);
     if (threadIdx.x == blockPos) {
         blockCounter.block(blockValue);
     }
@@ -23,7 +24,8 @@ __global__ void blockCounterBlockKernel(BlockCounterKernelArgs args, CellCount b
 
 __global__ void blockCounterUnblockKernel(BlockCounterKernelArgs args, CellCount blockPos, CellValue blockValue)
 {
-    auto blockCounter = construct(args);
+    extern __shared__ TestBlockCounter::Pair sharedBuffer[];
+    auto blockCounter = construct(args, sharedBuffer);
     if (threadIdx.x == blockPos) {
         blockCounter.unblock(blockValue);
     }
@@ -31,7 +33,8 @@ __global__ void blockCounterUnblockKernel(BlockCounterKernelArgs args, CellCount
 
 __global__ void blockCounterMarkOccupiedKernel(BlockCounterKernelArgs args, CellCount occupiedPos)
 {
-    auto blockCounter = construct(args);
+    extern __shared__ TestBlockCounter::Pair sharedBuffer[];
+    auto blockCounter = construct(args, sharedBuffer);
     if (threadIdx.x == occupiedPos) {
         blockCounter.markOccupied();
     }
@@ -39,7 +42,8 @@ __global__ void blockCounterMarkOccupiedKernel(BlockCounterKernelArgs args, Cell
 
 __global__ void blockCounterMarkFreeKernel(BlockCounterKernelArgs args, CellCount freePos)
 {
-    auto blockCounter = construct(args);
+    extern __shared__ TestBlockCounter::Pair sharedBuffer[];
+    auto blockCounter = construct(args, sharedBuffer);
     if (threadIdx.x == freePos) {
         blockCounter.markFree();
     }
@@ -48,8 +52,8 @@ __global__ void blockCounterMarkFreeKernel(BlockCounterKernelArgs args, CellCoun
 __global__ void blockCounterGetMaxCellBlockCountPairKernel(BlockCounterKernelArgs args, BlockCounterKernels::Pair* out)
 {
     extern __shared__ TestBlockCounter::Pair sharedBuffer[];
-    auto blockCounter = construct(args);
-    TestBlockCounter::Pair pair = blockCounter.getMaxCellBlockCountPair(sharedBuffer);
+    auto blockCounter = construct(args, sharedBuffer);
+    TestBlockCounter::Pair pair = blockCounter.getMaxCellBlockCountPair();
     BlockCounterKernels::Pair outPair{ pair.cellPos, pair.cellBlockCount };
     *out = outPair;
 }
@@ -60,6 +64,7 @@ BlockCounterKernels::BlockCounterKernels(sudoku::cuda::CellCount cellCount, sudo
     , hostValueBlockCounts_(cellCount * maxCellValue, 0)
     , deviceCellBlockCounts_(hostCellBlockCounts_)
     , deviceValueBlockCounts_(hostValueBlockCounts_)
+    , sharedMemSize_(sizeof(TestBlockCounter::Pair) * cellCountPow2_)
 {
     args_.cellCount = cellCount;
     args_.maxCellValue = maxCellValue;
@@ -86,37 +91,36 @@ ValueBlockCount BlockCounterKernels::getValueBlockCount(CellCount cellPos, CellV
 
 void BlockCounterKernels::block(CellCount blockPos, CellValue blockValue)
 {
-    blockCounterBlockKernel<<<1, cellCountPow2_>>>(args_, blockPos, blockValue);
+    blockCounterBlockKernel<<<1, cellCountPow2_, sharedMemSize_>>>(args_, blockPos, blockValue);
     ErrorCheck::lastError();
     copyToHost();
 }
 
 void BlockCounterKernels::unblock(CellCount unblockPos, CellValue unblockValue)
 {
-    blockCounterUnblockKernel<<<1, cellCountPow2_>>>(args_, unblockPos, unblockValue);
+    blockCounterUnblockKernel<<<1, cellCountPow2_, sharedMemSize_>>>(args_, unblockPos, unblockValue);
     ErrorCheck::lastError();
     copyToHost();
 }
 
 void BlockCounterKernels::markOccupied(CellCount occupiedPos)
 {
-    blockCounterMarkOccupiedKernel<<<1, cellCountPow2_>>>(args_, occupiedPos);
+    blockCounterMarkOccupiedKernel<<<1, cellCountPow2_, sharedMemSize_>>>(args_, occupiedPos);
     ErrorCheck::lastError();
     copyToHost();
 }
 
 void BlockCounterKernels::markFree(CellCount freePos)
 {
-    blockCounterMarkFreeKernel<<<1, cellCountPow2_>>>(args_, freePos);
+    blockCounterMarkFreeKernel<<<1, cellCountPow2_, sharedMemSize_>>>(args_, freePos);
     ErrorCheck::lastError();
     copyToHost();
 }
 
 BlockCounterKernels::Pair BlockCounterKernels::getMaxBlockCountPair()
 {
-    unsigned sharedMemSize = sizeof(TestBlockCounter::Pair) * cellCountPow2_;
     sudoku::cuda::DeviceBuffer<Pair> devicePair(1);
-    blockCounterGetMaxCellBlockCountPairKernel<<<1, cellCountPow2_, sharedMemSize>>>(args_, devicePair.get());
+    blockCounterGetMaxCellBlockCountPairKernel<<<1, cellCountPow2_, sharedMemSize_>>>(args_, devicePair.get());
     ErrorCheck::lastError();
     std::vector<Pair> hostPair = devicePair.copyToHost();
     return hostPair[0];

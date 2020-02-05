@@ -10,19 +10,6 @@ namespace sudoku
         template <unsigned MAX_CELL_VALUE>
         class BlockCounter
         {
-        private:
-            CellBlockCount*  globalCellBlockCounts_;
-            ValueBlockCount* globalValueBlockCounts_;
-            CellBlockCount   cellBlockCount_;
-            ValueBlockCount  valueBlockCounts_[MAX_CELL_VALUE];
-            CellCount        cellCount_;
-            CellValue        maxCellValue_;
-
-            __device__ unsigned getValueBlockCountOffset(CellValue cellValue)
-            {
-                return (cellCount_ * (cellValue-1)) + threadIdx.x;
-            }
-
         public:
             struct Pair
             {
@@ -30,6 +17,21 @@ namespace sudoku
                 CellBlockCount cellBlockCount;
             };
 
+        private:
+            CellBlockCount*  globalCellBlockCounts_;
+            ValueBlockCount* globalValueBlockCounts_;
+            CellBlockCount   cellBlockCount_;
+            ValueBlockCount  valueBlockCounts_[MAX_CELL_VALUE];
+            CellCount        cellCount_;
+            CellValue        maxCellValue_;
+            Pair*            sharedReductionBuffer_; ///< length == blockDim.x == cellCountPow2
+
+            __device__ unsigned getValueBlockCountOffset(CellValue cellValue)
+            {
+                return (cellCount_ * (cellValue-1)) + threadIdx.x;
+            }
+
+        public:
             static unsigned getValueBlockCountOffset(CellCount cellCount, CellCount cellPos, CellValue cellValue)
             {
                 return (cellCount * (cellValue - 1)) + cellPos;
@@ -37,13 +39,15 @@ namespace sudoku
 
             __device__ BlockCounter(CellCount cellCount, CellValue maxCellValue,
                                     CellBlockCount* globalCellBlockCounts,
-                                    ValueBlockCount* globalValueBlockCounts)
+                                    ValueBlockCount* globalValueBlockCounts,
+                                    Pair* sharedReductionBuffer)
             {
                 // Read block count + value block counts from global memory.
                 globalCellBlockCounts_ = globalCellBlockCounts;
                 globalValueBlockCounts_ = globalValueBlockCounts;
                 cellCount_ = cellCount;
                 maxCellValue_ = maxCellValue;
+                sharedReductionBuffer_ = sharedReductionBuffer;
                 cellBlockCount_ = -1;
                 if (threadIdx.x < cellCount_) {
                     cellBlockCount_ = globalCellBlockCounts_[threadIdx.x];
@@ -105,25 +109,24 @@ namespace sudoku
                 cellBlockCount_ += (maxCellValue_ + 1);
             }
 
-            /// Require len(sharedBuffer) == blockDim.x == power of 2.
-            __device__ Pair getMaxCellBlockCountPair(Pair* sharedBuffer) const
+            __device__ Pair getMaxCellBlockCountPair() const
             {
                 Pair myPair{ threadIdx.x, cellBlockCount_ };
-                sharedBuffer[threadIdx.x] = myPair;
+                sharedReductionBuffer_[threadIdx.x] = myPair;
                 __syncthreads();
 
                 for (unsigned offset = (blockDim.x >> 1); offset != 0; offset >>= 1) {
                     if (threadIdx.x < offset) {
-                        Pair lhs = sharedBuffer[threadIdx.x];
-                        Pair rhs = sharedBuffer[threadIdx.x + offset];
+                        Pair lhs = sharedReductionBuffer_[threadIdx.x];
+                        Pair rhs = sharedReductionBuffer_[threadIdx.x + offset];
                         if (rhs.cellBlockCount > lhs.cellBlockCount) {
-                            sharedBuffer[threadIdx.x] = rhs;
+                            sharedReductionBuffer_[threadIdx.x] = rhs;
                         }
                     }
                     __syncthreads();
                 }
 
-                return sharedBuffer[0];
+                return sharedReductionBuffer_[0];
             }
         };
     }

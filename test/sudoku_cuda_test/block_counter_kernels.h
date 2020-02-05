@@ -21,6 +21,7 @@ private:
     std::vector<sudoku::cuda::ValueBlockCount> hostValueBlockCounts_;
     sudoku::cuda::DeviceBuffer<sudoku::cuda::CellBlockCount> deviceCellBlockCounts_;
     sudoku::cuda::DeviceBuffer<sudoku::cuda::ValueBlockCount> deviceValueBlockCounts_;
+    unsigned sharedMemSize_;
 
     void copyToHost();
 
