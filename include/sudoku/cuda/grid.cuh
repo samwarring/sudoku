@@ -52,6 +52,11 @@ namespace sudoku
                 }
             }
 
+            __device__ CellValue getCellValue() const
+            {
+                return cellValue_;
+            }
+
             __device__ void setCellValue(CellCount cellPos, CellValue cellValue)
             {
                 // Save the new cell value.

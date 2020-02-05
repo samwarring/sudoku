@@ -4,30 +4,30 @@
 
 using namespace sudoku::cuda;
 
-__global__ void guessStackPushKernel(CellCount* globalGuessStack, CellCount* globalGuessStackSize, CellCount cellPos)
+__global__ void guessStackPushKernel(Guess* globalGuessStack, CellCount* globalGuessStackSize, CellCount cellPos)
 {
-    extern __shared__ CellCount sharedGuessStack[];
+    extern __shared__ Guess sharedGuessStack[];
     GuessStack guessStack(globalGuessStack, globalGuessStackSize, sharedGuessStack);
-    guessStack.push(cellPos);
+    guessStack.push(cellPos, 1);
 }
 
-__global__ void guessStackPopKernel(CellCount* globalGuessStack, CellCount* globalGuessStackSize, CellCount* outPos)
+__global__ void guessStackPopKernel(Guess* globalGuessStack, CellCount* globalGuessStackSize, CellCount* outPos)
 {
-    extern __shared__ CellCount sharedGuessStack[];
+    extern __shared__ Guess sharedGuessStack[];
     GuessStack guessStack(globalGuessStack, globalGuessStackSize, sharedGuessStack);
-    CellCount myOutPos = guessStack.pop();
+    auto prevGuess = guessStack.pop();
     if (threadIdx.x == 0) {
-        *outPos = myOutPos;
+        *outPos = prevGuess.cellPos;
     }
 }
 
 GuessStackKernels::GuessStackKernels(CellCount maxStackSize)
-    : hostGuessStack_(maxStackSize, 0)
+    : hostGuessStack_(maxStackSize, {0, 0})
     , hostGuessStackSize_(1, 0)
     , deviceGuessStack_(hostGuessStack_)
     , deviceGuessStackSize_(hostGuessStackSize_)
     , threadCount_(maxStackSize)
-    , sharedMemSize_(sizeof(CellCount) * maxStackSize)
+    , sharedMemSize_(sizeof(Guess) * maxStackSize)
 {}
 
 void GuessStackKernels::copyToHost()

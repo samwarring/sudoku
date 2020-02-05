@@ -8,9 +8,9 @@
 class GuessStackKernels
 {
 private:
-    std::vector<sudoku::cuda::CellCount> hostGuessStack_;
+    std::vector<sudoku::cuda::Guess> hostGuessStack_;
     std::vector<sudoku::cuda::CellCount> hostGuessStackSize_;
-    sudoku::cuda::DeviceBuffer<sudoku::cuda::CellCount> deviceGuessStack_;
+    sudoku::cuda::DeviceBuffer<sudoku::cuda::Guess> deviceGuessStack_;
     sudoku::cuda::DeviceBuffer<sudoku::cuda::CellCount> deviceGuessStackSize_;
     unsigned threadCount_;
     unsigned sharedMemSize_;

@@ -10,6 +10,17 @@ namespace sudoku
         using CellBlockCount = int;
         using ValueBlockCount = unsigned;
         using GroupCount = unsigned;
+        struct Guess
+        {
+            CellCount cellPos;
+            CellValue cellValue;
+        };
+        enum class Result : int
+        {
+            NO_SOLUTION,
+            FOUND_SOLUTION,
+            TIMED_OUT
+        };
     }
 }
 

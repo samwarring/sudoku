@@ -1,6 +1,7 @@
 add_library(
     sudoku_cuda
     sudoku_cuda.cu
+    solver.cu
 )
 
 target_include_directories(

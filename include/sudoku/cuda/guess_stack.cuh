@@ -11,13 +11,13 @@ namespace sudoku
         {
         private:
             CellCount  guessStackSize_;
-            CellCount* sharedGuessStack_;
+            Guess*     sharedGuessStack_;
             CellCount* globalGuessStackSize_;
-            CellCount* globalGuessStack_;
+            Guess*     globalGuessStack_;
 
         public:
-            __device__ GuessStack(CellCount* globalGuessStack, CellCount* globalGuessStackSize,
-                                  CellCount* sharedGuessStack) 
+            __device__ GuessStack(Guess* globalGuessStack, CellCount* globalGuessStackSize,
+                                  Guess* sharedGuessStack) 
                 : guessStackSize_(*globalGuessStackSize)
                 , sharedGuessStack_(sharedGuessStack)
                 , globalGuessStackSize_(globalGuessStackSize)
@@ -43,23 +43,24 @@ namespace sudoku
 
             __device__ CellCount getSize() const { return guessStackSize_; }
 
-            __device__ void push(CellCount cellPos)
+            __device__ void push(CellCount cellPos, CellValue cellValue)
             {
                 // Write position to guess stack.
                 if (threadIdx.x == 0) {
-                    sharedGuessStack_[guessStackSize_] = cellPos;
+                    Guess newGuess{ cellPos, cellValue };
+                    sharedGuessStack_[guessStackSize_] = newGuess;
                 }
                 __syncthreads();
                 guessStackSize_++;
             }
 
             /// \warning Do not call this method if stack size is 0
-            __device__ CellCount pop()
+            __device__ Guess pop()
             {
                 // Get top of stack.
                 guessStackSize_--;
                 return sharedGuessStack_[guessStackSize_];
-            }    
+            }
         };
     }
 }
