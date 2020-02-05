@@ -42,6 +42,16 @@ namespace sudoku
                 }
             }
 
+            __device__ void initBlockCounts()
+            {
+                for (CellCount cellPos = 0; cellPos < cellCount_; ++cellPos) {
+                    CellValue cellValue = globalCellValues_[cellPos];
+                    if (cellValue > 0) {
+                        setCellValue(cellPos, cellValue);
+                    }
+                }
+            }
+
             __device__ void setCellValue(CellCount cellPos, CellValue cellValue)
             {
                 // Save the new cell value.

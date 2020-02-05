@@ -1,7 +1,8 @@
 #include <boost/test/unit_test.hpp>
-#include <sudoku/square.h>
+#include <sudoku/cell_value_parser.h>
 #include <sudoku/dimensions.h>
 #include <sudoku/grid.h>
+#include <sudoku/square.h>
 #include "grid_kernels.h"
 
 BOOST_AUTO_TEST_CASE(Grid_4x4_setAndClearCellValue)
@@ -42,4 +43,26 @@ BOOST_AUTO_TEST_CASE(Grid_4x4_getMaxCellBlockCountPos)
     grid.setCellValue(15, 3);
 
     BOOST_CHECK_EQUAL(grid.getMaxCellBlockCountPos(), 3);
+}
+
+BOOST_AUTO_TEST_CASE(Grid_4x4_initialValues_getMaxCelBlockCountPos)
+{
+    // Set up the initial grid on the host.
+    sudoku::square::Dimensions dims(2);
+    std::vector<size_t> cellValues(dims.getCellCount(), 0);
+    cellValues[0] = 1;
+    cellValues[6] = 2;
+    cellValues[15] = 3;
+    sudoku::Grid grid(dims, cellValues);
+    
+    // Copy to device. Check values are correct.
+    GridKernels gk(grid);
+    gk.initBlockCounts();
+    
+    BOOST_CHECK_EQUAL(gk.getCellValue(0), 1);
+    BOOST_CHECK_EQUAL(gk.getCellValue(6), 2);
+    BOOST_CHECK_EQUAL(gk.getCellValue(15), 3);
+
+    BOOST_CHECK_EQUAL(gk.getCellBlockCount(3), 3);
+    BOOST_CHECK_EQUAL(gk.getMaxCellBlockCountPos(), 3);
 }

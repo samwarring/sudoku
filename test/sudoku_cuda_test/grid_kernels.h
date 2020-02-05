@@ -36,6 +36,8 @@ private:
 public:
     GridKernels(const sudoku::Grid& grid);
 
+    void initBlockCounts();
+
     void setCellValue(sudoku::cuda::CellCount cellPos, sudoku::cuda::CellValue cellValue);
 
     void clearCellValue(sudoku::cuda::CellCount cellPos);

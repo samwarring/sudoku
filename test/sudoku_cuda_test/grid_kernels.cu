@@ -45,6 +45,15 @@ struct GridKernelObjects
     {}
 };
 
+__global__ void gridInitBlockCountsKernel(RelatedGroupsKernelArgs relatedGroupsArgs,
+                                          BlockCounterKernelArgs blockCounterArgs,
+                                          GridKernelArgs gridArgs)
+{
+    extern __shared__ CellValue sharedGroupUpdates[];
+    GridKernelObjects objs(relatedGroupsArgs, blockCounterArgs, gridArgs, sharedGroupUpdates);
+    objs.grid.initBlockCounts();
+}
+
 __global__ void gridSetCellValueKernel(RelatedGroupsKernelArgs relatedGroupsArgs,
                                        BlockCounterKernelArgs blockCounterArgs,
                                        GridKernelArgs gridArgs,
@@ -126,6 +135,15 @@ void GridKernels::copyToHost()
     hostCellValues_ = deviceCellValues_.copyToHost();
     hostCellBlockCounts_ = deviceCellBlockCounts_.copyToHost();
     hostValueBlockCounts_ = deviceValueBlockCounts_.copyToHost();
+}
+
+void GridKernels::initBlockCounts()
+{
+    gridInitBlockCountsKernel<<<1, cellCountPow2_, sharedGroupUpdatesSize_>>>(
+        relatedGroupsArgs_, blockCounterArgs_, gridArgs_
+    );
+    ErrorCheck::lastError();
+    copyToHost();
 }
 
 void GridKernels::setCellValue(CellCount cellPos, CellValue cellValue)
