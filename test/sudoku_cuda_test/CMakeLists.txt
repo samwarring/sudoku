@@ -46,7 +46,7 @@ function(add_sudoku_cuda_test TEST_NAME TEST_PATTERN)
         NAME ${TEST_NAME}
         COMMAND ${CUDA_MEMCHECK} --show-backtrace no $<TARGET_FILE:sudoku_cuda_test> -t "${TEST_PATTERN}"
     )
-    set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 10)
+    set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 10 RUN_SERIAL TRUE)
 endfunction()
 
 add_sudoku_cuda_test(sudoku_cuda_test_block_counter  "BlockCounter*")

@@ -7,7 +7,7 @@ namespace sudoku
 {
     namespace cuda
     {
-        constexpr CellValue SOLVER_MAX_CELL_VALUE = 49;
+        constexpr CellValue SOLVER_MAX_CELL_VALUE = 25;
         constexpr GroupCount SOLVER_MAX_GROUPS_FOR_CELL = 3;
 
         /**
@@ -123,12 +123,15 @@ namespace sudoku
             kp.guessStackValues = guessStackValues_.get();
             kp.guessStackSize = guessStackSize_.get();
             kp.cellValues = deviceCellValues_.get();
-            DeviceBuffer<Result> outResult(1);
-            computeNextSolutionKernel<9, 3><<<1, cellCountPow2_, sharedMemSize_>>>(kp, outResult.get());
+            
+            DeviceBuffer<Result> deviceResult(1);
+            Result hostResult = Result::TIMED_OUT;
+            computeNextSolutionKernel<SOLVER_MAX_CELL_VALUE, SOLVER_MAX_GROUPS_FOR_CELL>
+                                        <<<1, cellCountPow2_, sharedMemSize_>>>(kp, deviceResult.get());
             ErrorCheck::lastError();
+            hostResult = deviceResult.copyToHost()[0];
             hostCellValues_ = deviceCellValues_.copyToHost();
-            Result kernelResult = outResult.copyToHost()[0];
-            return (kernelResult == Result::FOUND_SOLUTION);
+            return (hostResult == Result::FOUND_SOLUTION);
         }
 
         const std::vector<CellValue>& Solver::getCellValues() const
