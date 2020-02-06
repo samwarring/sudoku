@@ -59,7 +59,7 @@ namespace sudoku
                 return *sharedBroadcastValue_;
             }
 
-            __device__ Result computeNextSolution(unsigned guessCount)
+            __device__ unsigned computeNextSolution(unsigned guessCount, Result& result)
             {
                 CellCount cellPos = nextCellPosition();
                 CellValue minCellValue = 0;
@@ -67,13 +67,15 @@ namespace sudoku
                 while(cellPos < cellCount_) {
 
                     if (guessCount == 0) {
-                        return Result::TIMED_OUT;
+                        result = Result::TIMED_OUT;
+                        return guessCount;
                     }
 
                     CellValue cellValue = nextAvailableValue(cellPos, minCellValue);
                     if (cellValue > maxCellValue_) {
                         if (guessStack_->getSize() == 0) {
-                            return Result::NO_SOLUTION;
+                            result = Result::NO_SOLUTION;
+                            return guessCount;
                         }
                         auto prevGuess = guessStack_->pop();
                         cellPos = prevGuess.cellPos;
@@ -89,7 +91,8 @@ namespace sudoku
                     guessCount--;
                 }
 
-                return Result::FOUND_SOLUTION;
+                result = Result::FOUND_SOLUTION;
+                return guessCount;
             }
         };
     }

@@ -4,7 +4,7 @@
 #include <sudoku/cuda/solver.h>
 #include <sudoku/square.h>
 
-size_t roots[] = { 2, 3, 4 };
+size_t roots[] = { 2, 3, 4, 5 };
 BOOST_DATA_TEST_CASE(Solver_square_empty, roots)
 {
     sudoku::square::Dimensions dims(sample);
@@ -13,4 +13,32 @@ BOOST_DATA_TEST_CASE(Solver_square_empty, roots)
     auto cellValues = solver.getCellValues();
     BOOST_REQUIRE_EQUAL(std::count(cellValues.begin(), cellValues.end(), 0), 0);
     sudoku::Grid verifyGrid(dims, sudoku::cuda::Solver::castCellValues(cellValues));
+}
+
+BOOST_AUTO_TEST_CASE(Solver_multipleKernelInvocations_sameState)
+{
+    constexpr unsigned BATCH_SIZE = 40;
+    constexpr unsigned BATCH_COUNT = 2;
+
+    sudoku::square::Dimensions dims(5);
+    sudoku::cuda::Solver solver1(dims);
+    auto values1 = solver1.getCellValues();
+    for (auto i = 1; i <= BATCH_COUNT; ++i) {
+        solver1.computeNextSolution(BATCH_SIZE);
+        
+        // Count the occupied cells after this batch. We should have filled
+        // BATCH_SIZE cells.
+        values1 = solver1.getCellValues();
+        BOOST_REQUIRE_EQUAL(std::count(values1.begin(), values1.end(), 0),
+                            dims.getCellCount() - (BATCH_SIZE * i));
+    }
+
+    sudoku::cuda::Solver solver2(dims);
+    solver2.computeNextSolution(BATCH_COUNT * BATCH_SIZE);
+    auto values2 = solver2.getCellValues();
+    BOOST_REQUIRE_EQUAL(std::count(values2.begin(), values2.end(), 0),
+                        dims.getCellCount() - (BATCH_SIZE * BATCH_COUNT));
+
+    BOOST_REQUIRE_EQUAL_COLLECTIONS(values1.begin(), values1.end(),
+                                    values2.begin(), values2.end());
 }

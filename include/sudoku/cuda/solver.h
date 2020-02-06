@@ -5,6 +5,7 @@
 #include <sudoku/cuda/device_buffer.h>
 #include <sudoku/cuda/types.h>
 #include <sudoku/grid.h>
+#include <sudoku/metrics.h>
 
 namespace sudoku
 {
@@ -17,7 +18,11 @@ namespace sudoku
 
                 bool computeNextSolution();
 
+                Result computeNextSolution(unsigned guessCount);
+
                 const std::vector<sudoku::cuda::CellValue>& getCellValues() const;
+
+                Metrics getMetrics() const { return metrics_; }
 
                 /**
                  * Convert between sudoku::* classes' cell values (size_t)
@@ -46,6 +51,12 @@ namespace sudoku
                 // Grid
                 std::vector<CellValue> hostCellValues_;
                 DeviceBuffer<CellValue> deviceCellValues_;
+
+                // Misc
+                Metrics metrics_;
+
+                // Run a single batch of guesses. Do not copy cell values back to host.
+                Result computeNextSolutionOneBatch(unsigned guessCount);
         };
     }
 }

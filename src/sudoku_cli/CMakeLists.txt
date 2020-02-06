@@ -14,6 +14,7 @@ target_include_directories(
 target_link_libraries(
     sudoku_cli
     PRIVATE sudoku
+            sudoku_cuda
             Boost::program_options
 )
 

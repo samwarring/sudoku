@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(BlockCounter_81cells)
     BlockCounterKernels bc(81, 9);
     bc.block(15, 1);
     bc.block(15, 2);
-    bc.block(14, 2);
+    bc.block(14, 9);
     bc.markOccupied(13);
 
     BOOST_REQUIRE_EQUAL(bc.getCellBlockCount(15), 2);

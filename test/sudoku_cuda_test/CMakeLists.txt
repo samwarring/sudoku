@@ -39,12 +39,10 @@ endif()
 # See: https://stackoverflow.com/a/56330491
 #      https://stackoverflow.com/a/31642573
 
-find_file(CUDA_MEMCHECK NAMES cuda-memcheck)
-
 function(add_sudoku_cuda_test TEST_NAME TEST_PATTERN)
     add_test(
         NAME ${TEST_NAME}
-        COMMAND ${CUDA_MEMCHECK} --show-backtrace no $<TARGET_FILE:sudoku_cuda_test> -t "${TEST_PATTERN}"
+        COMMAND sudoku_cuda_test -t "${TEST_PATTERN}"
     )
     set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 10 RUN_SERIAL TRUE)
 endfunction()

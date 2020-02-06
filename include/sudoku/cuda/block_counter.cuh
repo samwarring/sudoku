@@ -48,7 +48,7 @@ namespace sudoku
                 cellCount_ = cellCount;
                 maxCellValue_ = maxCellValue;
                 sharedReductionBuffer_ = sharedReductionBuffer;
-                cellBlockCount_ = -1;
+                cellBlockCount_ = -(maxCellValue_ + 2);
                 if (threadIdx.x < cellCount_) {
                     cellBlockCount_ = globalCellBlockCounts_[threadIdx.x];
                     for (CellValue cellValue = 1; cellValue <= maxCellValue_; ++cellValue) {
@@ -63,7 +63,7 @@ namespace sudoku
                 // Write current block count + value block counts back to global memory.
                 if (threadIdx.x < cellCount_) {
                     globalCellBlockCounts_[threadIdx.x] = cellBlockCount_;
-                    for (CellValue cellValue = 1; cellValue < maxCellValue_; ++cellValue) {
+                    for (CellValue cellValue = 1; cellValue <= maxCellValue_; ++cellValue) {
                         unsigned offset = getValueBlockCountOffset(cellValue);
                         globalValueBlockCounts_[offset] = valueBlockCounts_[cellValue - 1];
                     }
