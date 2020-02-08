@@ -16,6 +16,7 @@ ProgramOptions::ProgramOptions(int argc, char** argv)
         ("square-dim-root,s", bpo::value<size_t>(), "Set dimensions to a square sudoku with given root value")
         ("threads,j", bpo::value<size_t>(), "Solve with this many worker threads")
         ("fork,k", bpo::value<size_t>(), "Fork the input grid")
+        ("echo-input,e", "Show input values in addition to solution")
         ; // end of options
 
     bpo::store(bpo::parse_command_line(argc, argv, description_), optionMap_);
@@ -35,11 +36,7 @@ ProgramOptions::ProgramOptions(int argc, char** argv)
         }
     }
 
-    // --input or --input-file is required ...
-    if (!optionMap_.count("input") && !optionMap_.count("input-file") &&!optionMap_.count("help")) {
-        throw bpo::error("--input or --inputFile is required");
-    }
-    // ... but they cannot both appear
+    // --input and --input-file cannot both appear
     if (optionMap_.count("input") && optionMap_.count("input-file")) {
         throw bpo::error("--input and --input-file are mutually exclusive");
     }
@@ -125,4 +122,9 @@ size_t ProgramOptions::getForkCount() const
     else {
         return 0;
     }
+}
+
+bool ProgramOptions::isEchoInput() const
+{
+    return optionMap_.count("echo-input") == 1;
 }

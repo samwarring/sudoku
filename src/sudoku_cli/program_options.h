@@ -34,6 +34,8 @@ class ProgramOptions
 
         size_t getForkCount() const;
 
+        bool isEchoInput() const;
+
     private:
     
         boost::program_options::options_description description_;

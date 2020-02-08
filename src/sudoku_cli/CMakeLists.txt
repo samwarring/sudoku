@@ -20,5 +20,5 @@ target_link_libraries(
 
 add_test(
     NAME sudoku_cli
-    COMMAND sudoku_cli --input 0
+    COMMAND sudoku_cli
 )
