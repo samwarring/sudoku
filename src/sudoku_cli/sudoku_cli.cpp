@@ -47,6 +47,10 @@ int handleOptions(const ProgramOptions& options)
             inputValues.push_back(sudoku::parseCellValues(dims, line.c_str()));
         }
     }
+    else {
+        // If no --input or --input-file, assume empty sudoku
+        inputValues.push_back(sudoku::parseCellValues(dims, "0"));
+    }
 
     // Select the correct format
     std::unique_ptr<sudoku::Formatter> formatter;
@@ -68,7 +72,9 @@ int handleOptions(const ProgramOptions& options)
         sudoku::Grid grid(dims, std::move(curInput));
         
         // Print the input values
-        std::cout << "Input " << (inputNum + 1) << ":\n" << formatter->format(grid.getCellValues()) << '\n';
+        if (options.isEchoInput()) {
+            std::cout << "Input " << (inputNum + 1) << ":\n" << formatter->format(grid.getCellValues()) << '\n';
+        }
 
         // If --fork, fork the grid and print each forked grid.
         if (options.getForkCount() > 0) {
