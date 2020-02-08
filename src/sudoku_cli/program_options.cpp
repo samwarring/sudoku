@@ -17,6 +17,7 @@ ProgramOptions::ProgramOptions(int argc, char** argv)
         ("threads,j", bpo::value<size_t>(), "Solve with this many worker threads")
         ("fork,k", bpo::value<size_t>(), "Fork the input grid")
         ("echo-input,e", "Show input values in addition to solution")
+        ("gpu,g", "Use CUDA solver on GPU (ignores --threads)")
         ; // end of options
 
     bpo::store(bpo::parse_command_line(argc, argv, description_), optionMap_);
@@ -127,4 +128,9 @@ size_t ProgramOptions::getForkCount() const
 bool ProgramOptions::isEchoInput() const
 {
     return optionMap_.count("echo-input") == 1;
+}
+
+bool ProgramOptions::isGpu() const
+{
+    return optionMap_.count("gpu") == 1;
 }

@@ -6,6 +6,7 @@
 #include <locale>
 #include <boost/program_options.hpp>
 #include <sudoku/sudoku.h>
+#include <sudoku/cuda/solver.h>
 #include "program_options.h"
 
 std::string formatMetrics(sudoku::Metrics metrics)
@@ -94,7 +95,21 @@ int handleOptions(const ProgramOptions& options)
         }
 
         // Find the first N solutions
-        if (options.getThreadCount() == 1) {
+        if (options.isGpu()) {
+            sudoku::cuda::Solver solver(grid);
+            if (solver.computeNextSolution()) {
+                auto cellValues = sudoku::cuda::Solver::castCellValues(solver.getCellValues());
+                std::cout << "\nInput " << (inputNum + 1) << ", ";
+                std::cout << "Solution 1, ";
+                std::cout << "Hash: " << hasher(formatter->format(cellValues)) << ", ";
+                std::cout << "Metrics: " << formatMetrics(solver.getMetrics()) << '\n';
+                std::cout << formatter->format(cellValues) << '\n';
+            }
+            else {
+                std::cout << "No solution\n";
+            }
+        }
+        else if (options.getThreadCount() == 1) {
             sudoku::Solver solver(std::move(grid));
             size_t numSolutionsFound = 0;
             while (numSolutionsFound < options.getNumSolutions() && solver.computeNextSolution()) {

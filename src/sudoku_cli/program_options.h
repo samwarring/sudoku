@@ -35,6 +35,8 @@ class ProgramOptions
         size_t getForkCount() const;
 
         bool isEchoInput() const;
+        
+        bool isGpu() const;
 
     private:
     
