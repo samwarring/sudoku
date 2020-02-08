@@ -77,6 +77,19 @@ namespace sudoku
         };
 
         template <CellValue MAX_CELL_VALUE, GroupCount MAX_GROUPS_FOR_CELL>
+        __global__ void initCellValuesKernel(KernelParams kp)
+        {
+            extern __shared__ int sharedMem[];
+            KernelObjects<MAX_CELL_VALUE, MAX_GROUPS_FOR_CELL> ko(kp, sharedMem);
+            for (CellCount cellPos = 0; cellPos < kp.cellCount; ++cellPos) {
+                CellValue cellValue = kp.cellValues[cellPos];
+                if (cellValue > 0) {
+                    ko.grid.setCellValue(cellPos, cellValue);
+                }
+            }
+        }
+
+        template <CellValue MAX_CELL_VALUE, GroupCount MAX_GROUPS_FOR_CELL>
         __global__ void computeNextSolutionKernel(KernelParams kp, Result* outResult,
                                                   unsigned guessCount, unsigned* consumedGuessCount)
         {
@@ -147,6 +160,16 @@ namespace sudoku
             kp.guessStackValues = guessStackValues_.get();
             kp.guessStackSize = guessStackSize_.get();
             kp.cellValues = deviceCellValues_.get();
+
+            if (!initCellValuesDone_) {
+                // Initialize cell values and block counts before solving.
+                initCellValuesKernel<SOLVER_MAX_CELL_VALUE, SOLVER_MAX_GROUPS_FOR_CELL>
+                    <<< 1, cellCountPow2_, sharedMemSize_ >>>(kp);
+                ErrorCheck::lastError();
+
+                // Don't re-initialize
+                initCellValuesDone_ = true;
+            }
             
             DeviceBuffer<Result> deviceResult(1);
             Result hostResult = Result::TIMED_OUT;

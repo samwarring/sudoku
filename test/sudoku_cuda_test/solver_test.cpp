@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
+#include <sudoku/cell_value_parser.h>
 #include <sudoku/cuda/solver.h>
 #include <sudoku/square.h>
 
@@ -41,4 +42,17 @@ BOOST_AUTO_TEST_CASE(Solver_multipleKernelInvocations_sameState)
 
     BOOST_REQUIRE_EQUAL_COLLECTIONS(values1.begin(), values1.end(),
                                     values2.begin(), values2.end());
+}
+
+BOOST_AUTO_TEST_CASE(Solver_9x9_initialValues)
+{
+    sudoku::square::Dimensions dims(3);
+    auto initialCellValues = sudoku::parseCellValues(dims, "9 5 0 2");
+    sudoku::Grid grid(dims, initialCellValues);
+    sudoku::cuda::Solver solver(grid);
+    BOOST_REQUIRE(solver.computeNextSolution());
+    auto cellValues = solver.getCellValues();
+    BOOST_CHECK_EQUAL(cellValues[0], 9);
+    BOOST_CHECK_EQUAL(cellValues[1], 5);
+    BOOST_CHECK_EQUAL(cellValues[3], 2);
 }

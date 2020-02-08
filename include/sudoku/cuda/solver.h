@@ -54,6 +54,7 @@ namespace sudoku
 
                 // Misc
                 Metrics metrics_;
+                bool initCellValuesDone_ = false;
 
                 // Run a single batch of guesses. Do not copy cell values back to host.
                 Result computeNextSolutionOneBatch(unsigned guessCount);
