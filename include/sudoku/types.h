@@ -13,9 +13,9 @@
 namespace sudoku
 {
     using CellCount = size_t;
-    using CellValue = unsigned char;
+    using CellValue = size_t;
     using CellBlockCount = int;
-    using ValueBlockCount = size_t;
+    using ValueBlockCount = unsigned char;
     using GroupCount = size_t;
 
     class CastException : public std::runtime_error { using std::runtime_error::runtime_error; };
