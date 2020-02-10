@@ -19,7 +19,7 @@ namespace sudoku
             /**
              * Create a potential for the given number of cell values.
              */
-            Potential(CellValue maxCellValue) : block_counts_(maxCellValue) {}
+            Potential(CellValue maxCellValue) : maxCellValue_(maxCellValue), block_counts_(maxCellValue) {}
 
             /**
              * Indicate that a related cell position claimed `cellValue`.
@@ -57,6 +57,7 @@ namespace sudoku
             std::vector<CellValue> getAvailableValues() const;
 
         private:
+            CellValue maxCellValue_;
             std::vector<ValueBlockCount> block_counts_;
     };
 }

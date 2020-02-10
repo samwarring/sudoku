@@ -46,19 +46,22 @@ BOOST_AUTO_TEST_CASE(SolutionQueue_ParallelProducers)
     sudoku::SolutionQueue::Consumer c(q);
     std::vector<std::thread> threads;
     const size_t numThreads = 4;
+    constexpr size_t numSolutionsPerThread = 10;
 
     // Create threads
     for (size_t i = 0; i < numThreads; ++i) {
         sudoku::SolutionQueue::Producer p(q);
-        threads.emplace_back([i, p=std::move(p)]() mutable {
+        threads.emplace_back([i, p=std::move(p), numSolutionsPerThread]() mutable {
             // Each thread computes many solutions.
-            // Thread 0: {0, 1, 2} ... {99, 100, 101}
+            // Thread 0: {0, 1, 2} ... {9, 10, 11}
             // ...
-            // Thread 3: {300, 301, 302} ... {399, 400, 401}
-            constexpr size_t numSolutionsPerThread = 100;
+            // Thread 3: {30, 31, 32} ... {39, 40, 41}
             for (size_t solutionNum = 0; solutionNum < numSolutionsPerThread; ++solutionNum) {
-                const sudoku::CellValue base = (numSolutionsPerThread * i) + solutionNum;
-                std::vector<sudoku::CellValue> solution{ base, base + 1, base + 2 };
+                const sudoku::CellValue base = sudoku::castCellValue((numSolutionsPerThread * i) + solutionNum);
+                const sudoku::CellValue v1 = base;
+                const sudoku::CellValue v2 = base + 1;
+                const sudoku::CellValue v3 = base + 2;
+                std::vector<sudoku::CellValue> solution{ v1, v2, v3 };
                 sudoku::Metrics metrics;
                 metrics.totalGuesses = i;
                 if (!p.push(solution, metrics)) {
@@ -77,7 +80,7 @@ BOOST_AUTO_TEST_CASE(SolutionQueue_ParallelProducers)
     while (c.pop(solution, metrics)) {
         ++numSolutions;
     }
-    BOOST_CHECK_EQUAL(numSolutions, 400);
+    BOOST_CHECK_EQUAL(numSolutions, numThreads * numSolutionsPerThread);
 
     for (auto& thread : threads) {
         thread.join();

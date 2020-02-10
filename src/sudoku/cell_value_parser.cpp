@@ -14,7 +14,7 @@ namespace sudoku
 
         // Get number of digits to represent maxCellValue
         std::ostringstream ossDigits;
-        ossDigits << maxCellValue;
+        ossDigits << static_cast<size_t>(maxCellValue);
         const size_t maxDigits = ossDigits.str().length();
 
         CellValue curCellValue = 0;

@@ -12,7 +12,7 @@ namespace sudoku
     {
         // Number of digits required to represent the max cell value.
         std::ostringstream sout;
-        sout << dims_.getMaxCellValue();
+        sout << static_cast<size_t>(dims_.getMaxCellValue());
         maxDigits_ = sout.str().length();
 
         // Validate the format string
@@ -49,7 +49,10 @@ namespace sudoku
         for (size_t i = 0; i < formatString_.length(); ++i) {
             char ch = formatString_[i];
             if (isPlaceholder(ch)) {
-                sout << std::setw(maxDigits_) << std::right << cellValues[cellPos++];
+                // Cast cell value to size_t so that it's always formatted as a number
+                // (whereas unsigned char is formatted as an ASCII character).
+                size_t cellValue = cellValues[cellPos++];
+                sout << std::setw(maxDigits_) << std::right << cellValue;
                 i += (maxDigits_ - 1);
             }
             else {

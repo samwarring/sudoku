@@ -35,7 +35,7 @@ namespace sudoku
         // the "cell-row" and "cell-column". For example, 9x9 sudokus' first three
         // "cell-rows" are all within the first "square-row".
         const CellCount cellCount = root * root * root * root;
-        const CellValue maxCellValue = root * root;
+        const CellValue maxCellValue = castCellValue(root * root);
         std::vector<std::vector<CellCount>> result(root * root);
         for (CellCount cellPos = 0; cellPos < cellCount; ++cellPos) {
             size_t row = cellPos / maxCellValue;

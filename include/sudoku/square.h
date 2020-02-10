@@ -26,7 +26,7 @@ namespace sudoku
                 Dimensions(size_t root)
                     : sudoku::Dimensions(
                         root * root * root * root,
-                        root * root,
+                        castCellValue(root * root),
                         joinGroups({
                             computeRowGroups(root * root, root * root),
                             computeColumnGroups(root * root, root * root),

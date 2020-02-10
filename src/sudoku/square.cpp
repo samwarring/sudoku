@@ -14,7 +14,7 @@ namespace sudoku
 
             // Compute max digits for placeholder
             std::ostringstream ossDigits;
-            ossDigits << dims.getMaxCellValue();
+            ossDigits << static_cast<size_t>(dims.getMaxCellValue());
             const size_t maxDigits = ossDigits.str().length();
 
             // Compute placeholder string from max digits
