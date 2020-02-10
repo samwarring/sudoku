@@ -38,18 +38,18 @@ namespace sudoku
         }
     }
 
-    std::string Formatter::format(const std::vector<size_t>& cellValues) const
+    std::string Formatter::format(const std::vector<CellValue>& cellValues) const
     {
         if (cellValues.size() != dims_.getCellCount()) {
             throw FormatterException("Number of cell values unequal to formatter dimensions");
         }
 
         std::ostringstream sout;
-        size_t cellValuePos = 0;
+        CellCount cellPos = 0;
         for (size_t i = 0; i < formatString_.length(); ++i) {
             char ch = formatString_[i];
             if (isPlaceholder(ch)) {
-                sout << std::setw(maxDigits_) << std::right << cellValues[cellValuePos++];
+                sout << std::setw(maxDigits_) << std::right << cellValues[cellPos++];
                 i += (maxDigits_ - 1);
             }
             else {

@@ -12,7 +12,7 @@ BOOST_AUTO_TEST_CASE(Formatter_2x2)
                                "0 | 0\n";
     sudoku::Formatter fmt(dims, formatString);
 
-    std::vector<size_t> cellValues {1, 2, 3, 0};
+    std::vector<sudoku::CellValue> cellValues {1, 2, 3, 0};
     const char* expectedString = "\n"
                                  "1 | 2\n"
                                  "--+--\n"
@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(Formatter_2x2)
 BOOST_AUTO_TEST_CASE(Formatter_customPlaceholder)
 {
     sudoku::Dimensions dims(4, 2, {});
-    std::vector<size_t> cellValues{ 0, 1, 2, 1 };
+    std::vector<sudoku::CellValue> cellValues{ 0, 1, 2, 1 };
     const char* formatString = "\\..*.*.(:>).*.*../";
     const char* placeholders = "*";
     sudoku::Formatter fmt(dims, formatString, placeholders);
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(Formatter_doubleDigitValues)
 {
     sudoku::Dimensions dims(10, 10, {});
     sudoku::Formatter fmt(dims, "!!00 00 00 00 00 00 00 00 00 00!!");
-    std::vector<size_t> cellValues{0, 1, 2, 3, 4, 5, 6, 7, 8, 10};
+    std::vector<sudoku::CellValue> cellValues{0, 1, 2, 3, 4, 5, 6, 7, 8, 10};
     std::string expected = "!! 0  1  2  3  4  5  6  7  8 10!!";
     std::string actual = fmt.format(cellValues);
     BOOST_REQUIRE_EQUAL(actual, expected);

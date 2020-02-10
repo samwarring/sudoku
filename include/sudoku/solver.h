@@ -9,6 +9,7 @@
 #include <sudoku/dimensions.h>
 #include <sudoku/grid.h>
 #include <sudoku/metrics.h>
+#include <sudoku/types.h>
 
 namespace sudoku
 {
@@ -44,7 +45,7 @@ namespace sudoku
              * Read the current cell values of the sudoku. If \ref computeNextSolution
              * has not been called, this returns the initial cell values.
              */
-            const std::vector<size_t>& getCellValues() const { return grid_.getCellValues(); }
+            const std::vector<CellValue>& getCellValues() const { return grid_.getCellValues(); }
 
             /**
              * Halt any occurance of \ref computeNextSolution() that may be
@@ -58,15 +59,15 @@ namespace sudoku
             Metrics getMetrics() const { return metrics_; }
 
         private:
-            void pushGuess(size_t cellPos, size_t cellValue);
+            void pushGuess(CellCount cellPos, CellValue cellValue);
 
-            std::pair<size_t, size_t> popGuess();
+            std::pair<CellCount, CellValue> popGuess();
 
             bool sequentialSolve();
 
             Grid grid_;
             Metrics metrics_;
-            std::stack<size_t> guesses_;  ///< stack of cell positions.
+            std::stack<CellCount> guesses_;  ///< stack of cell positions.
             std::atomic<bool> haltEvent_;
 
             // Set this flag to true if the solver contains a solution not yet reported

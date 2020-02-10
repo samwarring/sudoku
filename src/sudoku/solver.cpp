@@ -20,18 +20,18 @@ namespace sudoku
         return result;
     }
 
-    void Solver::pushGuess(size_t cellPos, size_t cellValue)
+    void Solver::pushGuess(CellCount cellPos, CellValue cellValue)
     {
         grid_.setCellValue(cellPos, cellValue);
         guesses_.push(cellPos);
         metrics_.totalGuesses++;
     }
 
-    std::pair<size_t, size_t> Solver::popGuess()
+    std::pair<CellCount, CellValue> Solver::popGuess()
     {
         auto cellPos = guesses_.top();
         guesses_.pop();
-        size_t cellValue = grid_.getCellValue(cellPos);
+        auto cellValue = grid_.getCellValue(cellPos);
         grid_.clearCellValue(cellPos);
         metrics_.totalBacktracks++;
         return {cellPos, cellValue};
@@ -48,8 +48,8 @@ namespace sudoku
         }
 
         const Dimensions& dims = grid_.getDimensions();
-        size_t cellPos = grid_.getMaxBlockEmptyCell();
-        size_t minCellValue = 0;
+        auto cellPos = grid_.getMaxBlockEmptyCell();
+        CellValue minCellValue = 0;
 
         // If already solved, pop the last guess.
         if (cellPos == dims.getCellCount()) {
@@ -73,7 +73,7 @@ namespace sudoku
             }
 
             // Does this cell have any remaining potential values?
-            size_t cellValue = grid_.getCellPotential(cellPos).getNextAvailableValue(minCellValue);
+            auto cellValue = grid_.getCellPotential(cellPos).getNextAvailableValue(minCellValue);
             if (cellValue == 0) {
                 // Backtrack
                 if (guesses_.size() == 0) {

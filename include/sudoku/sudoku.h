@@ -18,5 +18,6 @@
 #include <sudoku/parallel_solver.h>
 #include <sudoku/metrics.h>
 #include <sudoku/fork.h>
+#include <sudoku/types.h>
 
 #endif

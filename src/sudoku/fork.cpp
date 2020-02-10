@@ -1,4 +1,5 @@
 #include <sudoku/fork.h>
+#include <sudoku/types.h>
 
 namespace sudoku
 {
@@ -13,10 +14,10 @@ namespace sudoku
      *         2. pos of completely blocked cell
      *         3. pos of maxBlockEmptyCell with multiple available values.
      */
-    static size_t simplify(Grid& grid)
+    static CellCount simplify(Grid& grid)
     {
         const Dimensions& dims = grid.getDimensions();
-        size_t cellPos = grid.getMaxBlockEmptyCell();
+        auto cellPos = grid.getMaxBlockEmptyCell();
         while (cellPos != dims.getCellCount()) {
             
             auto blockCount = grid.getBlockCount(cellPos);
@@ -45,8 +46,8 @@ namespace sudoku
      */
     static std::vector<Grid> forkOneAvailableValuePerPeer(
         const Grid& grid,
-        size_t forkPos,
-        const std::vector<size_t>& availableValues)
+        CellCount forkPos,
+        const std::vector<CellValue>& availableValues)
     {
         std::vector<Grid> result;
         result.reserve(availableValues.size());
@@ -65,8 +66,8 @@ namespace sudoku
     static std::vector<Grid> forkMoreAvailableValuesThanPeers(
         const Grid& grid,
         size_t peerCount,
-        size_t forkPos,
-        const std::vector<size_t>& availableValues)
+        CellCount forkPos,
+        const std::vector<CellValue>& availableValues)
     {
         // Create a grid for each peer.
         std::vector<Grid> result(peerCount, grid);
@@ -97,8 +98,8 @@ namespace sudoku
     static std::vector<Grid> forkMorePeersThanAvailableValues(
         const Grid& grid,
         size_t peerCount,
-        size_t forkPos,
-        const std::vector<size_t>& availableValues)
+        CellCount forkPos,
+        const std::vector<CellValue>& availableValues)
     {
         // Create peers from the current fork position.
         auto firstPeers = forkOneAvailableValuePerPeer(grid, forkPos, availableValues);
@@ -134,7 +135,7 @@ namespace sudoku
     std::vector<Grid> fork(Grid grid, size_t peerCount)
     {
         // Simplify the original grid.
-        size_t forkPos = simplify(grid);
+        auto forkPos = simplify(grid);
 
         if (forkPos == grid.getDimensions().getCellCount()) {
             // The grid is already solved. Can't fork. Just return return the

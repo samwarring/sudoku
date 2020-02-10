@@ -2,6 +2,7 @@
 #define INCLUDED_SUDOKU_POTENTIAL_H
 
 #include <vector>
+#include <sudoku/types.h>
 
 namespace sudoku
 {
@@ -18,7 +19,7 @@ namespace sudoku
             /**
              * Create a potential for the given number of cell values.
              */
-            Potential(size_t maxCellValue) : block_counts_(maxCellValue) {}
+            Potential(CellValue maxCellValue) : block_counts_(maxCellValue) {}
 
             /**
              * Indicate that a related cell position claimed `cellValue`.
@@ -26,7 +27,7 @@ namespace sudoku
              * 
              * \return true if the value was previously unblocked.
              */
-            bool block(size_t cellValue);
+            bool block(CellValue cellValue);
 
             /**
              * Indicate that a related cell position previously set to
@@ -36,27 +37,27 @@ namespace sudoku
              * 
              * \return true if the value was previously blocked.
              */
-            bool unblock(size_t cellValue);
+            bool unblock(CellValue cellValue);
 
             /**
              * Checks if at least one related cell is blocking the given
              * `cellValue`.
              */
-            bool isBlocked(size_t cellValue) const { return block_counts_[cellValue - 1] > 0; }
+            bool isBlocked(CellValue cellValue) const { return block_counts_[cellValue - 1] > 0; }
 
             /**
              * Gets the next available cell value greater than `minValue`.
              * If no such value exists, return 0.
              */
-            size_t getNextAvailableValue(size_t minValue) const;
+            CellValue getNextAvailableValue(CellValue minValue) const;
 
             /**
              * Gets a vector containing all available values.
              */
-            std::vector<size_t> getAvailableValues() const;
+            std::vector<CellValue> getAvailableValues() const;
 
         private:
-            std::vector<size_t> block_counts_;
+            std::vector<ValueBlockCount> block_counts_;
     };
 }
 

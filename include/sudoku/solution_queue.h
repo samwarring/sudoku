@@ -6,6 +6,7 @@
 #include <queue>
 #include <vector>
 #include <sudoku/metrics.h>
+#include <sudoku/types.h>
 
 namespace sudoku
 {
@@ -41,7 +42,7 @@ namespace sudoku
                      * \return true if a solution was added to the queue.
                      *         false if the queue has no consumers.
                      */
-                    bool push(std::vector<size_t> solution, Metrics metrics);
+                    bool push(std::vector<CellValue> solution, Metrics metrics);
 
                 private:
                     SolutionQueue& queue_;
@@ -68,7 +69,7 @@ namespace sudoku
                      * \return true if a solution was retrieved.
                      *         false if the queue has no producers.
                      */
-                    bool pop(std::vector<size_t>& solution, Metrics& metrics);
+                    bool pop(std::vector<CellValue>& solution, Metrics& metrics);
 
                 private:
                     SolutionQueue& queue_;
@@ -77,7 +78,7 @@ namespace sudoku
 
         private:
             size_t maxSize_;
-            std::queue<std::vector<size_t>> valuesQueue_;
+            std::queue<std::vector<CellValue>> valuesQueue_;
             std::queue<Metrics> metricsQueue_;
             std::mutex mutex_;
             std::condition_variable condVar_;

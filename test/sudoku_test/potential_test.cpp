@@ -22,7 +22,11 @@ BOOST_AUTO_TEST_CASE(Potential_3_getNextAvailableValue)
 {
     sudoku::Potential p(3);  // [0 0 0]
 
-    auto requireNextAvailableValue = [&p] (size_t v0, size_t v1, size_t v2, size_t v3) {
+    auto requireNextAvailableValue = [&p] (sudoku::CellValue v0,
+                                           sudoku::CellValue v1,
+                                           sudoku::CellValue v2,
+                                           sudoku::CellValue v3)
+    {
         BOOST_REQUIRE_EQUAL(p.getNextAvailableValue(0), v0);
         BOOST_REQUIRE_EQUAL(p.getNextAvailableValue(1), v1);
         BOOST_REQUIRE_EQUAL(p.getNextAvailableValue(2), v2);

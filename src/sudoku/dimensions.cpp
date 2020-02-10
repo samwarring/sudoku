@@ -2,15 +2,15 @@
 
 namespace sudoku
 {
-    std::vector<std::vector<size_t>> Dimensions::computeGroupsForEachCell()
+    std::vector<std::vector<GroupCount>> Dimensions::computeGroupsForEachCell()
     {
         // Need to validate the state first or else the rest of this
         // function might raise a vector-index-out-of-bounds error.
         validate();
 
-        std::vector<std::vector<size_t>> result(cellCount_);
-        for(size_t groupNum = 0; groupNum < cellsForEachGroup_.size(); ++groupNum) {
-            for (size_t cellPos : cellsForEachGroup_[groupNum]) {
+        std::vector<std::vector<GroupCount>> result(cellCount_);
+        for(GroupCount groupNum = 0; groupNum < cellsForEachGroup_.size(); ++groupNum) {
+            for (CellCount cellPos : cellsForEachGroup_[groupNum]) {
                 result[cellPos].push_back(groupNum);
             }
         }
@@ -29,7 +29,7 @@ namespace sudoku
             if (maxCellValue_ < group.size()) {
                 throw DimensionsException("Dimensions cellGroup size exceeds maxCellValue");
             }
-            for (size_t cellPos : group) {
+            for (auto cellPos : group) {
                 if (cellCount_ <= cellPos) {
                     throw DimensionsException("Dimensions cellGroup contains position beyond cellCount");
                 }

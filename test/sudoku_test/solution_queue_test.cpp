@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_CASE(SolutionQueue_PushAndPop_SingleThread)
     sudoku::SolutionQueue::Consumer c(q);
     
     // Sample solutions + metrics
-    std::vector<size_t> s1{1, 2, 3}, s2{4, 5, 6};
+    std::vector<sudoku::CellValue> s1{1, 2, 3}, s2{4, 5, 6};
     sudoku::Metrics m1, m2;
     m1.totalGuesses = 123;
     m2.totalGuesses = 456;
@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(SolutionQueue_PushAndPop_SingleThread)
     BOOST_REQUIRE(p.push(s2, m2));
     
     // Read the solutions
-    std::vector<size_t> solution;
+    std::vector<sudoku::CellValue> solution;
     sudoku::Metrics metrics;
     
     BOOST_REQUIRE(c.pop(solution, metrics));
@@ -57,8 +57,8 @@ BOOST_AUTO_TEST_CASE(SolutionQueue_ParallelProducers)
             // Thread 3: {300, 301, 302} ... {399, 400, 401}
             constexpr size_t numSolutionsPerThread = 100;
             for (size_t solutionNum = 0; solutionNum < numSolutionsPerThread; ++solutionNum) {
-                const size_t base = (numSolutionsPerThread * i) + solutionNum;
-                std::vector<size_t> solution = {base, base + 1, base + 2};
+                const sudoku::CellValue base = (numSolutionsPerThread * i) + solutionNum;
+                std::vector<sudoku::CellValue> solution{ base, base + 1, base + 2 };
                 sudoku::Metrics metrics;
                 metrics.totalGuesses = i;
                 if (!p.push(solution, metrics)) {
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(SolutionQueue_ParallelProducers)
 
     // Count solutions
     size_t numSolutions = 0;
-    std::vector<size_t> solution;
+    std::vector<sudoku::CellValue> solution;
     sudoku::Metrics metrics;
     while (c.pop(solution, metrics)) {
         ++numSolutions;

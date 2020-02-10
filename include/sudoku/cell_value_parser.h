@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <vector>
 #include <sudoku/dimensions.h>
+#include <sudoku/types.h>
 
 namespace sudoku
 {
@@ -32,14 +33,14 @@ namespace sudoku
      * \note if maxCellValue representable by >1 digits, then values must be separated by at least
      *       one ignoreChar. If representable by 1 digit, then values can appear consecutively.
      */
-    std::vector<size_t> parseCellValues(
-        size_t cellCount,
-        size_t maxCellValue,
+    std::vector<CellValue> parseCellValues(
+        CellCount cellCount,
+        CellValue maxCellValue,
         const std::string& valueString,
         const std::string& ignoreChars="., \t\n\r"
     );
 
-    std::vector<size_t> parseCellValues(const Dimensions& dims, const std::string& valueString);
+    std::vector<CellValue> parseCellValues(const Dimensions& dims, const std::string& valueString);
 }
 
 #endif

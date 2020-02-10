@@ -2,20 +2,20 @@
 
 namespace sudoku
 {
-    bool Potential::block(size_t cellValue)
+    bool Potential::block(CellValue cellValue)
     {
         return (++block_counts_[cellValue - 1] == 1);
     }
 
-    bool Potential::unblock(size_t cellValue)
+    bool Potential::unblock(CellValue cellValue)
     {
         return (--block_counts_[cellValue - 1] == 0);
     }
 
-    size_t Potential::getNextAvailableValue(size_t minValue) const
+    CellValue Potential::getNextAvailableValue(CellValue minValue) const
     {
-        const size_t maxCellValue = block_counts_.size();
-        for (size_t cellValue = minValue + 1; cellValue <= maxCellValue; ++cellValue) {
+        const CellValue maxCellValue = block_counts_.size();
+        for (CellValue cellValue = minValue + 1; cellValue <= maxCellValue; ++cellValue) {
             if (block_counts_[cellValue - 1] == 0) {
                 return cellValue;
             }
@@ -23,11 +23,11 @@ namespace sudoku
         return 0;
     }
 
-    std::vector<size_t> Potential::getAvailableValues() const
+    std::vector<CellValue> Potential::getAvailableValues() const
     {
-        const size_t maxCellValue = block_counts_.size();
-        std::vector<size_t> result;
-        for (size_t cellValue = 1; cellValue <= maxCellValue; ++cellValue) {
+        const CellValue maxCellValue = block_counts_.size();
+        std::vector<CellValue> result;
+        for (CellValue cellValue = 1; cellValue <= maxCellValue; ++cellValue) {
             if (block_counts_[cellValue - 1] == 0) {
                 result.push_back(cellValue);
             }

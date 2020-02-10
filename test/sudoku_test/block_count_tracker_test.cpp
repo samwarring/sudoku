@@ -2,7 +2,7 @@
 #include <sudoku/block_count_tracker.h>
 #include <sudoku/square.h>
 
-void alterBlockCount(sudoku::BlockCountTracker& tracker, size_t cellPos, int delta)
+void alterBlockCount(sudoku::BlockCountTracker& tracker, sudoku::CellCount cellPos, int delta)
 {
     if (delta > 0) {
         for (int i = 0; i < delta; ++i) {

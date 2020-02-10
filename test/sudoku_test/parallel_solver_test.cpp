@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(ParallelSolver_example9x9_4threads)
 BOOST_AUTO_TEST_CASE(ParallelSolver_empty9x9_16Threads)
 {
     sudoku::standard::Dimensions dims;
-    std::vector<size_t> cellValues(dims.getCellCount(), 0);
+    std::vector<sudoku::CellValue> cellValues(dims.getCellCount(), 0);
     sudoku::Grid grid(dims, cellValues);
     sudoku::ParallelSolver solver(grid, 16, 8);
 
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(ParallelSolver_25x25_2threads)
     // with the condition variable.
 
     sudoku::square::Dimensions dims(5);
-    std::vector<size_t> cellValues(dims.getCellCount(), 0);
+    std::vector<sudoku::CellValue> cellValues(dims.getCellCount(), 0);
     sudoku::Grid grid(dims, std::move(cellValues));
     sudoku::ParallelSolver solver(std::move(grid), 2, 1);
     BOOST_REQUIRE(solver.computeNextSolution());
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(ParallelSolver_findsAllSolutions)
     // a 4x4 square sudoku. This test verifies that none of the solutions
     // are lost when using a parallel solver.
     sudoku::square::Dimensions dims(2);
-    std::vector<size_t> cellValues(dims.getCellCount(), 0);
+    std::vector<sudoku::CellValue> cellValues(dims.getCellCount(), 0);
     sudoku::Grid grid(dims, cellValues);
     sudoku::ParallelSolver solver(grid, 4, 10);
     auto solutionCount = 0;

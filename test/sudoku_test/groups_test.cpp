@@ -129,11 +129,11 @@ BOOST_AUTO_TEST_CASE(joinGroups_emptyVectors)
 
 BOOST_AUTO_TEST_CASE(joinGroups_simple)
 {
-    std::vector<std::vector<size_t>> groups1 = {  // 2 groups
+    std::vector<std::vector<sudoku::CellCount>> groups1 = {  // 2 groups
         {0, 1, 2, 3},
         {4, 5, 6, 7}
     };
-    std::vector<std::vector<size_t>> groups2 = {  // 4 groups
+    std::vector<std::vector<sudoku::CellCount>> groups2 = {  // 4 groups
         {0, 4},
         {1, 5},
         {2, 6},

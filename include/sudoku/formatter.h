@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <sudoku/dimensions.h>
+#include <sudoku/types.h>
 
 namespace sudoku
 {
@@ -37,7 +38,7 @@ namespace sudoku
              * \throw FormatterError if size of cellValues does not match the
              *        dimensions' cell count.
              */
-            std::string format(const std::vector<size_t>& cellValues) const;
+            std::string format(const std::vector<CellValue>& cellValues) const;
 
         private:
             bool isPlaceholder(char ch) const;

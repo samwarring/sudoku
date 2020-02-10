@@ -36,7 +36,7 @@ namespace sudoku
         }
     }
 
-    bool SolutionQueue::Producer::push(std::vector<size_t> solution, Metrics metrics)
+    bool SolutionQueue::Producer::push(std::vector<CellValue> solution, Metrics metrics)
     {
         // Wait until the queue has free capacity, or until there are
         // no more consumers.
@@ -88,7 +88,7 @@ namespace sudoku
         }
     }
 
-    bool SolutionQueue::Consumer::pop(std::vector<size_t>& solution, Metrics& metrics)
+    bool SolutionQueue::Consumer::pop(std::vector<CellValue>& solution, Metrics& metrics)
     {
         // Wait until the queue contains at least one element, or until
         // there are no more producers.

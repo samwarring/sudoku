@@ -6,7 +6,7 @@
 namespace sudoku
 {
     BlockCountTracker::BlockCountTracker(const sudoku::Dimensions& dims)
-        : occupiedBlockCount_(static_cast<int>(dims.getMaxCellValue() + 1))
+        : occupiedBlockCount_(static_cast<CellBlockCount>(dims.getMaxCellValue() + 1))
         , posIndex_(dims.getCellCount())
         , posHeap_(dims.getCellCount() + 1)
         , blockCounts_(dims.getCellCount())
@@ -16,10 +16,10 @@ namespace sudoku
         // This simplifies implementation.
         std::iota(posIndex_.begin(), posIndex_.end(), 1);
         std::iota(posHeap_.begin() + 1, posHeap_.end(), 0);
-        posHeap_[0] = static_cast<size_t>(~0);
+        posHeap_[0] = static_cast<CellCount>(~0);
     }
 
-    void BlockCountTracker::incrementBlockCount(size_t cellPos)
+    void BlockCountTracker::incrementBlockCount(CellCount cellPos)
     {
         assert(cellPos < posIndex_.size());
         assert(blockCounts_[cellPos] != -1);
@@ -27,7 +27,7 @@ namespace sudoku
         onBlockCountIncrease(cellPos);
     }
 
-    void BlockCountTracker::derementBlockCount(size_t cellPos)
+    void BlockCountTracker::derementBlockCount(CellCount cellPos)
     {
         assert(cellPos < posIndex_.size());
         assert(blockCounts_[cellPos] != 0);
@@ -35,7 +35,7 @@ namespace sudoku
         onBlockCountDecrease(cellPos);
     }
 
-    void BlockCountTracker::markCellOccupied(size_t cellPos)
+    void BlockCountTracker::markCellOccupied(CellCount cellPos)
     {
         assert(cellPos < posIndex_.size());
         assert(blockCounts_[cellPos] >= 0);
@@ -43,7 +43,7 @@ namespace sudoku
         onBlockCountDecrease(cellPos);
     }
 
-    void BlockCountTracker::markCellEmpty(size_t cellPos)
+    void BlockCountTracker::markCellEmpty(CellCount cellPos)
     {
         assert(cellPos < posIndex_.size());
         assert(blockCounts_[cellPos] < 0);
@@ -51,42 +51,42 @@ namespace sudoku
         onBlockCountIncrease(cellPos);
     }
 
-    int BlockCountTracker::getBlockCount(size_t cellPos) const
+    CellBlockCount BlockCountTracker::getBlockCount(CellCount cellPos) const
     {
         assert(blockCounts_[cellPos] >= 0);
         return blockCounts_[cellPos];
     }
 
-    size_t BlockCountTracker::getLeftHeapChild(size_t heapIndex)
+    BlockCountTracker::HeapIndex BlockCountTracker::getLeftHeapChild(HeapIndex heapIndex)
     {
         return heapIndex * 2;
     }
 
-    size_t BlockCountTracker::getRightHeapChild(size_t heapIndex)
+    BlockCountTracker::HeapIndex BlockCountTracker::getRightHeapChild(HeapIndex heapIndex)
     {
         return (heapIndex * 2) + 1;
     }
 
-    size_t BlockCountTracker::getHeapParent(size_t heapIndex)
+    BlockCountTracker::HeapIndex BlockCountTracker::getHeapParent(HeapIndex heapIndex)
     {
         return heapIndex / 2;
     }
 
-    void BlockCountTracker::onBlockCountIncrease(size_t cellPos)
+    void BlockCountTracker::onBlockCountIncrease(CellCount cellPos)
     {
-        size_t heapIndex = posIndex_[cellPos];
-        size_t parentIndex = getHeapParent(heapIndex);
+        HeapIndex heapIndex = posIndex_[cellPos];
+        HeapIndex parentIndex = getHeapParent(heapIndex);
         while (parentIndex && trySwap(heapIndex, parentIndex)) {
             heapIndex = parentIndex;
             parentIndex = getHeapParent(parentIndex);
         }
     }
 
-    void BlockCountTracker::onBlockCountDecrease(size_t cellPos)
+    void BlockCountTracker::onBlockCountDecrease(CellCount cellPos)
     {
-        size_t heapIndex = posIndex_[cellPos];
-        size_t leftChildIndex = getLeftHeapChild(heapIndex);
-        size_t rightChildIndex = getRightHeapChild(heapIndex);
+        HeapIndex heapIndex = posIndex_[cellPos];
+        HeapIndex leftChildIndex = getLeftHeapChild(heapIndex);
+        HeapIndex rightChildIndex = getRightHeapChild(heapIndex);
         for(;;) {
             if (leftChildIndex >= posHeap_.size()) {
                 // 0 children
@@ -121,7 +121,7 @@ namespace sudoku
         }
     }
 
-    bool BlockCountTracker::trySwap(size_t childIndex, size_t parentIndex)
+    bool BlockCountTracker::trySwap(HeapIndex childIndex, HeapIndex parentIndex)
     {
         auto childCellPos = posHeap_[childIndex];
         auto parentCellPos = posHeap_[parentIndex];

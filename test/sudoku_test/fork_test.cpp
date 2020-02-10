@@ -19,7 +19,7 @@ BOOST_DATA_TEST_CASE(fork9x9, testCases_fork9x9)
     // Initialize a solver and fork it!
     const size_t numPeers = sample;
     sudoku::square::Dimensions dims(3);
-    std::vector<size_t> cellValues(dims.getCellCount(), 0);
+    std::vector<sudoku::CellValue> cellValues(dims.getCellCount(), 0);
     sudoku::Grid grid(dims, std::move(cellValues));
     auto peers = sudoku::fork(std::move(grid), numPeers);
     
@@ -53,7 +53,7 @@ BOOST_DATA_TEST_CASE(fork9x9, testCases_fork9x9)
 BOOST_AUTO_TEST_CASE(Solver_oneCellRemaining_fork)
 {
     sudoku::square::Dimensions dims(2);
-    std::vector<size_t> cellValues{
+    std::vector<sudoku::CellValue> cellValues{
         1, 2, 3, 4,
         3, 4, 1, 2,
         2, 1, 4, 3,
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(Solver_oneCellRemaining_fork)
     // solutions in this case).
     sudoku::Solver solver(peers[0]);
     BOOST_REQUIRE(solver.computeNextSolution());
-    std::vector<size_t> expectedSolution = {
+    std::vector<sudoku::CellValue> expectedSolution = {
         1, 2, 3, 4,
         3, 4, 1, 2,
         2, 1, 4, 3,
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(Solver_fork_peerInitializedWithSolution)
     // cause fork() to produce 4 peers, where each is initialized
     // with a complete solution.
     sudoku::Dimensions dims(4, 4, {});
-    std::vector<size_t> cellValues{1, 2, 3, 0};
+    std::vector<sudoku::CellValue> cellValues{1, 2, 3, 0};
     sudoku::Grid grid(dims, cellValues);
     //sudoku::Solver solver(grid);
     auto peers = sudoku::fork(grid, 4);

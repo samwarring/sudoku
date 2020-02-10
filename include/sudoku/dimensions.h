@@ -4,6 +4,7 @@
 #include <vector>
 #include <stdexcept>
 #include <string>
+#include <sudoku/types.h>
 
 namespace sudoku
 {
@@ -47,9 +48,9 @@ namespace sudoku
              *       1. if any cell group contains duplicate values.
              *       2. if any cell groups contain the excact same values.
              *       These situations can be addressed in the future by passing groups as
-             *       std::set<size_t>, but for now, this is not essential.
+             *       std::set<CellCount>, but for now, this is not essential.
              */
-            Dimensions(size_t cellCount, size_t maxCellValue, std::vector<std::vector<size_t>> cellGroups)
+            Dimensions(CellCount cellCount, CellValue maxCellValue, std::vector<std::vector<CellCount>> cellGroups)
                 : cellCount_(cellCount)
                 , maxCellValue_(maxCellValue)
                 , cellsForEachGroup_(std::move(cellGroups))
@@ -59,34 +60,34 @@ namespace sudoku
             /**
              * Gets the number of cells in the sudoku.
              */
-            size_t getCellCount() const { return cellCount_; }
+            CellCount getCellCount() const { return cellCount_; }
 
             /**
              * Gets the maximum value allowed for any cell in the sudoku.
              */
-            size_t getMaxCellValue() const { return maxCellValue_; }
+            CellValue getMaxCellValue() const { return maxCellValue_; }
 
             /**
              * Gets the number of groups in the dimensions.
              */
-            size_t getNumGroups() const { return cellsForEachGroup_.size(); }
+            GroupCount getNumGroups() const { return cellsForEachGroup_.size(); }
 
             /**
              * Gets a list of cell positions for the given group num.
              */
-            const std::vector<size_t>& getCellsInGroup(size_t groupNum) const { return cellsForEachGroup_[groupNum]; }
+            const std::vector<CellCount>& getCellsInGroup(GroupCount groupNum) const { return cellsForEachGroup_[groupNum]; }
 
             /**
              * Gets a list of group numbers containing the given cell position.
              */
-            const std::vector<size_t>& getGroupsForCell(size_t cellPos) const { return groupsForEachCell_[cellPos]; }
+            const std::vector<GroupCount>& getGroupsForCell(CellCount cellPos) const { return groupsForEachCell_[cellPos]; }
 
         private:
 
             /**
              * Computes the initial value of groupsForEachCell_
              */
-            std::vector<std::vector<size_t>> computeGroupsForEachCell();
+            std::vector<std::vector<CellCount>> computeGroupsForEachCell();
 
             /**
              * Throws an exception if the object is invalid.
@@ -94,10 +95,10 @@ namespace sudoku
              */
             void validate() const;
 
-            const size_t cellCount_;
-            const size_t maxCellValue_;
-            const std::vector<std::vector<size_t>> cellsForEachGroup_;
-            const std::vector<std::vector<size_t>> groupsForEachCell_;
+            const CellCount cellCount_;
+            const CellValue maxCellValue_;
+            const std::vector<std::vector<CellCount>> cellsForEachGroup_;
+            const std::vector<std::vector<GroupCount>> groupsForEachCell_;
     };
 }
 

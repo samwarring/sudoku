@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(Solver_halt)
 {
     // Prepare a large sudoku
     sudoku::square::Dimensions dims(6);
-    std::vector<size_t> cellValues(dims.getCellCount(), 0);
+    std::vector<sudoku::CellValue> cellValues(dims.getCellCount(), 0);
     sudoku::Grid grid(dims, std::move(cellValues));
     sudoku::Solver solver(grid);
 
@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(Solver_alreadySolved_computeNextSolutionSucceedsOnce)
     // should return true on the first call to computeNextSolution(),
     // and should return false after that.
     sudoku::Dimensions dims(4, 4, {});
-    std::vector<size_t> cellValues{1, 2, 3, 4};
+    std::vector<sudoku::CellValue> cellValues{1, 2, 3, 4};
     sudoku::Grid grid(dims, cellValues);
     sudoku::Solver solver(grid);
     BOOST_REQUIRE(solver.computeNextSolution());

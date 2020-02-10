@@ -3,21 +3,21 @@
 
 namespace sudoku
 {
-    std::vector<size_t> parseCellValues(
-        size_t cellCount,
-        size_t maxCellValue,
+    std::vector<CellValue> parseCellValues(
+        CellCount cellCount,
+        CellValue maxCellValue,
         const std::string& valueString,
         const std::string& ignoreChars)
     {
-        std::vector<size_t> cellValues(cellCount);
-        size_t cellPos = 0;
+        std::vector<CellValue> cellValues(cellCount);
+        CellCount cellPos = 0;
 
         // Get number of digits to represent maxCellValue
         std::ostringstream ossDigits;
         ossDigits << maxCellValue;
         const size_t maxDigits = ossDigits.str().length();
 
-        size_t curCellValue = 0;
+        CellValue curCellValue = 0;
         size_t curNumDigits = 0;
         auto addValue = [&]() {
             if (curCellValue > maxCellValue) {
@@ -62,7 +62,7 @@ namespace sudoku
         return cellValues;
     }
 
-    std::vector<size_t> parseCellValues(const sudoku::Dimensions& dims, const std::string& valueString)
+    std::vector<CellValue> parseCellValues(const sudoku::Dimensions& dims, const std::string& valueString)
     {
         return parseCellValues(dims.getCellCount(), dims.getMaxCellValue(), valueString);
     }

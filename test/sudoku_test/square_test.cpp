@@ -6,7 +6,7 @@ BOOST_AUTO_TEST_CASE(SquareFormatter_Root1)
 {
     sudoku::square::Dimensions dims(1);
     sudoku::square::Formatter fmt(dims);
-    std::vector<size_t> cellValues{ 1 };
+    std::vector<sudoku::CellValue> cellValues{ 1 };
     std::string expected = "1";
     std::string actual = fmt.format(cellValues);
     BOOST_REQUIRE_EQUAL(expected, actual);
@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE(SquareFormatter_Root2)
 {
     sudoku::square::Dimensions dims(2);
     sudoku::square::Formatter fmt(dims);
-    std::vector<size_t> cellValues{ 
+    std::vector<sudoku::CellValue> cellValues{ 
         1, 2, 3, 4,
         4, 3, 2, 1,
         3, 4, 1, 2,
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(SquareFormatter_Root3)
 {
     sudoku::square::Dimensions dims(3);
     sudoku::square::Formatter fmt(dims);
-    std::vector<size_t> cellValues(81, 0);
+    std::vector<sudoku::CellValue> cellValues(81, 0);
     std::string expected = 
         "0 0 0 | 0 0 0 | 0 0 0\n"
         "0 0 0 | 0 0 0 | 0 0 0\n"
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(SquareFormatter_Root4)
     // The first square with double-digit placeholders.
     sudoku::square::Dimensions dims(4);
     sudoku::square::Formatter fmt(dims);
-    std::vector<size_t> cellValues(256, 0);
+    std::vector<sudoku::CellValue> cellValues(256, 0);
     std::string expected = 
         " 0  0  0  0 |  0  0  0  0 |  0  0  0  0 |  0  0  0  0\n"
         " 0  0  0  0 |  0  0  0  0 |  0  0  0  0 |  0  0  0  0\n"

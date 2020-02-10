@@ -10,13 +10,13 @@ struct GridTestSuiteFixture
     void fillGrid()
     {
         // Fill grid with a valid solution
-        std::vector<size_t> cellValues{
+        std::vector<sudoku::CellValue> cellValues{
             1, 2, 3, 4,
             3, 4, 1, 2,
             2, 1, 4, 3,
             4, 3, 2, 1
         };
-        for (size_t cellPos = 0; cellPos < dims.getCellCount(); ++cellPos) {
+        for (sudoku::CellCount cellPos = 0; cellPos < dims.getCellCount(); ++cellPos) {
             grid.setCellValue(cellPos, cellValues[cellPos]);
         }
     }
@@ -27,8 +27,8 @@ BOOST_FIXTURE_TEST_SUITE(GridTestSuite, GridTestSuiteFixture)
     BOOST_AUTO_TEST_CASE(initialPotentialsAllUnblocked)
     {
         // Each value of each cell should be available.
-        for (size_t cellPos = 0; cellPos < dims.getCellCount(); ++cellPos) {
-            for (size_t cellValue = 1; cellValue <= dims.getMaxCellValue(); ++cellValue) {
+        for (sudoku::CellCount cellPos = 0; cellPos < dims.getCellCount(); ++cellPos) {
+            for (sudoku::CellValue cellValue = 1; cellValue <= dims.getMaxCellValue(); ++cellValue) {
                 BOOST_REQUIRE(!grid.getCellPotential(cellPos).isBlocked(cellValue));
             }
         }
@@ -91,7 +91,7 @@ BOOST_FIXTURE_TEST_SUITE(GridTestSuite, GridTestSuiteFixture)
 
     BOOST_AUTO_TEST_CASE(getMaxBlockEmptyCell_emptyGrid)
     {
-        size_t cellPos = grid.getMaxBlockEmptyCell();
+        auto cellPos = grid.getMaxBlockEmptyCell();
         BOOST_REQUIRE_LT(cellPos, dims.getCellCount());
     }
 

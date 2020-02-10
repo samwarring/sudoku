@@ -33,7 +33,7 @@ int handleOptions(const ProgramOptions& options)
     sudoku::square::Dimensions dims(options.getSquareDimensionRoot());
 
     // Parse cell values from --input or --input-file
-    std::vector<std::vector<size_t>> inputValues;
+    std::vector<std::vector<sudoku::CellValue>> inputValues;
     if (!options.getInput().empty()) {
         inputValues.push_back(sudoku::parseCellValues(dims, options.getInput().c_str()));
     }
@@ -68,7 +68,7 @@ int handleOptions(const ProgramOptions& options)
 
     // Solve each set of input values
     for (size_t inputNum = 0; inputNum < inputValues.size(); ++inputNum) {
-        const std::vector<size_t>& curInput = inputValues[inputNum];
+        const std::vector<sudoku::CellValue>& curInput = inputValues[inputNum];
         sudoku::Grid grid(dims, std::move(curInput));
         
         // Print the input values

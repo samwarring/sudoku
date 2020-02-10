@@ -50,7 +50,7 @@ namespace sudoku
         return true;
     }
 
-    const std::vector<size_t>& ParallelSolver::getCellValues() const
+    const std::vector<CellValue>& ParallelSolver::getCellValues() const
     {
         if (threads_.size() > 0) {
             return solution_;

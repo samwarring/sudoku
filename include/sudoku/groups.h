@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <sudoku/types.h>
 
 namespace sudoku
 {
@@ -12,7 +13,7 @@ namespace sudoku
      * 
      * \return A vector of vectors, each containing the cell positions in thier respective row.
      */
-    std::vector<std::vector<size_t>> computeRowGroups(size_t rowCount, size_t columnCount);
+    std::vector<std::vector<CellCount>> computeRowGroups(size_t rowCount, size_t columnCount);
 
     /**
      * Computes a vector of cell groups for the given dimensions. Each group is a column
@@ -20,14 +21,14 @@ namespace sudoku
      * 
      * \return A vector of vectors, each containing the cell positions in their respective column.
      */
-    std::vector<std::vector<size_t>> computeColumnGroups(size_t rowCount, size_t columnCount);
+    std::vector<std::vector<CellCount>> computeColumnGroups(size_t rowCount, size_t columnCount);
 
     /**
      * Computes a vector of cell groups for a square sudoku with the given root. For example,
      * the typical 9x9 sudoku has a root of 3. A 36x36 sudoku has a root of 6. The returned
      * groups do not contain row groups or column groups - only the remaining "sub-squares".
      */
-    std::vector<std::vector<size_t>> computeSquareGroups(size_t root);
+    std::vector<std::vector<CellCount>> computeSquareGroups(size_t root);
 
     /**
      * Computes a vector of cell groups specified by a string which "maps" each cell position
@@ -52,7 +53,7 @@ namespace sudoku
      * -# Specify behavior when group numbers are skipped (e.g. "0 1 2 99")
      * -# Include ability to 'ignore' positions so they don't belong to any group
      */
-    std::vector<std::vector<size_t>> computeGroupsFromMap(const std::string& groupMap);
+    std::vector<std::vector<CellCount>> computeGroupsFromMap(const std::string& groupMap);
 
     /**
      * Joins mulitple group vectors into a single group vector.
@@ -77,7 +78,7 @@ namespace sudoku
      *     );
      *     auto totalGroups = sudoku::joinGroups({rowGroups, columnGroups, squareGroups});  // 12 groups
      */
-    std::vector<std::vector<size_t>> joinGroups(std::vector<std::vector<std::vector<size_t>>> groupOfGroups);
+    std::vector<std::vector<CellCount>> joinGroups(std::vector<std::vector<std::vector<CellCount>>> groupOfGroups);
 
 }
 

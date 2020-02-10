@@ -5,15 +5,15 @@ namespace sudoku
 {
     Grid::Grid(
         const Dimensions& dims,
-        std::vector<size_t> cellValues,
-        std::vector<std::pair<size_t, size_t>> restrictions)
+        std::vector<CellValue> cellValues,
+        std::vector<Restriction> restrictions)
         : dims_(&dims)
         , blockCountTracker_(dims)
         , cellValues_(dims.getCellCount())
     {
         // Initialize cell potentials.
         cellPotentials_.reserve(dims_->getCellCount());
-        for (size_t cellPos = 0; cellPos < dims_->getCellCount(); ++cellPos) {
+        for (CellCount cellPos = 0; cellPos < dims_->getCellCount(); ++cellPos) {
             cellPotentials_.emplace_back(dims_->getMaxCellValue());
         }
 
@@ -22,7 +22,7 @@ namespace sudoku
         if (cellValues.size() != 0 && cellValues.size() != dims.getCellCount()) {
             throw GridException("Incorrect number of initial values");
         }
-        for (size_t cellPos = 0; cellPos < cellValues.size(); ++cellPos) {
+        for (CellCount cellPos = 0; cellPos < cellValues.size(); ++cellPos) {
             auto cellValue = cellValues[cellPos];
             if (cellValue != 0) {
                 if (cellValue > dims.getMaxCellValue()) {
@@ -48,7 +48,7 @@ namespace sudoku
         }
     }
 
-    void Grid::setCellValue(size_t cellPos, size_t cellValue)
+    void Grid::setCellValue(CellCount cellPos, CellValue cellValue)
     {
         cellValues_[cellPos] = cellValue;
         blockCountTracker_.markCellOccupied(cellPos);
@@ -61,9 +61,9 @@ namespace sudoku
         }
     }
 
-    void Grid::clearCellValue(size_t cellPos)
+    void Grid::clearCellValue(CellCount cellPos)
     {
-        size_t cellValue = cellValues_[cellPos];
+        auto cellValue = cellValues_[cellPos];
         cellValues_[cellPos] = 0;
         blockCountTracker_.markCellEmpty(cellPos);
         for (auto groupNum : dims_->getGroupsForCell(cellPos)) {
@@ -75,7 +75,7 @@ namespace sudoku
         }
     }
 
-    void Grid::restrictCellValue(size_t cellPos, size_t cellValue)
+    void Grid::restrictCellValue(CellCount cellPos, CellValue cellValue)
     {
         if (cellPotentials_[cellPos].block(cellValue)) {
             blockCountTracker_.incrementBlockCount(cellPos);
@@ -83,9 +83,9 @@ namespace sudoku
         restrictions_.emplace_back(cellPos, cellValue);
     }
 
-    size_t Grid::getMaxBlockEmptyCell() const
+    CellCount Grid::getMaxBlockEmptyCell() const
     {
-        size_t candidate = blockCountTracker_.getMaxBlockEmptyCell();
+        auto candidate = blockCountTracker_.getMaxBlockEmptyCell();
         if (cellValues_[candidate]) {
             // No more empty cells
             return dims_->getCellCount();
