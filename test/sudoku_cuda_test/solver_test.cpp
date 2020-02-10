@@ -56,3 +56,11 @@ BOOST_AUTO_TEST_CASE(Solver_9x9_initialValues)
     BOOST_CHECK_EQUAL(cellValues[1], 5);
     BOOST_CHECK_EQUAL(cellValues[3], 2);
 }
+
+BOOST_AUTO_TEST_CASE(Solver_16x16_metrics)
+{
+    sudoku::square::Dimensions dims(4);
+    sudoku::cuda::Solver solver(dims);
+    BOOST_REQUIRE(solver.computeNextSolution());
+    BOOST_REQUIRE_GT(solver.getMetrics().duration.count(), 0);
+}

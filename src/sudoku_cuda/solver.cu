@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
+#include <sudoku/cuda/clock.cuh>
 #include <sudoku/cuda/solver.h>
 #include <sudoku/cuda/device_solver.cuh>
 #include <sudoku/cuda/util.h>
@@ -22,6 +23,7 @@ namespace sudoku
             // Common
             CellCount cellCount;
             CellValue maxCellValue;
+            clock_t* tickCount;
             // Related groups
             GroupCount totalGroupCount;
             GroupCount* groupCounts;
@@ -95,7 +97,11 @@ namespace sudoku
         {
             extern __shared__ int sharedMem[];
             KernelObjects<MAX_CELL_VALUE, MAX_GROUPS_FOR_CELL> ko(kp, sharedMem);
-            unsigned guessesRemaining = ko.deviceSolver.computeNextSolution(guessCount, *outResult);
+            unsigned guessesRemaining = guessCount;
+            {
+                Clock timer(kp.tickCount);
+                guessesRemaining = ko.deviceSolver.computeNextSolution(guessCount, *outResult);
+            }
             if (threadIdx.x == 0) {
                 *consumedGuessCount = (guessCount - guessesRemaining);
             }
@@ -104,6 +110,7 @@ namespace sudoku
         Solver::Solver(const sudoku::Grid& grid) : cellCount_(static_cast<CellCount>(grid.getDimensions().getCellCount()))
                                                  , maxCellValue_(static_cast<CellValue>(grid.getDimensions().getMaxCellValue()))
                                                  , cellCountPow2_(nearestPowerOf2(cellCount_))
+                                                 , hostTickCount_(0)
                                                  , totalGroupCount_(static_cast<GroupCount>(grid.getDimensions().getNumGroups()))
                                                  , groupCounts_(RelatedGroups<3>::getGroupCounts(grid.getDimensions()))
                                                  , groupIds_(RelatedGroups<3>::getGroupIds(grid.getDimensions()))
@@ -130,28 +137,36 @@ namespace sudoku
             );
         }
 
+        void Solver::copyToHost()
+        {
+            hostCellValues_ = deviceCellValues_.copyToHost();
+            metrics_.duration = Clock::readClock(hostTickCount_);
+        }
+
         bool Solver::computeNextSolution()
         {
             auto result = Result::TIMED_OUT;
             while (result == Result::TIMED_OUT) {
                 result = computeNextSolutionOneBatch(SOLVER_GUESS_BATCH_SIZE);
             }
-            hostCellValues_ = deviceCellValues_.copyToHost();
+            copyToHost();
             return result == Result::FOUND_SOLUTION;
         }
 
         Result Solver::computeNextSolution(unsigned guessCount)
         {
             auto result = computeNextSolutionOneBatch(guessCount);
-            hostCellValues_ = deviceCellValues_.copyToHost();
+            copyToHost();
             return result;
         }
 
         Result Solver::computeNextSolutionOneBatch(unsigned guessCount)
         {
+            DeviceBuffer<clock_t> deviceTickCount(std::vector<clock_t>{0});
             KernelParams kp;
             kp.cellCount = cellCount_;
             kp.maxCellValue = maxCellValue_;
+            kp.tickCount = deviceTickCount.get();
             kp.totalGroupCount = totalGroupCount_;
             kp.groupCounts = groupCounts_.get();
             kp.groupIds = groupIds_.get();
@@ -180,6 +195,7 @@ namespace sudoku
             ErrorCheck::lastError();
             
             hostResult = deviceResult.copyToHost()[0];
+            hostTickCount_ += deviceTickCount.copyToHost()[0];
             metrics_.totalGuesses += deviceGuessCount.copyToHost()[0];
             return hostResult;
         }

@@ -12,6 +12,8 @@ add_executable(
     guess_stack_test.cpp
     guess_stack_kernels.cu
     solver_test.cpp
+    clock_test.cpp
+    clock_kernels.cu
 )
 
 target_include_directories(
@@ -52,3 +54,4 @@ add_sudoku_cuda_test(sudoku_cuda_test_related_groups "RelatedGroups*")
 add_sudoku_cuda_test(sudoku_cuda_test_grid           "Grid*")
 add_sudoku_cuda_test(sudoku_cuda_test_guess_stack    "GuessStack*")
 add_sudoku_cuda_test(sudoku_cuda_test_solver         "Solver*")
+add_sudoku_cuda_test(sudoku_cuda_test_clock          "Clock*")

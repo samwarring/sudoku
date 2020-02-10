@@ -1,6 +1,7 @@
 #ifndef INCLUDED_SUDOKU_CUDA_SOLVER_H
 #define INCLUDED_SUDOKU_CUDA_SOLVER_H
 
+#include <ctime>
 #include <vector>
 #include <sudoku/cuda/device_buffer.h>
 #include <sudoku/cuda/types.h>
@@ -37,7 +38,7 @@ namespace sudoku
                 CellCount cellCount_;
                 CellValue maxCellValue_;
                 CellCount cellCountPow2_;
-                unsigned sharedMemSize_;
+                unsigned long long hostTickCount_;
                 // Related groups
                 GroupCount totalGroupCount_;
                 DeviceBuffer<GroupCount> groupCounts_;
@@ -53,8 +54,12 @@ namespace sudoku
                 DeviceBuffer<CellValue> deviceCellValues_;
 
                 // Misc
+                unsigned sharedMemSize_;
                 Metrics metrics_;
                 bool initCellValuesDone_ = false;
+
+                // Copy data back to host after computations
+                void copyToHost();
 
                 // Run a single batch of guesses. Do not copy cell values back to host.
                 Result computeNextSolutionOneBatch(unsigned guessCount);
