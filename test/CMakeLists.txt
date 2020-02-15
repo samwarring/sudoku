@@ -1,1 +1,2 @@
 add_subdirectory(sudoku_test)
+add_subdirectory(sudoku_perf_test)
