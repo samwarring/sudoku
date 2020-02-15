@@ -9,9 +9,19 @@ void addMetrics(sudoku::Metrics& target, sudoku::Metrics delta)
     target.duration += delta.duration;
 }
 
+size_t getGBT(sudoku::Metrics metrics)
+{
+    return metrics.totalGuesses + metrics.totalBacktracks;
+}
+
 double getMsec(sudoku::Metrics metrics)
 {
     return static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(metrics.duration).count());
+}
+
+double getGBTRate(sudoku::Metrics metrics)
+{
+    return getGBT(metrics) / getMsec(metrics);
 }
 
 int main()
@@ -25,13 +35,15 @@ int main()
     std::cout << "WARNING! This is a Debug build!\n";
     #endif
 
-    std::cout << "Starting performance test: 36x36 sudoku, 3 trials...\n";
+    std::cout << "Starting performance test: 36x36 sudoku, 3 trials..." << std::endl;
     for (auto i = 0; i < SAMPLE_SIZE; ++i) {
-        sudoku::Grid grid(dims);
-        sudoku::Solver solver(grid);
+        sudoku::Solver solver(dims);
         if (solver.computeNextSolution()) {
             auto metrics = solver.getMetrics();
-            std::cout << "Trial " << i + 1 << '/' << SAMPLE_SIZE << ": " << getMsec(metrics) << " ms" << std::endl;
+            std::cout << "Trial " << i + 1 << '/' << SAMPLE_SIZE << ": ";
+            std::cout << getGBT(metrics) << " G+BT, ";
+            std::cout << getMsec(metrics) << " ms, ";
+            std::cout << getGBTRate(metrics) << " G+BT/ms" << std::endl;
             addMetrics(totalMetrics, metrics);
         }
         else {
@@ -40,6 +52,9 @@ int main()
         }
     }
 
-    std::cout << "Average: " << (getMsec(totalMetrics) / SAMPLE_SIZE) << " ms/trial\n";
+    std::cout << "Average: ";
+    std::cout << (getGBT(totalMetrics) / SAMPLE_SIZE) << " G+BT/trial, ";
+    std::cout << (getMsec(totalMetrics) / SAMPLE_SIZE) << " ms/trial, ";
+    std::cout << getGBTRate(totalMetrics) << " G+BT/ms\n";
     return 0;
 }
