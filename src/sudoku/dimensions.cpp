@@ -1,3 +1,4 @@
+#include <unordered_set>
 #include <sudoku/dimensions.h>
 
 namespace sudoku
@@ -14,6 +15,26 @@ namespace sudoku
                 result[cellPos].push_back(groupNum);
             }
         }
+        return result;
+    }
+
+    std::vector<std::vector<CellCount>> Dimensions::computeRelatedCells()
+    {
+        std::vector<std::vector<CellCount>> result;
+        result.reserve(cellCount_);
+
+        for (CellCount cellPos = 0; cellPos < cellCount_; ++cellPos) {
+            std::unordered_set<CellCount> relatedCellSet;
+            for (auto groupNum : groupsForEachCell_[cellPos]) {
+                for (auto relatedPos : cellsForEachGroup_[groupNum]) {
+                    if (relatedPos != cellPos) {
+                        relatedCellSet.insert(relatedPos);
+                    }
+                }
+            }
+            result.emplace_back(relatedCellSet.begin(), relatedCellSet.end());
+        }
+
         return result;
     }
 

@@ -55,6 +55,7 @@ namespace sudoku
                 , maxCellValue_(maxCellValue)
                 , cellsForEachGroup_(std::move(cellGroups))
                 , groupsForEachCell_(computeGroupsForEachCell())
+                , relatedCells_(computeRelatedCells())
             {}
 
             /**
@@ -82,12 +83,23 @@ namespace sudoku
              */
             const std::vector<GroupCount>& getGroupsForCell(CellCount cellPos) const { return groupsForEachCell_[cellPos]; }
 
+            /**
+             * Gets a list of unique cell positions related to the given cell position.
+             */
+            const std::vector<CellCount>& getRelatedCells(CellCount cellPos) const { return relatedCells_[cellPos]; }
+
+
         private:
 
             /**
              * Computes the initial value of groupsForEachCell_
              */
             std::vector<std::vector<CellCount>> computeGroupsForEachCell();
+
+            /**
+             * Computes the related cell vectors.
+             */
+            std::vector<std::vector<CellCount>> computeRelatedCells();
 
             /**
              * Throws an exception if the object is invalid.
@@ -99,6 +111,7 @@ namespace sudoku
             const CellValue maxCellValue_;
             const std::vector<std::vector<CellCount>> cellsForEachGroup_;
             const std::vector<std::vector<GroupCount>> groupsForEachCell_;
+            const std::vector<std::vector<CellCount>> relatedCells_;
     };
 }
 

@@ -1,7 +1,9 @@
+#include <iostream>
+#include <set>
+#include <vector>
 #include <boost/test/unit_test.hpp>
 #include <sudoku/dimensions.h>
 #include <sudoku/groups.h>
-#include <iostream>
 #include "util.h"
 
 BOOST_AUTO_TEST_CASE(Dimensions_4x4)
@@ -85,4 +87,26 @@ BOOST_AUTO_TEST_CASE(Dimensions_constructor_MaxCellValueIsZero)
         sudoku::Dimensions(81, 0, {}),
         sudoku::DimensionsException
     );
+}
+
+BOOST_AUTO_TEST_CASE(Dimensions_getRelatedCells)
+{
+    auto rowGroups = sudoku::computeRowGroups(4, 4);
+    auto colGroups = sudoku::computeColumnGroups(4, 4);
+    auto allGroups = sudoku::joinGroups({rowGroups, colGroups});
+    sudoku::Dimensions dims(16, 4, allGroups);
+
+    // 4x4 sudoku - only rows and cols are groups:
+    //  0  1  2  3
+    //  4  5  6  7
+    //  8  9 10 11
+    // 12 13 14 15
+
+    sudoku::CellCount targetPos = 9;
+    std::set<sudoku::CellCount> expectedSet{1, 5, 8, 10, 11, 13};
+    auto relatedCells = dims.getRelatedCells(targetPos);
+    std::set<sudoku::CellCount> actualSet(relatedCells.begin(), relatedCells.end());
+
+    BOOST_REQUIRE_EQUAL_COLLECTIONS(expectedSet.begin(), expectedSet.end(),
+                                    actualSet.begin(), actualSet.end());
 }
