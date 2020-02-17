@@ -26,6 +26,11 @@ namespace sudoku
                            const std::vector<PartitionCount>& partitionIds);
 
             /**
+             * Gets the number of partitions contained in the table.
+             */
+            PartitionCount getPartitionCount() const;
+
+            /**
              * Gets the partitionId covering the cell position.
              */
             PartitionCount getPartitionId(CellCount cellPos) const;

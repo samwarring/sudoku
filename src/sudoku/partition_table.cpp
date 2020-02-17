@@ -20,6 +20,11 @@ namespace sudoku
         partitions_.swap(emptyVector);
     }
 
+    PartitionCount PartitionTable::getPartitionCount() const
+    {
+        return partitionCount_;
+    }
+
     PartitionCount PartitionTable::getPartitionId(CellCount cellPos) const
     {
         return combinedPartitionIndex_[cellPos] / maxPartitionSize_;
