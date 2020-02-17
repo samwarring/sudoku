@@ -16,6 +16,7 @@ add_executable(
     fork_test.cpp
     block_count_tracker_test.cpp
     partition_table_test.cpp
+    partition_block_count_tracker_test.cpp
 )
 
 target_include_directories(

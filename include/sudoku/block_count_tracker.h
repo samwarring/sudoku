@@ -14,7 +14,9 @@ namespace sudoku
     class BlockCountTracker
     {
         public:
-            BlockCountTracker(const sudoku::Dimensions& dims);
+            BlockCountTracker(CellCount cellCount, CellValue maxCellValue);
+
+            BlockCountTracker(const Dimensions& dims);
 
             /**
              * Get an empty cell with the highest block count. If there are no

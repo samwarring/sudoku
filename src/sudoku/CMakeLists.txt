@@ -14,6 +14,7 @@ add_library(
     block_count_tracker.cpp
     partitions.cpp
     partition_table.cpp
+    partition_block_count_tracker.cpp
 )
 
 target_include_directories(

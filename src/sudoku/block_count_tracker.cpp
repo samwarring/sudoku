@@ -5,11 +5,15 @@
 
 namespace sudoku
 {
-    BlockCountTracker::BlockCountTracker(const sudoku::Dimensions& dims)
-        : occupiedBlockCount_(static_cast<CellBlockCount>(dims.getMaxCellValue() + 1))
-        , posIndex_(dims.getCellCount())
-        , posHeap_(dims.getCellCount() + 1)
-        , blockCounts_(dims.getCellCount())
+    BlockCountTracker::BlockCountTracker(const Dimensions& dims)
+        : BlockCountTracker(dims.getCellCount(), dims.getMaxCellValue())
+    {}
+
+    BlockCountTracker::BlockCountTracker(CellCount cellCount, CellValue maxCellValue)
+        : occupiedBlockCount_(maxCellValue + 1)
+        , posIndex_(cellCount)
+        , posHeap_(cellCount + 1)
+        , blockCounts_(cellCount)
     {
         // Don't use the first position in the heap.
         // posHeap[1] is the _real_ max of the heap.
