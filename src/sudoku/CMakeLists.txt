@@ -13,6 +13,7 @@ add_library(
     fork.cpp
     block_count_tracker.cpp
     partitions.cpp
+    partition_table.cpp
 )
 
 target_include_directories(

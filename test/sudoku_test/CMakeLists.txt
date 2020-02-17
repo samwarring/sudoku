@@ -15,6 +15,7 @@ add_executable(
     grid_test.cpp
     fork_test.cpp
     block_count_tracker_test.cpp
+    partition_table_test.cpp
 )
 
 target_include_directories(
