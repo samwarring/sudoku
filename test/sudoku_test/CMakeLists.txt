@@ -18,6 +18,7 @@ add_executable(
     partition_table_test.cpp
     partition_block_count_tracker_test.cpp
     partition_grid_test.cpp
+    barrier_test.cpp
 )
 
 target_include_directories(

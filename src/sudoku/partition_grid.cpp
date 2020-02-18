@@ -1,3 +1,4 @@
+#include <thread>
 #include <sudoku/partition_grid.h>
 
 namespace sudoku
@@ -7,30 +8,76 @@ namespace sudoku
         , partitionTable_(&partitionTable)
         , cellValues_(dims.getCellCount()) // init to empty grid (for now...)
         , partitionCount_(partitionTable.getPartitionCount())
+        , startBarrier_(partitionCount_)
+        , endBarrier_(partitionCount_)
+        , broadcastCellPos_(dims.getCellCount())
+        , broadcastCellValue_(dims.getMaxCellValue() + 1)
+        , broadcastOperation_(true)
+        , broadcastTerminate_(false)
     {
         for (PartitionCount partitionId = 0; partitionId < partitionCount_; ++partitionId) {
             trackers_.emplace_back(partitionTable, partitionId, dims.getMaxCellValue());
+        }
+
+        // Start threads
+        for (PartitionCount partitionId = 1; partitionId < partitionCount_; ++partitionId) {
+            threads_.emplace_back([this, partitionId](){
+                while (true) {
+                    startBarrier_.wait();
+                    if (broadcastTerminate_) {
+                        return;
+                    }
+                    if (broadcastOperation_) {
+                        trackers_[partitionId].setCellValue(broadcastCellPos_, broadcastCellValue_);
+                    }
+                    else {
+                        trackers_[partitionId].clearCellValue(broadcastCellPos_, broadcastCellValue_);
+                    }
+                    endBarrier_.wait();
+                }
+            });
+        }
+    }
+
+    PartitionGrid::~PartitionGrid()
+    {
+        broadcastTerminate_ = true;
+        startBarrier_.wait();
+        for (auto& t : threads_) {
+            t.join();
         }
     }
 
     void PartitionGrid::setCellValue(CellCount cellPos, CellValue cellValue)
     {
-        // TODO: run each partition in its own thread.
-        for (auto& tracker : trackers_) {
-            tracker.setCellValue(cellPos, cellValue);
-        }
+        // Broadcast the parameters
+        broadcastOperation_ = true;
+        broadcastCellPos_ = cellPos;
+        broadcastCellValue_ = cellValue;
+
+        // Run this thread synchronized with the workers.
+        startBarrier_.wait();
+        trackers_[0].setCellValue(cellPos, cellValue);
+        endBarrier_.wait();
+
+        // Update cell value
         cellValues_[cellPos] = cellValue;
     }
 
     void PartitionGrid::clearCellValue(CellCount cellPos)
     {
-        auto oldValue = cellValues_[cellPos];
-        cellValues_[cellPos] = 0;
+        // Broadcast the parameters.
+        broadcastOperation_ = false;
+        broadcastCellPos_ = cellPos;
+        broadcastCellValue_ = cellValues_[cellPos];
 
-        // TODO: run each partition in its own thread.
-        for (auto& tracker : trackers_) {
-            tracker.clearCellValue(cellPos, oldValue);
-        }
+        // Run this thread synchronized with the workers.
+        startBarrier_.wait();
+        trackers_[0].clearCellValue(cellPos, cellValues_[cellPos]);
+        endBarrier_.wait();
+
+        // Update cell value
+        cellValues_[cellPos] = 0;
     }
 
     CellCount PartitionGrid::getMaxBlockEmptyCell() const
