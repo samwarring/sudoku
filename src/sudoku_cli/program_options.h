@@ -36,6 +36,8 @@ class ProgramOptions
 
         bool isEchoInput() const;
 
+        bool isGroupwise() const;
+
     private:
     
         boost::program_options::options_description description_;

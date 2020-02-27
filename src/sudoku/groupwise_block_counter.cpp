@@ -35,7 +35,7 @@ namespace sudoku
         }
         mask >>= minCellValue;
         // TODO: Can the following loop be replaced with a more efficient intrinsic?
-        for (CellValue cellValue = minCellValue + 1; cellValue < dims_->getMaxCellValue(); ++cellValue) {
+        for (CellValue cellValue = minCellValue + 1; cellValue <= dims_->getMaxCellValue(); ++cellValue) {
             if (mask & 1) {
                 mask >>= 1;
             }

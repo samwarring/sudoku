@@ -2,6 +2,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <sudoku/dimensions.h>
+#include <sudoku/groupwise_empty_solver.h>
 #include <sudoku/parallel_solver.h>
 #include <sudoku/solver.h>
 #include <sudoku/solver_interface.h>
@@ -11,7 +12,8 @@
 enum class SolverType
 {
     SEQUENTIAL,
-    PARALLEL
+    PARALLEL,
+    GROUPWISE_EMPTY
 };
 
 namespace std
@@ -21,6 +23,7 @@ namespace std
         switch (solverType) {
             case SolverType::SEQUENTIAL: return out << "sudoku::Solver";
             case SolverType::PARALLEL: return out << "sudoku::ParallelSolver";
+            case SolverType::GROUPWISE_EMPTY: return out << "sudoku::GroupwiseEmptySolver";
             default: return out << "<Unknown Solver>";
         }
     }
@@ -33,6 +36,8 @@ std::unique_ptr<sudoku::SolverInterface> solverFactory(const sudoku::Dimensions&
             return std::make_unique<sudoku::Solver>(dims);
         case SolverType::PARALLEL:
             return std::make_unique<sudoku::ParallelSolver>(dims, 4, 8);
+        case SolverType::GROUPWISE_EMPTY:
+            return std::make_unique<sudoku::GroupwiseEmptySolver>(dims);
         default:
             throw std::runtime_error("unrecognised SolverType");
     }
@@ -53,12 +58,13 @@ std::unique_ptr<sudoku::SolverInterface> solverFactory(const sudoku::Dimensions&
     }
 }
 
-SolverType solverTypes[] = {
+SolverType emptySolverTypes[] = {
     SolverType::SEQUENTIAL,
-    SolverType::PARALLEL
+    SolverType::PARALLEL,
+    SolverType::GROUPWISE_EMPTY
 };
 
-BOOST_DATA_TEST_CASE(SolverInterface_empty9x9, solverTypes)
+BOOST_DATA_TEST_CASE(SolverInterface_empty9x9, emptySolverTypes)
 {
     sudoku::square::Dimensions dims(3);
     auto solver = solverFactory(dims, sample);
@@ -70,7 +76,18 @@ BOOST_DATA_TEST_CASE(SolverInterface_empty9x9, solverTypes)
     BOOST_REQUIRE_GE(metrics.totalGuesses, dims.getCellCount());
     BOOST_REQUIRE_EQUAL(metrics.totalGuesses - metrics.totalBacktracks, dims.getCellCount());
     BOOST_REQUIRE_GT(std::chrono::duration_cast<std::chrono::nanoseconds>(metrics.duration).count(), 0);
+
+    // Empty sudokus have more than 1 solution.
+    BOOST_REQUIRE(solver->computeNextSolution());
+    auto cellValues2 = solver->getCellValues();
+    BOOST_REQUIRE_EQUAL(0, std::count(cellValues2.begin(), cellValues2.end(), 0));
+    BOOST_REQUIRE(cellValues != cellValues2);
 }
+
+SolverType solverTypes[] = {
+    SolverType::SEQUENTIAL,
+    SolverType::PARALLEL
+};
 
 BOOST_DATA_TEST_CASE(SolverInterface_initialValues, solverTypes)
 {

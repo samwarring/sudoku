@@ -5,9 +5,24 @@
 #include <algorithm>
 #include <locale>
 #include <memory>
+#include <sstream>
 #include <boost/program_options.hpp>
 #include <sudoku/sudoku.h>
 #include "program_options.h"
+
+std::string computeSerialFormatString(const sudoku::Dimensions& dims)
+{
+    std::ostringstream ossDigits;
+    ossDigits << dims.getMaxCellValue();
+    size_t numDigits = ossDigits.str().length();
+    std::string placeholder(numDigits, '0');
+    
+    std::ostringstream ossResult;
+    for (sudoku::CellCount pos = 0; pos < dims.getCellCount(); ++pos) {
+        ossResult << placeholder << ' ';
+    }
+    return ossResult.str();
+}
 
 std::string formatMetrics(sudoku::Metrics metrics)
 {
@@ -26,6 +41,19 @@ std::unique_ptr<sudoku::SolverInterface> solverFactory(const sudoku::Dimensions&
                                                        std::vector<sudoku::CellValue> initialValues,
                                                        const ProgramOptions& options)
 {
+    auto emptyCount = std::count(initialValues.begin(), initialValues.end(), 0);
+    if (emptyCount == dims.getCellCount()) {
+        // Sudoku is empty. We can use groupwise solver if desired.
+        if (options.isGroupwise()) {
+            if (options.getThreadCount() > 1) {
+                throw std::runtime_error("Groupwise solver does not support multiple threads");
+            }
+            return std::make_unique<sudoku::GroupwiseEmptySolver>(dims);
+        }
+    }
+    else if (options.isGroupwise()) {
+        throw std::runtime_error("Groupwise solver does not support initial cell values");
+    }
     sudoku::Grid grid(dims, initialValues);
     if (options.getThreadCount() == 1) {
         return std::make_unique<sudoku::Solver>(grid);
@@ -76,7 +104,7 @@ int handleOptions(const ProgramOptions& options)
             formatter.reset(new sudoku::square::Formatter(dims));
             break;
         case ProgramOptions::OutputFormat::SERIAL:
-            formatter.reset(new sudoku::Formatter(dims, std::string(dims.getCellCount(), '0')));
+            formatter.reset(new sudoku::Formatter(dims, computeSerialFormatString(dims)));
             break;
     }
 
@@ -136,16 +164,7 @@ int main(int argc, char** argv)
         ProgramOptions options(argc, argv);
         return handleOptions(options);
     }
-    catch (const boost::program_options::error& err) {
+    catch (const std::exception& err) {
         std::cerr << "error: " << err.what() << '\n';
-        return 1;
-    }
-    catch (const sudoku::SolverException& err) {
-        std::cerr << "error: " << err.what() << '\n';
-        return 1;
-    }
-    catch (const sudoku::CellValueParseException& err) {
-        std::cerr << "error: " << err.what() << '\n';
-        return 1;
     }
 }

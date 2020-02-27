@@ -20,5 +20,6 @@
 #include <sudoku/fork.h>
 #include <sudoku/types.h>
 #include <sudoku/solver_interface.h>
+#include <sudoku/groupwise_empty_solver.h>
 
 #endif
