@@ -16,6 +16,7 @@ add_executable(
     fork_test.cpp
     block_count_tracker_test.cpp
     solver_interface_test.cpp
+    groupwise_block_counter_test.cpp
 )
 
 target_include_directories(

@@ -12,6 +12,7 @@ add_library(
     grid.cpp
     fork.cpp
     block_count_tracker.cpp
+    groupwise_block_counter.cpp
 )
 
 target_include_directories(
