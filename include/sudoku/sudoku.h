@@ -19,5 +19,6 @@
 #include <sudoku/metrics.h>
 #include <sudoku/fork.h>
 #include <sudoku/types.h>
+#include <sudoku/solver_interface.h>
 
 #endif

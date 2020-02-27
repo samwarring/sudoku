@@ -4,6 +4,7 @@
 #include <fstream>
 #include <algorithm>
 #include <locale>
+#include <memory>
 #include <boost/program_options.hpp>
 #include <sudoku/sudoku.h>
 #include "program_options.h"
@@ -19,6 +20,22 @@ std::string formatMetrics(sudoku::Metrics metrics)
     sout << durationMilli.count() << " ms, ";
     sout << (totalGuessesAndBacktracks * 1.0 / durationMilli.count()) << " G+BT/ms";
     return sout.str();
+}
+
+std::unique_ptr<sudoku::SolverInterface> solverFactory(const sudoku::Dimensions& dims,
+                                                       std::vector<sudoku::CellValue> initialValues,
+                                                       const ProgramOptions& options)
+{
+    sudoku::Grid grid(dims, initialValues);
+    if (options.getThreadCount() == 1) {
+        return std::make_unique<sudoku::Solver>(grid);
+    }
+    else if (options.getThreadCount() > 1) {
+        return std::make_unique<sudoku::ParallelSolver>(grid, options.getThreadCount(), options.getNumSolutions());
+    }
+    else {
+        throw std::runtime_error("Invalid thread count");
+    }
 }
 
 int handleOptions(const ProgramOptions& options)
@@ -69,15 +86,15 @@ int handleOptions(const ProgramOptions& options)
     // Solve each set of input values
     for (size_t inputNum = 0; inputNum < inputValues.size(); ++inputNum) {
         const std::vector<sudoku::CellValue>& curInput = inputValues[inputNum];
-        sudoku::Grid grid(dims, std::move(curInput));
         
         // Print the input values
         if (options.isEchoInput()) {
-            std::cout << "Input " << (inputNum + 1) << ":\n" << formatter->format(grid.getCellValues()) << '\n';
+            std::cout << "Input " << (inputNum + 1) << ":\n" << formatter->format(curInput) << '\n';
         }
 
         // If --fork, fork the grid and print each forked grid.
         if (options.getForkCount() > 0) {
+            sudoku::Grid grid(dims, curInput);
             auto grids = sudoku::fork(std::move(grid), options.getForkCount());
             for (size_t gridNum = 0; gridNum < grids.size(); ++gridNum) {
                 std::cout << "\nPeer " << (gridNum + 1) << ":\n";
@@ -94,37 +111,19 @@ int handleOptions(const ProgramOptions& options)
         }
 
         // Find the first N solutions
-        if (options.getThreadCount() == 1) {
-            sudoku::Solver solver(std::move(grid));
-            size_t numSolutionsFound = 0;
-            while (numSolutionsFound < options.getNumSolutions() && solver.computeNextSolution()) {
-                numSolutionsFound++;
-                std::cout << "\nInput " << (inputNum + 1) << ", ";
-                std::cout << "Solution " << numSolutionsFound << ", ";
-                std::cout << "Hash: " << hasher(formatter->format(solver.getCellValues())) << ", ";
-                std::cout << "Metrics: " << formatMetrics(solver.getMetrics()) << '\n';
-                std::cout << formatter->format(solver.getCellValues()) << '\n';
-            }
-
-            if (numSolutionsFound == 0) {
-                std::cout << "No solution after " << solver.getMetrics().totalGuesses << " guesses.\n";
-            }
+        auto solver = solverFactory(dims, curInput, options);
+        size_t solutionCount = 0;
+        while (solutionCount < options.getNumSolutions() && solver->computeNextSolution()) {
+            solutionCount++;
+            std::cout << "\nInput " << (inputNum + 1) << ", ";
+            std::cout << "Solution " << solutionCount << ", ";
+            std::cout << "Hash: " << hasher(formatter->format(solver->getCellValues())) << ", ";
+            std::cout << "Metrics: " << formatMetrics(solver->getMetrics()) << '\n';
+            std::cout << formatter->format(solver->getCellValues()) << '\n';
         }
-        else { // options.getThreadCount > 1
-            sudoku::ParallelSolver solver(std::move(grid), options.getThreadCount(), 8);
-            size_t solutionCount = 0;
-            while (solutionCount < options.getNumSolutions() && solver.computeNextSolution()) {
-                solutionCount++;
-                std::cout << "\nInput " << (inputNum + 1) << ", ";
-                std::cout << "Solution " << solutionCount << ", ";
-                std::cout << "Hash: " << hasher(formatter->format(solver.getCellValues())) << ", ";
-                std::cout << "Metrics: " << formatMetrics(solver.getMetrics()) << '\n';
-                std::cout << formatter->format(solver.getCellValues()) << '\n';
-            }
 
-            if (solutionCount == 0) {
-                std::cout << "No solution.\n";
-            }
+        if (solutionCount == 0) {
+            std::cout << "No solution\n";
         }
     }
 

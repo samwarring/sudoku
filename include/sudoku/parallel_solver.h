@@ -11,12 +11,13 @@
 #include <sudoku/solver.h>
 #include <sudoku/solution_queue.h>
 #include <sudoku/types.h>
+#include <sudoku/solver_interface.h>
 
 namespace sudoku
 {
     class ParallelSolverException : public std::logic_error { using std::logic_error::logic_error; };
 
-    class ParallelSolver
+    class ParallelSolver : public SolverInterface
     {
         public:
             ParallelSolver(

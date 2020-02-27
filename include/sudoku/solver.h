@@ -10,6 +10,7 @@
 #include <sudoku/grid.h>
 #include <sudoku/metrics.h>
 #include <sudoku/types.h>
+#include <sudoku/solver_interface.h>
 
 namespace sudoku
 {
@@ -24,7 +25,7 @@ namespace sudoku
      * can iterate through all possible solutions of the sudoku for the given
      * initial values.
      */
-    class Solver
+    class Solver : public SolverInterface
     {
         public:
 
@@ -77,4 +78,4 @@ namespace sudoku
     };
 }
 
-#endif 
+#endif

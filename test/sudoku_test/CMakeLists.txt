@@ -15,6 +15,7 @@ add_executable(
     grid_test.cpp
     fork_test.cpp
     block_count_tracker_test.cpp
+    solver_interface_test.cpp
 )
 
 target_include_directories(
