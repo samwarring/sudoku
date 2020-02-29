@@ -82,6 +82,16 @@ namespace sudoku
              */
             const std::vector<GroupCount>& getGroupsForCell(CellCount cellPos) const { return groupsForEachCell_[cellPos]; }
 
+            /**
+             * Validate a sequence of cell values. The sequence must
+             *   1. Have length equal to cell count
+             *   2. Have no cell values greater than max cell value
+             *   3. Have no values repeated in any group
+             *
+             * \throw std::exception if any of these conditions do not hold
+             */
+            void validateCellValues(const std::vector<CellValue>& cellValues) const;
+
         private:
 
             /**

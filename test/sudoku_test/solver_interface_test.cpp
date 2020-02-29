@@ -8,12 +8,14 @@
 #include <sudoku/solver_interface.h>
 #include <sudoku/square.h>
 #include <sudoku/cell_value_parser.h>
+#include <sudoku/groupwise_solver.h>
 
 enum class SolverType
 {
     SEQUENTIAL,
     PARALLEL,
-    GROUPWISE_EMPTY
+    GROUPWISE_EMPTY,
+    GROUPWISE
 };
 
 namespace std
@@ -24,6 +26,7 @@ namespace std
             case SolverType::SEQUENTIAL: return out << "sudoku::Solver";
             case SolverType::PARALLEL: return out << "sudoku::ParallelSolver";
             case SolverType::GROUPWISE_EMPTY: return out << "sudoku::GroupwiseEmptySolver";
+            case SolverType::GROUPWISE: return out << "sudoku::GroupwiseSolver";
             default: return out << "<Unknown Solver>";
         }
     }
@@ -38,6 +41,8 @@ std::unique_ptr<sudoku::SolverInterface> solverFactory(const sudoku::Dimensions&
             return std::make_unique<sudoku::ParallelSolver>(dims, 4, 8);
         case SolverType::GROUPWISE_EMPTY:
             return std::make_unique<sudoku::GroupwiseEmptySolver>(dims);
+        case SolverType::GROUPWISE:
+            return std::make_unique<sudoku::GroupwiseSolver>(dims);
         default:
             throw std::runtime_error("unrecognised SolverType");
     }
@@ -53,6 +58,8 @@ std::unique_ptr<sudoku::SolverInterface> solverFactory(const sudoku::Dimensions&
             return std::make_unique<sudoku::Solver>(grid);
         case SolverType::PARALLEL:
             return std::make_unique<sudoku::ParallelSolver>(grid, 4, 8);
+        case SolverType::GROUPWISE:
+            return std::make_unique<sudoku::GroupwiseSolver>(dims, initialValues);
         default:
             throw std::runtime_error("unrecognised SolverType");
     }
@@ -61,7 +68,8 @@ std::unique_ptr<sudoku::SolverInterface> solverFactory(const sudoku::Dimensions&
 SolverType emptySolverTypes[] = {
     SolverType::SEQUENTIAL,
     SolverType::PARALLEL,
-    SolverType::GROUPWISE_EMPTY
+    SolverType::GROUPWISE_EMPTY,
+    SolverType::GROUPWISE
 };
 
 BOOST_DATA_TEST_CASE(SolverInterface_empty9x9, emptySolverTypes)
@@ -86,7 +94,8 @@ BOOST_DATA_TEST_CASE(SolverInterface_empty9x9, emptySolverTypes)
 
 SolverType solverTypes[] = {
     SolverType::SEQUENTIAL,
-    SolverType::PARALLEL
+    SolverType::PARALLEL,
+    SolverType::GROUPWISE
 };
 
 BOOST_DATA_TEST_CASE(SolverInterface_initialValues, solverTypes)

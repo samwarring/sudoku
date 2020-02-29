@@ -21,5 +21,6 @@
 #include <sudoku/types.h>
 #include <sudoku/solver_interface.h>
 #include <sudoku/groupwise_empty_solver.h>
+#include <sudoku/groupwise_solver.h>
 
 #endif

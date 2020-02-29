@@ -14,6 +14,7 @@ add_library(
     block_count_tracker.cpp
     groupwise_block_counter.cpp
     groupwise_empty_solver.cpp
+    groupwise_solver.cpp
 )
 
 target_include_directories(

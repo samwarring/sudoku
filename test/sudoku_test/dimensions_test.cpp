@@ -86,3 +86,41 @@ BOOST_AUTO_TEST_CASE(Dimensions_constructor_MaxCellValueIsZero)
         sudoku::DimensionsException
     );
 }
+
+BOOST_AUTO_TEST_CASE(Dimensions_validateCellValues_notEnoughValues)
+{
+    BOOST_REQUIRE_THROW(
+        sudoku::Dimensions(4, 4, {}).validateCellValues({1, 2, 3}),
+        std::exception
+    );
+}
+
+BOOST_AUTO_TEST_CASE(Dimensions_validateCellValues_tooManyValues)
+{
+    BOOST_REQUIRE_THROW(
+        sudoku::Dimensions(4, 4, {}).validateCellValues({0, 0, 0, 0, 0}),
+        std::exception
+    );
+}
+
+BOOST_AUTO_TEST_CASE(Dimensions_validateCellValues_valueTooLarge)
+{
+    BOOST_REQUIRE_THROW(
+        sudoku::Dimensions(4, 4, {}).validateCellValues({2, 3, 4, 5}),
+        std::exception
+    );
+}
+
+BOOST_AUTO_TEST_CASE(Dimensions_validateCellValues_repeatedGroupValue)
+{
+    BOOST_REQUIRE_THROW(
+        sudoku::Dimensions(4, 4, { {0, 1, 2, 3} }).validateCellValues({1, 0, 0, 1}),
+        std::exception
+    );
+}
+
+BOOST_AUTO_TEST_CASE(Dimensions_validateCellValues_valid)
+{
+    sudoku::Dimensions dims(4, 4, { {0, 1, 2, 3} });
+    dims.validateCellValues({1, 2, 3, 4});
+}

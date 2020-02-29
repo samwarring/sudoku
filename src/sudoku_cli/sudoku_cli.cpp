@@ -42,18 +42,18 @@ std::unique_ptr<sudoku::SolverInterface> solverFactory(const sudoku::Dimensions&
                                                        const ProgramOptions& options)
 {
     auto emptyCount = std::count(initialValues.begin(), initialValues.end(), 0);
-    if (emptyCount == dims.getCellCount()) {
-        // Sudoku is empty. We can use groupwise solver if desired.
-        if (options.isGroupwise()) {
-            if (options.getThreadCount() > 1) {
-                throw std::runtime_error("Groupwise solver does not support multiple threads");
-            }
+    if (options.isGroupwise()) {
+        if (options.getThreadCount() > 1) {
+            throw std::runtime_error("Groupwise solver does not support multiple threads");
+        }
+        if (emptyCount == dims.getCellCount()) {
             return std::make_unique<sudoku::GroupwiseEmptySolver>(dims);
         }
+        else {
+            return std::make_unique<sudoku::GroupwiseSolver>(dims, initialValues);
+        }
     }
-    else if (options.isGroupwise()) {
-        throw std::runtime_error("Groupwise solver does not support initial cell values");
-    }
+
     sudoku::Grid grid(dims, initialValues);
     if (options.getThreadCount() == 1) {
         return std::make_unique<sudoku::Solver>(grid);
