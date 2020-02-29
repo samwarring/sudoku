@@ -64,8 +64,6 @@ namespace sudoku
 
             std::pair<CellCount, CellValue> popGuess();
 
-            bool sequentialSolve();
-
             Grid grid_;
             Metrics metrics_;
             std::stack<CellCount> guesses_;  ///< stack of cell positions.

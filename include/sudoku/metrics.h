@@ -42,6 +42,24 @@ namespace sudoku
          */
         Duration duration{0};
     };
+
+    class Timer
+    {
+        private:
+            Metrics::TimePoint startTime_;
+            Metrics::Duration* duration_;
+
+        public:
+            Timer(Metrics::Duration& duration) : duration_(&duration)
+            {
+                startTime_ = Metrics::now();
+            }
+
+            ~Timer()
+            {
+                *duration_ += (Metrics::now() - startTime_);
+            }
+    };
 }
 
 #endif

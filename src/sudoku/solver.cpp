@@ -11,15 +11,6 @@ namespace sudoku
         unreportedSolution_ = grid_.isFull();
     }
 
-    bool Solver::computeNextSolution()
-    {
-        auto startTime = Metrics::now();
-        bool result = sequentialSolve();
-        auto stopTime = Metrics::now();
-        metrics_.duration += (stopTime - startTime);
-        return result;
-    }
-
     void Solver::pushGuess(CellCount cellPos, CellValue cellValue)
     {
         grid_.setCellValue(cellPos, cellValue);
@@ -37,8 +28,10 @@ namespace sudoku
         return {cellPos, cellValue};
     }
 
-    bool Solver::sequentialSolve()
+    bool Solver::computeNextSolution()
     {
+        Timer timer(metrics_.duration);
+
         if (unreportedSolution_) {
             // We previously found a solution without sequentialSolve().
             // Future calls to sequentialSolve() will continue searching,

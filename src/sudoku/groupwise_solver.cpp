@@ -25,6 +25,7 @@ namespace sudoku
 
     bool GroupwiseSolver::computeNextSolution()
     {
+        Timer timer(metrics_.duration);
         CellCount cellPos = getNextEmptyCell(0);
         CellValue minCellValue = 0;
 
@@ -37,7 +38,6 @@ namespace sudoku
             metrics_.totalBacktracks++;
         }
 
-        auto startTime = Metrics::now();
         while (cellPos < dims_->getCellCount()) {
             auto cellValue = blockCounter_.getNextAvailableValue(cellPos, minCellValue);
             if (cellValue) {
@@ -54,7 +54,6 @@ namespace sudoku
             else {
                 if (guessStackPos_ == 0) {
                     // No more guesses to backtrack. No solution.
-                    metrics_.duration += (Metrics::now() - startTime);
                     return false;
                 }
 
@@ -67,7 +66,6 @@ namespace sudoku
             }
         }
 
-        metrics_.duration += (Metrics::now() - startTime);
         return true;
     }
 

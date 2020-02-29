@@ -10,6 +10,7 @@ namespace sudoku
 
     bool GroupwiseEmptySolver::computeNextSolution()
     {
+        Timer timer(metrics_.duration);
         CellCount cellPos = 0;
         CellValue minCellValue = 0;
 
@@ -22,7 +23,6 @@ namespace sudoku
             cellValues_[cellPos] = 0;
         }
 
-        auto startTime = Metrics::now();
         while (cellPos < dims_->getCellCount()) {
             auto cellValue = blockCounter_.getNextAvailableValue(cellPos, minCellValue);
             if (cellValue) {
@@ -35,7 +35,6 @@ namespace sudoku
             else {
                 metrics_.totalBacktracks++;
                 if (cellPos == 0) {
-                    metrics_.duration += Metrics::now() - startTime;
                     return false;
                 }
                 cellPos--;
@@ -44,7 +43,6 @@ namespace sudoku
                 cellValues_[cellPos] = 0;
             }
         }
-        metrics_.duration += Metrics::now() - startTime;
         return true;
     }
 }
