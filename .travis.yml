@@ -19,7 +19,6 @@ addons:
     apt:
         packages:
             - libboost-all-dev
-            - gcovr
 
 matrix:
     exclude:
