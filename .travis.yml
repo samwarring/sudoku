@@ -34,9 +34,8 @@ before_script:
     - scripts/travis_before_script.sh
 
 script:
-    - cd build
-    - cmake --build .
-    - ctest
+    - scripts/travis_script.sh
 
 after_success:
     - scripts/travis_after_success.sh
+
