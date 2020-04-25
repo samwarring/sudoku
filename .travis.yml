@@ -13,11 +13,13 @@ compiler:
 env:
     - CONFIG=Debug
     - CONFIG=RelWithDebInfo
+    - COVERAGE=ON
 
 addons:
     apt:
         packages:
             - libboost-all-dev
+            - gcovr
 
 matrix:
     exclude:
@@ -25,12 +27,15 @@ matrix:
           compiler: clang
         - os: osx
           compiler: gcc
+        - os: osx
+          env: COVERAGE=ON
 
 before_script:
-    - mkdir build
-    - cd build
-    - cmake .. -DCMAKE_BUILD_TYPE=%CONFIG%
+    - scripts/travis_before_script.sh
 
 script:
     - cmake --build .
     - ctest
+
+after_success:
+    - scripts/travis_after_success.sh
