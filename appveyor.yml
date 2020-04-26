@@ -10,8 +10,8 @@ configuration:
 before_build:
     - scripts\appveyor_before_build.bat
 
-build:
-    build_script: scripts\appveyor_build.bat
+build_script:
+    - scripts\appveyor_build_script.bat
 
 test_script:
     - scripts\appveyor_test_script.bat
