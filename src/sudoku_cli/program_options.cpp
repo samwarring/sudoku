@@ -14,6 +14,7 @@ ProgramOptions::ProgramOptions(int argc, char** argv)
         ("output-format,f", bpo::value<std::string>(), "Choose from `pretty` (default) or `serial`")
         ("input-file,I", bpo::value<std::string>(), "Read multiple initial value strings from input file")
         ("square-dim-root,s", bpo::value<size_t>(), "Set dimensions to a square sudoku with given root value")
+        ("inner-rect-dims,r", bpo::value<std::string>(), "Set dimensions to inner-rectangular: e.g -r \"2 3\"")
         ("threads,j", bpo::value<size_t>(), "Solve with this many worker threads")
         ("fork,k", bpo::value<size_t>(), "Fork the input grid")
         ("echo-input,e", "Show input values in addition to solution")
@@ -102,6 +103,31 @@ size_t ProgramOptions::getSquareDimensionRoot() const
     }
     else {
         return 3;
+    }
+}
+
+std::pair<size_t, size_t> ProgramOptions::getInnerRectangularSize() const
+{
+    if (optionMap_.count("inner-rect-dims")) {
+        size_t innerRowCount = 0;
+        size_t innerColumnCount = 0;
+        std::istringstream iss(optionMap_["inner-rect-dims"].as<std::string>());
+        iss >> innerRowCount;
+        iss >> innerColumnCount;
+        if (innerRowCount == 0) {
+            throw std::runtime_error("invalid inner-rectangular row count");
+        }
+        if (innerColumnCount == 0) {
+            throw std::runtime_error("invalid inner-rectangular column count");
+        }
+        return {innerRowCount, innerColumnCount};
+    }
+    else if (optionMap_.count("square-dim-root")) {
+        size_t root = optionMap_["square-dim-root"].as<size_t>();
+        return {root, root};
+    }
+    else {
+        return {3, 3};
     }
 }
 

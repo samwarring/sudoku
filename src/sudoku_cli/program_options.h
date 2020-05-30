@@ -2,6 +2,7 @@
 #define INCLUDED_SUDOKU_CLI_PROGRAM_OPTIONS_H
 
 #include <string>
+#include <utility>
 #include <boost/program_options.hpp>
 
 class ProgramOptions
@@ -30,6 +31,8 @@ class ProgramOptions
 
         size_t getSquareDimensionRoot() const;
 
+        std::pair<size_t, size_t> getInnerRectangularSize() const;
+
         size_t getThreadCount() const;
 
         size_t getForkCount() const;
@@ -39,7 +42,7 @@ class ProgramOptions
         bool isGroupwise() const;
 
     private:
-    
+
         boost::program_options::options_description description_;
         boost::program_options::variables_map optionMap_;
         OutputFormat outputFormat_;

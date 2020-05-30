@@ -17,6 +17,7 @@ add_executable(
     block_count_tracker_test.cpp
     solver_interface_test.cpp
     groupwise_block_counter_test.cpp
+    inner_rectangular_test.cpp
 )
 
 target_include_directories(
