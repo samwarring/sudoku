@@ -48,6 +48,36 @@ namespace sudoku
         return result;
     }
 
+    std::vector<std::vector<CellCount>> computeInnerRectangularGroups(size_t innerRowCount,
+                                                                      size_t innerColumnCount)
+    {
+        size_t totalCols = innerRowCount * innerColumnCount;
+        size_t cellCount = totalCols * totalCols;
+        size_t horizontalBandSize = innerRowCount * innerColumnCount * innerRowCount;
+        std::vector<std::vector<CellCount>> groups(innerRowCount * innerColumnCount);
+        GroupCount groupNum = 0;
+        for (CellCount cellPos = 0; cellPos < cellCount; ++cellPos) {
+            if (cellPos == 0) {
+                // First cell.
+                groupNum = 0;
+            }
+            else if ((cellPos % totalCols == 0) && (cellPos % horizontalBandSize == 0)) {
+                // Starting a new horzontal band of groups
+                groupNum++;
+            }
+            else if (cellPos % totalCols == 0) {
+                // Starting a new row (same horizontal band)
+                groupNum -= (innerRowCount - 1);
+            }
+            else if (cellPos % innerColumnCount == 0) {
+                // Starting a new group in the current row
+                groupNum++;
+            }
+            groups[groupNum].push_back(cellPos);
+        }
+        return groups;
+    }
+
     std::vector<std::vector<CellCount>> computeGroupsFromMap(const std::string& groupMap)
     {
         std::istringstream iss(groupMap);

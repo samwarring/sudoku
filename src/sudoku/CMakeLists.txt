@@ -15,6 +15,7 @@ add_library(
     groupwise_block_counter.cpp
     groupwise_empty_solver.cpp
     groupwise_solver.cpp
+    inner_rectangular.cpp
 )
 
 target_include_directories(

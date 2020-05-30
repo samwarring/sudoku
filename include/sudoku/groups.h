@@ -31,6 +31,16 @@ namespace sudoku
     std::vector<std::vector<CellCount>> computeSquareGroups(size_t root);
 
     /**
+     * Computes a vector of cell groups for a square sudoku where the inner-groups
+     * (traditionally 3x3 squares) are rectangular in shape.
+     * 
+     * \param innerRowCount number of rows in the inner-group
+     * \param innerColumncount number of cols in the inner-group.
+     */
+    std::vector<std::vector<CellCount>> computeInnerRectangularGroups(size_t innerRowCount,
+                                                                      size_t innerColumnCount);
+
+    /**
      * Computes a vector of cell groups specified by a string which "maps" each cell position
      * to a unique group.
      * 
