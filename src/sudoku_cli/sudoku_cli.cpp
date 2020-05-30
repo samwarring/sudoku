@@ -74,8 +74,10 @@ int handleOptions(const ProgramOptions& options)
         return 0;
     }
 
-    // Using square dimensions only
-    sudoku::square::Dimensions dims(options.getSquareDimensionRoot());
+    // Using inner-rectangular dimensions only
+    auto innerRectangleDims = options.getInnerRectangularSize();
+    sudoku::inner_rectangular::Dimensions dims(innerRectangleDims.first,
+                                               innerRectangleDims.second);
 
     // Parse cell values from --input or --input-file
     std::vector<std::vector<sudoku::CellValue>> inputValues;
@@ -101,7 +103,7 @@ int handleOptions(const ProgramOptions& options)
     std::unique_ptr<sudoku::Formatter> formatter;
     switch (options.getOutputFormat()) {
         case ProgramOptions::OutputFormat::PRETTY:
-            formatter.reset(new sudoku::square::Formatter(dims));
+            formatter.reset(new sudoku::inner_rectangular::Formatter(dims));
             break;
         case ProgramOptions::OutputFormat::SERIAL:
             formatter.reset(new sudoku::Formatter(dims, computeSerialFormatString(dims)));
