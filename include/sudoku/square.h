@@ -2,9 +2,7 @@
 #define INCLUDED_SUDOKU_SQUARE_H
 
 #include <vector>
-#include <sudoku/dimensions.h>
-#include <sudoku/groups.h>
-#include <sudoku/formatter.h>
+#include <sudoku/inner_rectangular.h>
 
 namespace sudoku
 {
@@ -15,7 +13,7 @@ namespace sudoku
      */
     namespace square
     {
-        class Dimensions : public sudoku::Dimensions
+        class Dimensions : public sudoku::inner_rectangular::Dimensions
         {
             public:
                 /**
@@ -24,14 +22,7 @@ namespace sudoku
                  *             3 means a 9x9 sudoku; etc.
                  */
                 Dimensions(size_t root)
-                    : sudoku::Dimensions(
-                        root * root * root * root,
-                        castCellValue(root * root),
-                        joinGroups({
-                            computeRowGroups(root * root, root * root),
-                            computeColumnGroups(root * root, root * root),
-                            computeSquareGroups(root)
-                        }))
+                    : sudoku::inner_rectangular::Dimensions(root, root)
                     , root_(root)
                 {}
 
@@ -44,18 +35,12 @@ namespace sudoku
                 size_t root_;
         };
 
-        class Formatter : public sudoku::Formatter
+        class Formatter : public sudoku::inner_rectangular::Formatter
         {
             public:
                 Formatter(const Dimensions& dims)
-                    : sudoku::Formatter(
-                        dims,
-                        computeFormatString(dims)
-                    )
+                    : sudoku::inner_rectangular::Formatter(dims)
                 {}
-
-            private:
-                static std::string computeFormatString(const Dimensions& dims);
         };
     }
 }

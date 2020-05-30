@@ -7,7 +7,6 @@ add_library(
     cell_value_parser.cpp
     formatter.cpp
     solution_queue.cpp
-    square.cpp
     parallel_solver.cpp
     grid.cpp
     fork.cpp
