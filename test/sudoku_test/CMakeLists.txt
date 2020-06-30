@@ -18,6 +18,7 @@ add_executable(
     solver_interface_test.cpp
     groupwise_block_counter_test.cpp
     inner_rectangular_test.cpp
+    version_test.cpp
 )
 
 target_include_directories(

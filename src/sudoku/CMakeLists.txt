@@ -1,3 +1,9 @@
+# Create version.cpp from version.in.cpp
+configure_file(
+    version.in.cpp
+    version.cpp
+)
+
 add_library(
     sudoku
     dimensions.cpp
@@ -15,6 +21,7 @@ add_library(
     groupwise_empty_solver.cpp
     groupwise_solver.cpp
     inner_rectangular.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/version.cpp
 )
 
 target_include_directories(
