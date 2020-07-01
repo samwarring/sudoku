@@ -33,10 +33,6 @@ def main():
         cmd.append('-D' + argname + '=' + argval)
     cmd.append(root_relative)
 
-    # Appveyor needs to update build version
-    if args.ci_env == 'appveyor':
-        check_output(['appveyor', 'UpdateBuild', '-Version', version_vars['sudoku_VERSION_DESC']])
-
     # Make and move into build directory
     mkdir(args.build_directory)
     chdir(args.build_directory)
