@@ -23,5 +23,6 @@
 #include <sudoku/groupwise_empty_solver.h>
 #include <sudoku/groupwise_solver.h>
 #include <sudoku/inner_rectangular.h>
+#include <sudoku/version.h>
 
 #endif

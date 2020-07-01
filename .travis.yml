@@ -11,9 +11,9 @@ compiler:
     - clang
 
 env:
-    - CONFIG=Debug
-    - CONFIG=RelWithDebInfo
-    - COVERAGE=ON
+    - CONFIG=Debug COVERAGE=OFF
+    - CONFIG=Debug COVERAGE=ON
+    - CONFIG=RelWithDebInfo COVERAGE=OFF
 
 addons:
     apt:
@@ -27,10 +27,10 @@ matrix:
         - os: osx
           compiler: gcc
         - os: osx
-          env: COVERAGE=ON
+          env: CONFIG=Debug COVERAGE=ON
 
 before_script:
-    - scripts/travis_before_script.sh
+    - python3 scripts/configure.py . build --config $CONFIG --coverage $COVERAGE --ci-env travis
 
 script:
     - scripts/travis_script.sh
