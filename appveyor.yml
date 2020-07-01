@@ -8,7 +8,7 @@ configuration:
     - RelWithDebInfo
 
 before_build:
-    - scripts\appveyor_before_build.bat
+    - py -3 scripts\configure.py . build --ci-env appveyor
 
 build_script:
     - scripts\appveyor_build_script.bat
