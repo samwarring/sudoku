@@ -26,7 +26,7 @@ def main():
     all_vars = {}
     all_vars.update(get_config_vars(args.config))
     all_vars.update(get_boost_vars())
-    version_vars = get_version_vars()
+    version_vars = get_version_vars(args.ci_env)
     all_vars.update(version_vars)
     all_vars.update(get_coverage_vars(args.coverage))
     for (argname, argval) in all_vars.items():
@@ -102,9 +102,9 @@ def get_coverage_vars(is_coverage_enabled):
     }
 
 
-def get_version_vars():
+def get_version_vars(ci_env):
     # Get VERSION and VERSION_DESC
-    git_desc = check_output('git describe --tags --always --long')
+    git_desc = check_output(['git', 'describe', '--tags', '--always', '--long'])
     version = re.match(r'[0-9]+\.[0-9]+\.[0-9]+', git_desc[1:])
     if version:
         version = version.group(0)
@@ -112,17 +112,23 @@ def get_version_vars():
         raise RuntimeError('Failed to parse version X.Y.Z from `git describe` output')
 
     # Get COMMIT_DATE
-    git_commit_date = check_output(r'git log -n1 --format=%ci')
+    git_commit_date = check_output(['git', 'log', '-n1', r'--format=%ci'])
 
     # Get BUILD_DATE
     build_date = datetime.datetime.utcnow().strftime(r'%Y-%m-%d %H:%M:%S')
 
     # Get BRANCH
-    git_branch_output = check_output('git branch')
-    git_branch = [line for line in git_branch_output.splitlines() if line.startswith('*')]
-    if len(git_branch) != 1:
-        raise RuntimeError('Failed to parse current branch')
-    git_branch = git_branch[0][2:]
+    if ci_env == 'appveyor':
+        git_branch = os.getenv('APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH') or os.getenv('APPVEYOR_REPO_BRANCH')
+    elif ci_env == 'travis':
+        git_branch = os.getenv('TRAVIS_PULL_REQUEST_BRANCH') or os.getenv('TRAVIS_BRANCH')
+    else:
+        # Read from 'git branch'
+        git_branch_output = check_output(['git', 'branch'])
+        git_branch = [line for line in git_branch_output.splitlines() if line.startswith('*')]
+        if len(git_branch) != 1:
+            raise RuntimeError('Failed to parse current branch')
+        git_branch = git_branch[0][2:]
 
     # Return collected vars
     return {
