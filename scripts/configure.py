@@ -39,6 +39,7 @@ def main():
 
     # Configure with CMake
     print_cmd(cmd)
+    sys.stdout.flush()
     subprocess.check_call(cmd)
 
     # No errors
