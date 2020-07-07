@@ -74,6 +74,16 @@ int handleOptions(const ProgramOptions& options)
         return 0;
     }
 
+    // Print --version if necessary
+    if (options.isVersion()) {
+        std::cout << "sudoku library version: " << sudoku::version::getVersion() << '\n'
+                  << "   version description: " << sudoku::version::getDescription() << '\n'
+                  << "                branch: " << sudoku::version::getBranch() << '\n'
+                  << "           commit date: " << sudoku::version::getCommitDate() << '\n'
+                  << "            build date: " << sudoku::version::getBuildDate() << '\n';
+        return 0;
+    }
+
     // Using inner-rectangular dimensions only
     auto innerRectangleDims = options.getInnerRectangularSize();
     sudoku::inner_rectangular::Dimensions dims(innerRectangleDims.first,

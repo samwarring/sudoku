@@ -9,6 +9,7 @@ ProgramOptions::ProgramOptions(int argc, char** argv)
 {
     description_.add_options()
         ("help,h", "Show usage and exit")
+        ("version,v", "Show version and exit")
         ("input,i", bpo::value<std::string>(), "Initial cell values")
         ("num-solutions,n", bpo::value<size_t>(), "Compute up to this many solutions")
         ("output-format,f", bpo::value<std::string>(), "Choose from `pretty` (default) or `serial`")
@@ -159,4 +160,9 @@ bool ProgramOptions::isEchoInput() const
 bool ProgramOptions::isGroupwise() const
 {
     return optionMap_.count("groupwise") == 1;
+}
+
+bool ProgramOptions::isVersion() const
+{
+    return optionMap_.count("version") == 1;
 }

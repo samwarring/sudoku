@@ -41,6 +41,8 @@ class ProgramOptions
 
         bool isGroupwise() const;
 
+        bool isVersion() const;
+
     private:
 
         boost::program_options::options_description description_;
