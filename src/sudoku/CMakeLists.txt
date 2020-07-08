@@ -37,7 +37,6 @@ target_compile_features(
 )
 
 # Using std::thread
-find_package(Threads)
 target_link_libraries(
     sudoku
     PUBLIC Threads::Threads

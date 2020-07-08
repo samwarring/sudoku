@@ -26,8 +26,7 @@ def main():
     all_vars = {}
     all_vars.update(get_config_vars(args.config))
     all_vars.update(get_boost_vars())
-    version_vars = get_version_vars(args.ci_env)
-    all_vars.update(version_vars)
+    all_vars.update(get_version_vars(args.ci_env))
     all_vars.update(get_coverage_vars(args.coverage))
     for (argname, argval) in all_vars.items():
         cmd.append('-D' + argname + '=' + argval)

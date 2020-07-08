@@ -1,5 +1,3 @@
-find_package(Boost REQUIRED program_options)
-
 add_executable(
     sudoku_cli
     sudoku_cli.cpp

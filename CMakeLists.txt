@@ -10,7 +10,18 @@ set(sudoku_BRANCH       "none"  CACHE STRING "current branch")
 set(sudoku_COMMIT_DATE  "none"  CACHE STRING "timestamp of current commit")
 set(sudoku_BUILD_DATE   "none"  CACHE STRING "timestamp of build")
 
+# Identify compilers
 project(sudoku VERSION ${sudoku_VERSION})
 enable_testing()
+
+# 1.59.0 - Added BOOST_DATA_TEST_CASE
+# 1.65.1 - Ubuntu 18.04
+find_package(Boost 1.59 REQUIRED unit_test_framework
+                                 program_options)
+
+# Find pthreads or std::thread
+find_package(Threads)
+
+# Add targets from subdirectories
 add_subdirectory(src)
 add_subdirectory(test)

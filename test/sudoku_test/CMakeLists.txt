@@ -1,5 +1,3 @@
-find_package(Boost REQUIRED unit_test_framework)
-
 add_executable(
     sudoku_test
     sudoku_test.cpp
