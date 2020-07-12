@@ -38,3 +38,11 @@ script:
 after_success:
     - scripts/travis_after_success.sh
 
+deploy:
+    provider: releases
+    file_glob: true
+    file: build/*.deb
+    on:
+        tags: true
+        branch: master
+        condition: $CONFIG = RelWithDebInfo
