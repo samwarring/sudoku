@@ -19,8 +19,9 @@ test_script:
     - scripts\appveyor_test_script.bat
 
 deploy:
-    artifact: /.*\.msi/
-    on:
+    - provider: GitHub
+      artifact: /.*\.msi/
+      on:
         branch: master
         appveyor_repo_tag: true
         configuration: RelWithDebInfo
