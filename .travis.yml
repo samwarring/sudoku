@@ -42,6 +42,7 @@ deploy:
     provider: releases
     api_key:
         - secure: "R4jvYtSpTQM0ESK2OnahPK7S3DOd7nwuyIHdbSQQ4yCaYbsz+nfOmeEs5U9HsQXTmSYgazdvUR2Ht891PptCQMNTbvn2FebzDfgx5Fo9yiHxLCX2zY9r4nC+omcOenBUuZUzPJAHy7ZyFUAxT05qLGDSMGuoiSALnI9sY46l7K4WNQFwSJxICh7rTPDlgw7XoDaDB6uT8sKMu4aCKcIAJDiCgPPHKyoeJfIVJxTw59Nvz5zT1Pg8r5IH5578reyZ3AsxR6lvfMEOd+YLi+NLTq3Jw8sA9TL6eVhf8EalDHNCkiDToZeLeDkzB2eNEUUxEWeCJFcta8+XUDpgIqFXNCFCHk4fxMh7DcvqlJS5SEpUO3puXEObhAZmiVTt25nIDjNvhQxluIGdGyi56SO6KWfTe27LC1UYyyoNDl+sdji+IGn1zLSZD9Hnq10/SaPrpXJiiNcrSQKsncln5wV8Fcgd4Nbu5QlUh7CfykqVXUctC+u5zfEPMoMdGqwld/vPd4Ml4rn9zuUOAr3KWfDFHIIgRc6Xzp55nXAP0cZa3/GXMCEgpyoinT8o0vglO/CIHImaw/5Wavwaja11TzakLHtJHjP/rf+yoQk14ZaGqyEzIFR0OwlFLHgY9a9xM3qUNSTlwwDE9hQ4cEaDcBHDarmXoZa4E92ywhGpJJeVD78="
+    skip_cleanup: true
     file_glob: true
     file: build/*.deb
     on:

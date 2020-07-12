@@ -25,7 +25,7 @@ artifacts:
 deploy:
     - provider: GitHub
       auth_token:
-        secure: gyJA963HfKdXaK+6VUGMKLY0uWx8w82Lw+igutKmZ766JtkbAdA6zT0vMY0lbaSa
+        secure: Px5yStNC2smlE7T56UFthLutvKP85tjLz0ldRDIWuXTnZU+jmISWBcivw7o2DjFQ
       artifact: msi-installer
       on:
         branch: master
