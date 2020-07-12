@@ -19,3 +19,5 @@ add_test(
     NAME sudoku_cli
     COMMAND sudoku_cli
 )
+
+install(TARGETS sudoku_cli RUNTIME DESTINATION bin)
