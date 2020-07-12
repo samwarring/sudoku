@@ -40,9 +40,12 @@ after_success:
 
 deploy:
     provider: releases
+    api_key:
+        - secure: "l8/vVJliAeIifFY9EhznHSW5xv3aaeD+zC8Bi/zcTTcg5i7K9usBSdq6QirIbMJDcwzdJ4bgLzaH7pQfos+7oaQZZtofgV0ExoV2QJjk66m0cWOqzVm0ROWh0x7OQ27NCjgVPEMn9lPNDl+mNXGRHKffL29rJ6rKSNb/Xi4+3mtqwD6h8jIy+1F7NjFgvU1gk8ZGtoK1BHuqNa49iGVDnk0E3cBDfiJl/arn4KuqIydE56e+oXO1vUFsIp/tjXxllpCkKak4dDiZprYruqeZhstlGs1werqo+Sz0X7YznZi5VY5myTeovwGr4gJEmWV0jCT0hhFL7SZ+L1uXtWBMKlMY/KUP6hFZSEt3hGV1M2hU5SaCaYmnN+h8fj6TVOW5KeO3QKoaQh2TnEbNwnjOe2sbnDSAg9PZvTKP6P21wSg8ubqlymlMse67WVglZDDlgU77BS4agBMUaNKbMvtd2bUuMvuglbd5CyXK27VnEEz4NrWA9H1UPmEssflWRreZyihzg4Q1HeFRpZQ9PelUPUVuPoxfwETJFpWI48dcusPZNmhbcIeMg74x29UKhvB9lgzducdeZWgVK69UTqsciQxe9XNywCk2aMmRk6/uwTNqeQRBqO/QZQX8juzbYpVnhBES2N86YUaMoI3T8vZNW2QhwwfFdwYbixRCPmP3Iuc="
     file_glob: true
     file: build/*.deb
     on:
         tags: true
         branch: master
         condition: $CONFIG = RelWithDebInfo
+        os: linux
