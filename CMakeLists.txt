@@ -22,6 +22,10 @@ find_package(Boost 1.59 REQUIRED unit_test_framework
 # Find pthreads or std::thread
 find_package(Threads)
 
+# Define paths to files in the root directory
+set(sudoku_LICENSE_FILE "${CMAKE_CURRENT_LIST_DIR}/LICENSE")
+
 # Add targets from subdirectories
 add_subdirectory(src)
 add_subdirectory(test)
+add_subdirectory(pkg)
