@@ -20,6 +20,8 @@ test_script:
 
 deploy:
     - provider: GitHub
+      auth_token:
+        secure: gyJA963HfKdXaK+6VUGMKLY0uWx8w82Lw+igutKmZ766JtkbAdA6zT0vMY0lbaSa
       artifact: /.*\.msi/
       on:
         branch: master
