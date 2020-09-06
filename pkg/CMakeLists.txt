@@ -17,3 +17,18 @@ install(
     EXPORT sudoku_targets
     DESTINATION ${sudoku_INSTALLDIR_SHARE}
 )
+
+# Install a sudoku-config.cmake file for downstream projects to load
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+    sudoku-config.in.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/sudoku-config.cmake
+    INSTALL_DESTINATION ${sudoku_INSTALLDIR_SHARE}
+    PATH_VARS sudoku_INSTALLDIR_SHARE
+)
+
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/sudoku-config.cmake
+    DESTINATION ${sudoku_INSTALLDIR_SHARE}
+)
