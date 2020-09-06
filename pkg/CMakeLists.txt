@@ -16,6 +16,7 @@ include(CPack)
 install(
     EXPORT sudoku_targets
     DESTINATION ${sudoku_INSTALLDIR_SHARE}
+    NAMESPACE sudoku::
 )
 
 # Install a sudoku-config.cmake file for downstream projects to load
