@@ -45,6 +45,7 @@ target_link_libraries(
 
 install(
     TARGETS sudoku
+    EXPORT sudoku_targets
     ARCHIVE DESTINATION ${sudoku_INSTALLDIR_ARCHIVE}
 )
 

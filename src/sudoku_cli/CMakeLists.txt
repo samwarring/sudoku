@@ -22,5 +22,6 @@ add_test(
 
 install(
     TARGETS sudoku_cli
+    EXPORT sudoku_targets
     RUNTIME DESTINATION ${sudoku_INSTALLDIR_RUNTIME}
 )

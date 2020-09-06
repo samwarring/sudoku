@@ -27,6 +27,7 @@ set(sudoku_LICENSE_FILE "${CMAKE_CURRENT_LIST_DIR}/LICENSE")
 
 # Installation relative directories
 set(sudoku_INSTALLDIR_ARCHIVE lib/sudoku-${PROJECT_VERSION})
+set(sudoku_INSTALLDIR_SHARE share/sudoku-${PROJECT_VERSION})
 set(sudoku_INSTALLDIR_RUNTIME bin)
 set(sudoku_INSTALLDIR_HEADERS include)
 

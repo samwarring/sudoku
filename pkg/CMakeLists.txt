@@ -11,3 +11,9 @@ set(CPACK_PACKAGE_CONTACT       "github.com/samwarring/sudoku/issues")
 set(CPACK_WIX_UPGRADE_GUID      "307B560E-6A80-402E-9CAE-C6B3B87E4D92")
 
 include(CPack)
+
+# Install a sudoku_targets.cmake file containing the imported targets
+install(
+    EXPORT sudoku_targets
+    DESTINATION ${sudoku_INSTALLDIR_SHARE}
+)
