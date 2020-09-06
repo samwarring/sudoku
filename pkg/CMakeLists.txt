@@ -28,7 +28,13 @@ configure_package_config_file(
     PATH_VARS sudoku_INSTALLDIR_SHARE
 )
 
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/sudoku-config-version.cmake
+    COMPATIBILITY SameMajorVersion
+)
+
 install(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/sudoku-config.cmake
+          ${CMAKE_CURRENT_BINARY_DIR}/sudoku-config-version.cmake
     DESTINATION ${sudoku_INSTALLDIR_SHARE}
 )
