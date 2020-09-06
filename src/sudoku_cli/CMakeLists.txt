@@ -20,4 +20,7 @@ add_test(
     COMMAND sudoku_cli
 )
 
-install(TARGETS sudoku_cli RUNTIME DESTINATION bin)
+install(
+    TARGETS sudoku_cli
+    RUNTIME DESTINATION ${sudoku_INSTALLDIR_RUNTIME}
+)

@@ -25,6 +25,11 @@ find_package(Threads)
 # Define paths to files in the root directory
 set(sudoku_LICENSE_FILE "${CMAKE_CURRENT_LIST_DIR}/LICENSE")
 
+# Installation relative directories
+set(sudoku_INSTALLDIR_ARCHIVE lib/sudoku-${PROJECT_VERSION})
+set(sudoku_INSTALLDIR_RUNTIME bin)
+set(sudoku_INSTALLDIR_HEADERS include)
+
 # Add targets from subdirectories
 add_subdirectory(src)
 add_subdirectory(test)

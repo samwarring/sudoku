@@ -26,18 +26,28 @@ add_library(
 
 target_include_directories(
     sudoku
-    PUBLIC ../../include
+    PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+           $<INSTALL_INTERFACE:include>
 )
 
 target_compile_features(
     sudoku
     PUBLIC cxx_template_template_parameters
            cxx_range_for
-	   cxx_std_14
+           cxx_std_14
 )
 
 # Using std::thread
 target_link_libraries(
     sudoku
     PUBLIC Threads::Threads
+)
+
+install(
+    TARGETS sudoku
+    ARCHIVE DESTINATION ${sudoku_INSTALLDIR_ARCHIVE}
+)
+
+install(
+    DIRECTORY "${PROJECT_SOURCE_DIR}/include/sudoku" DESTINATION ${sudoku_INSTALLDIR_HEADERS}
 )
